@@ -21,7 +21,7 @@ class Control(Node):
         self.last_error_angle=0
 
     def send_command(self):
-        center_servo=95
+        center_servo=100
         delta_servo=20
         if self.speed>150:
             self.speed=150
