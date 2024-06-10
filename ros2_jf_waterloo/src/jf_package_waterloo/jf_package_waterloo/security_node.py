@@ -60,7 +60,7 @@ class Security(Node):
     
     def detect_error(self):
         t=time.time()
-        if (t-self.time_detect_car)>1000  or self.Xcar<80:
+        if (t-self.time_detect_car)>1000  or self.Xcar<50:
             self.get_logger().info("Problem car {:.2f} {}".format(t-self.time_detect_car,self.angle))
             self.send_stop_treadmill()
         
