@@ -1,0 +1,18 @@
+{
+    "python.autoComplete.extraPaths": [
+        "/home/autobots/ros2_jf_waterloo/install/py_pubsub/lib/python3.10/site-packages",
+        "/home/autobots/ros2_jf_waterloo/install/jf_package_waterloo/lib/python3.10/site-packages",
+        "/home/autobots/megatron_ws/install/motor_speed_controller/lib/python3.10/site-packages",
+        "/home/autobots/ros2_ws/install/test_robot_controller/lib/python3.10/site-packages",
+        "/opt/ros/humble/lib/python3.10/site-packages",
+        "/opt/ros/humble/local/lib/python3.10/dist-packages"
+    ],
+    "python.analysis.extraPaths": [
+        "/home/autobots/ros2_jf_waterloo/install/py_pubsub/lib/python3.10/site-packages",
+        "/home/autobots/ros2_jf_waterloo/install/jf_package_waterloo/lib/python3.10/site-packages",
+        "/home/autobots/megatron_ws/install/motor_speed_controller/lib/python3.10/site-packages",
+        "/home/autobots/ros2_ws/install/test_robot_controller/lib/python3.10/site-packages",
+        "/opt/ros/humble/lib/python3.10/site-packages",
+        "/opt/ros/humble/local/lib/python3.10/dist-packages"
+    ]
+}

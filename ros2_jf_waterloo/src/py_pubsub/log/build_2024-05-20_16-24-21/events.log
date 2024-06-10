@@ -1,0 +1,55 @@
+[0.000000] (-) TimerEvent: {}
+[0.000188] (py_pubsub) JobQueued: {'identifier': 'py_pubsub', 'dependencies': OrderedDict()}
+[0.000221] (py_pubsub) JobStarted: {'identifier': 'py_pubsub'}
+[0.099050] (-) TimerEvent: {}
+[0.199513] (-) TimerEvent: {}
+[0.299912] (-) TimerEvent: {}
+[0.400346] (-) TimerEvent: {}
+[0.500753] (-) TimerEvent: {}
+[0.596461] (py_pubsub) Command: {'cmd': ['/usr/bin/python3', '-W', 'ignore:setup.py install is deprecated', 'setup.py', 'egg_info', '--egg-base', 'build/py_pubsub', 'build', '--build-base', '/home/jf/ros2_jf_waterloo/src/py_pubsub/build/py_pubsub/build', 'install', '--record', '/home/jf/ros2_jf_waterloo/src/py_pubsub/build/py_pubsub/install.log', '--single-version-externally-managed', 'install_data'], 'cwd': '/home/jf/ros2_jf_waterloo/src/py_pubsub', 'env': {'LESSOPEN': '| /usr/bin/lesspipe %s', 'USER': 'jf', 'XDG_SESSION_TYPE': 'x11', 'SHLVL': '1', 'LD_LIBRARY_PATH': '/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib', 'HOME': '/home/jf', 'OLDPWD': '/home/jf/ros2_jf_waterloo/src/py_pubsub/py_pubsub', 'DESKTOP_SESSION': 'ubuntu', 'ROS_PYTHON_VERSION': '3', 'GNOME_SHELL_SESSION_MODE': 'ubuntu', 'GTK_MODULES': 'gail:atk-bridge', 'SYSTEMD_EXEC_PID': '2506', 'DBUS_SESSION_BUS_ADDRESS': 'unix:path=/run/user/1000/bus', 'COLORTERM': 'truecolor', 'INFOPATH': '/usr/local/texlive/2021/texmf-dist/doc/info:', 'ROS_DISTRO': 'humble', 'GTK_IM_MODULE': 'ibus', 'LOGNAME': 'jf', '_': '/usr/bin/colcon', 'ROS_VERSION': '2', 'XDG_SESSION_CLASS': 'user', 'USERNAME': 'jf', 'TERM': 'xterm-256color', 'GNOME_DESKTOP_SESSION_ID': 'this-is-deprecated', 'ROS_LOCALHOST_ONLY': '0', 'WINDOWPATH': '2', 'PATH': '/usr/local/texlive/2021/bin/x86_64-linux:/opt/ros/humble/bin:/home/jf/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin', 'SESSION_MANAGER': 'local/jf:@/tmp/.ICE-unix/2285,unix/jf:/tmp/.ICE-unix/2285', 'XDG_MENU_PREFIX': 'gnome-', 'GNOME_TERMINAL_SCREEN': '/org/gnome/Terminal/screen/c9d8b8ef_e919_4115_9bfa_2450ba22eaa5', 'XDG_RUNTIME_DIR': '/run/user/1000', 'DISPLAY': ':1', 'LANG': 'fr_FR.UTF-8', 'XDG_CURRENT_DESKTOP': 'ubuntu:GNOME', 'XMODIFIERS': '@im=ibus', 'XDG_SESSION_DESKTOP': 'ubuntu', 'XAUTHORITY': '/run/user/1000/gdm/Xauthority', 'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:', 'GNOME_TERMINAL_SERVICE': ':1.127', 'SSH_AGENT_LAUNCHER': 'gnome-keyring', 'SSH_AUTH_SOCK': '/run/user/1000/keyring/ssh', 'AMENT_PREFIX_PATH': '/opt/ros/humble', 'SHELL': '/bin/bash', 'QT_ACCESSIBILITY': '1', 'GDMSESSION': 'ubuntu', 'LESSCLOSE': '/usr/bin/lesspipe %s %s', 'GPG_AGENT_INFO': '/run/user/1000/gnupg/S.gpg-agent:0:1', 'QT_IM_MODULE': 'ibus', 'PWD': '/home/jf/ros2_jf_waterloo/src/py_pubsub/build/py_pubsub', 'LC_ALL': 'fr_FR.UTF-8', 'XDG_CONFIG_DIRS': '/etc/xdg/xdg-ubuntu:/etc/xdg', 'XDG_DATA_DIRS': '/usr/share/ubuntu:/usr/share/gnome:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop', 'PYTHONPATH': '/home/jf/ros2_jf_waterloo/src/py_pubsub/build/py_pubsub/prefix_override:/home/jf/ros2_jf_waterloo/src/py_pubsub/install/py_pubsub/lib/python3.10/site-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages', 'COLCON': '1', 'MANPATH': '/usr/local/texlive/2021/texmf-dist/doc/man:', 'VTE_VERSION': '6800'}, 'shell': False}
+[0.600818] (-) TimerEvent: {}
+[0.701019] (-) TimerEvent: {}
+[0.753999] (py_pubsub) StdoutLine: {'line': b'running egg_info\n'}
+[0.754287] (py_pubsub) StdoutLine: {'line': b'creating build/py_pubsub/py_pubsub.egg-info\n'}
+[0.754449] (py_pubsub) StdoutLine: {'line': b'writing build/py_pubsub/py_pubsub.egg-info/PKG-INFO\n'}
+[0.754617] (py_pubsub) StdoutLine: {'line': b'writing dependency_links to build/py_pubsub/py_pubsub.egg-info/dependency_links.txt\n'}
+[0.754730] (py_pubsub) StdoutLine: {'line': b'writing entry points to build/py_pubsub/py_pubsub.egg-info/entry_points.txt\n'}
+[0.754805] (py_pubsub) StdoutLine: {'line': b'writing requirements to build/py_pubsub/py_pubsub.egg-info/requires.txt\n'}
+[0.754851] (py_pubsub) StdoutLine: {'line': b'writing top-level names to build/py_pubsub/py_pubsub.egg-info/top_level.txt\n'}
+[0.754895] (py_pubsub) StdoutLine: {'line': b"writing manifest file 'build/py_pubsub/py_pubsub.egg-info/SOURCES.txt'\n"}
+[0.755824] (py_pubsub) StdoutLine: {'line': b"reading manifest file 'build/py_pubsub/py_pubsub.egg-info/SOURCES.txt'\n"}
+[0.755931] (py_pubsub) StdoutLine: {'line': b"adding license file 'LICENSE'\n"}
+[0.756276] (py_pubsub) StdoutLine: {'line': b"writing manifest file 'build/py_pubsub/py_pubsub.egg-info/SOURCES.txt'\n"}
+[0.756377] (py_pubsub) StdoutLine: {'line': b'running build\n'}
+[0.756448] (py_pubsub) StdoutLine: {'line': b'running build_py\n'}
+[0.756531] (py_pubsub) StdoutLine: {'line': b'creating /home/jf/ros2_jf_waterloo/src/py_pubsub/build/py_pubsub/build\n'}
+[0.756582] (py_pubsub) StdoutLine: {'line': b'creating /home/jf/ros2_jf_waterloo/src/py_pubsub/build/py_pubsub/build/lib\n'}
+[0.756624] (py_pubsub) StdoutLine: {'line': b'creating /home/jf/ros2_jf_waterloo/src/py_pubsub/build/py_pubsub/build/lib/py_pubsub\n'}
+[0.756686] (py_pubsub) StdoutLine: {'line': b'copying py_pubsub/publisher_member_function.py -> /home/jf/ros2_jf_waterloo/src/py_pubsub/build/py_pubsub/build/lib/py_pubsub\n'}
+[0.756740] (py_pubsub) StdoutLine: {'line': b'copying py_pubsub/subscriber_member_function.py -> /home/jf/ros2_jf_waterloo/src/py_pubsub/build/py_pubsub/build/lib/py_pubsub\n'}
+[0.756780] (py_pubsub) StdoutLine: {'line': b'copying py_pubsub/__init__.py -> /home/jf/ros2_jf_waterloo/src/py_pubsub/build/py_pubsub/build/lib/py_pubsub\n'}
+[0.756854] (py_pubsub) StdoutLine: {'line': b'running install\n'}
+[0.757040] (py_pubsub) StdoutLine: {'line': b'running install_lib\n'}
+[0.757439] (py_pubsub) StdoutLine: {'line': b'creating /home/jf/ros2_jf_waterloo/src/py_pubsub/install/py_pubsub/lib/python3.10/site-packages/py_pubsub\n'}
+[0.757502] (py_pubsub) StdoutLine: {'line': b'copying /home/jf/ros2_jf_waterloo/src/py_pubsub/build/py_pubsub/build/lib/py_pubsub/publisher_member_function.py -> /home/jf/ros2_jf_waterloo/src/py_pubsub/install/py_pubsub/lib/python3.10/site-packages/py_pubsub\n'}
+[0.757582] (py_pubsub) StdoutLine: {'line': b'copying /home/jf/ros2_jf_waterloo/src/py_pubsub/build/py_pubsub/build/lib/py_pubsub/subscriber_member_function.py -> /home/jf/ros2_jf_waterloo/src/py_pubsub/install/py_pubsub/lib/python3.10/site-packages/py_pubsub\n'}
+[0.757663] (py_pubsub) StdoutLine: {'line': b'copying /home/jf/ros2_jf_waterloo/src/py_pubsub/build/py_pubsub/build/lib/py_pubsub/__init__.py -> /home/jf/ros2_jf_waterloo/src/py_pubsub/install/py_pubsub/lib/python3.10/site-packages/py_pubsub\n'}
+[0.758027] (py_pubsub) StdoutLine: {'line': b'byte-compiling /home/jf/ros2_jf_waterloo/src/py_pubsub/install/py_pubsub/lib/python3.10/site-packages/py_pubsub/publisher_member_function.py to publisher_member_function.cpython-310.pyc\n'}
+[0.758390] (py_pubsub) StdoutLine: {'line': b'byte-compiling /home/jf/ros2_jf_waterloo/src/py_pubsub/install/py_pubsub/lib/python3.10/site-packages/py_pubsub/subscriber_member_function.py to subscriber_member_function.cpython-310.pyc\n'}
+[0.758630] (py_pubsub) StdoutLine: {'line': b'byte-compiling /home/jf/ros2_jf_waterloo/src/py_pubsub/install/py_pubsub/lib/python3.10/site-packages/py_pubsub/__init__.py to __init__.cpython-310.pyc\n'}
+[0.758718] (py_pubsub) StdoutLine: {'line': b'running install_data\n'}
+[0.758800] (py_pubsub) StdoutLine: {'line': b'creating /home/jf/ros2_jf_waterloo/src/py_pubsub/install/py_pubsub/share/ament_index\n'}
+[0.758866] (py_pubsub) StdoutLine: {'line': b'creating /home/jf/ros2_jf_waterloo/src/py_pubsub/install/py_pubsub/share/ament_index/resource_index\n'}
+[0.758925] (py_pubsub) StdoutLine: {'line': b'creating /home/jf/ros2_jf_waterloo/src/py_pubsub/install/py_pubsub/share/ament_index/resource_index/packages\n'}
+[0.758967] (py_pubsub) StdoutLine: {'line': b'copying resource/py_pubsub -> /home/jf/ros2_jf_waterloo/src/py_pubsub/install/py_pubsub/share/ament_index/resource_index/packages\n'}
+[0.759035] (py_pubsub) StdoutLine: {'line': b'copying package.xml -> /home/jf/ros2_jf_waterloo/src/py_pubsub/install/py_pubsub/share/py_pubsub\n'}
+[0.759076] (py_pubsub) StdoutLine: {'line': b'running install_egg_info\n'}
+[0.760096] (py_pubsub) StdoutLine: {'line': b'Copying build/py_pubsub/py_pubsub.egg-info to /home/jf/ros2_jf_waterloo/src/py_pubsub/install/py_pubsub/lib/python3.10/site-packages/py_pubsub-0.0.0-py3.10.egg-info\n'}
+[0.760743] (py_pubsub) StdoutLine: {'line': b'running install_scripts\n'}
+[0.775435] (py_pubsub) StdoutLine: {'line': b'Installing listener script to /home/jf/ros2_jf_waterloo/src/py_pubsub/install/py_pubsub/lib/py_pubsub\n'}
+[0.775739] (py_pubsub) StdoutLine: {'line': b'Installing talker script to /home/jf/ros2_jf_waterloo/src/py_pubsub/install/py_pubsub/lib/py_pubsub\n'}
+[0.775877] (py_pubsub) StdoutLine: {'line': b"writing list of installed files to '/home/jf/ros2_jf_waterloo/src/py_pubsub/build/py_pubsub/install.log'\n"}
+[0.794868] (py_pubsub) CommandEnded: {'returncode': 0}
+[0.801147] (-) TimerEvent: {}
+[0.801583] (py_pubsub) JobEnded: {'identifier': 'py_pubsub', 'rc': 0}
+[0.802270] (-) EventReactorShutdown: {}
