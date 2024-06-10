@@ -24,6 +24,7 @@ class Security(Node):
         self.speed,self.angle=0,0
         self.time_detect_command=time.time()
         self.car_sub  # prevent unused variable warning
+        self.no_detected=0
         
              
     def error_sub_function(self,msg):

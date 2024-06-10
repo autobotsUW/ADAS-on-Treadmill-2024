@@ -99,7 +99,7 @@ class Control(Node):
         self.last_error_angle=error_angle
         
         
-        max_angle=min(15,abs(error_angle/5))
+        max_angle=min(10,abs(error_angle/5))
         if (self.car_angle>max_angle and self.angle<0) or (self.car_angle<-max_angle and self.angle>0):
             self.angle=0     
         # self.get_logger().info('Command calculate: speed {} angle {}'.format(self.speed,self.angle)) 

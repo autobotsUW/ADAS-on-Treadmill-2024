@@ -13,16 +13,19 @@ class Input(Node):
         self.obstacles_sub = self.create_subscription(Float32MultiArray, 'obstacles_position', self.obstacles_sub_function, 10)
         self.Xinput,self.Yinput=200,200
         self.Linput=[self.Xinput,self.Yinput]
+        self.LastInput=self.Linput
         self.Lobstacle=[]
         self.Lcar=[]
         self.send_input(self.Xinput,self.Yinput)
 
     def send_input(self,x,y):
-        msg = Float32MultiArray()
-        msg.data = [float(x),float(y)]
-        self.publisher_.publish(msg)
-        self.get_logger().info('Input {} {}'.format(self.Xinput,self.Yinput))
         self.Linput=[self.Xinput,self.Yinput]
+        if self.Linput!=self.LastInput:
+            msg = Float32MultiArray()
+            msg.data = [float(x),float(y)]
+            self.publisher_.publish(msg)
+            self.get_logger().info('Input {} {}'.format(self.Xinput,self.Yinput))
+            self.LastInput=self.Linput     
         
     def car_sub_function(self, msg):
         if len(msg.data)>0:
@@ -40,7 +43,7 @@ class Input(Node):
             self.send_input(self.Xinput,200)
             return
         i=5
-        
+
         current_distance = self.distance_car_obstacle(self.Linput)
         right_distance = self.distance_car_obstacle([self.Linput[0],self.Linput[1]-i])
         left_distance = self.distance_car_obstacle([self.Linput[0],self.Linput[1]+i])
