@@ -40,9 +40,10 @@ class Input(Node):
             self.send_input(self.Xinput,200)
             return
         i=5
+        
         current_distance = self.distance_car_obstacle(self.Linput)
-        left_distance = self.distance_car_obstacle([self.Linput[0],self.Linput[1]+i])
         right_distance = self.distance_car_obstacle([self.Linput[0],self.Linput[1]-i])
+        left_distance = self.distance_car_obstacle([self.Linput[0],self.Linput[1]+i])
         
         if current_distance>left_distance and current_distance>right_distance:
             # Keep position
@@ -55,7 +56,7 @@ class Input(Node):
                 right_distance=distance
                 i+=10
                 
-            self.Yinput=self.Lcar[1]-i
+            self.Yinput=self.Linput[1]-i
         
         elif left_distance>current_distance and left_distance>right_distance:
             # Go to the left
@@ -68,8 +69,8 @@ class Input(Node):
         
         if self.Yinput>350:
             self.Yinput=350
-        elif self.Yinput<80:
-            self.Yinput=80        
+        elif self.Yinput<100:
+            self.Yinput=100        
         self.send_input(self.Xinput,self.Yinput)  
         return
     

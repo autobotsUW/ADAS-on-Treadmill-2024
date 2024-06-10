@@ -75,6 +75,13 @@ class Control(Node):
         Ki_angle = 5e-3
         Kd_angle = 0
 
+        # Kp_speed = 0.8
+        # Ki_speed = 0.2
+        # Kd_speed = 0.1
+        # Kp_angle = 1e-2
+        # Ki_angle = 5e-4
+        # Kd_angle = 0
+
         error_speed = self.Xinput - self.Xcar
         error_angle = self.Yinput - self.Ycar
 
@@ -84,7 +91,7 @@ class Control(Node):
         
         
         # self.get_logger().info('Error speed: {:.3f}'.format(error_speed))
-        # self.get_logger().info('Error angle: {:.3f} {:.3f}'.format(error_angle,self.error_sum_angle))
+        self.get_logger().info('Error angle: {:.3f}'.format(error_angle))
         self.speed = int(Kp_speed * error_speed + Ki_speed * self.error_sum_speed + Kd_speed * (error_speed-self.last_error_speed)/delta_time)
         self.angle = int(Kp_angle * error_angle + Ki_angle * self.error_sum_angle + Kd_angle * (error_angle-self.last_error_angle)/delta_time)
 
@@ -92,20 +99,20 @@ class Control(Node):
         self.last_error_angle=error_angle
         
         
-        max_angle=10
+        max_angle=min(15,abs(error_angle/5))
         if (self.car_angle>max_angle and self.angle<0) or (self.car_angle<-max_angle and self.angle>0):
             self.angle=0     
         # self.get_logger().info('Command calculate: speed {} angle {}'.format(self.speed,self.angle)) 
             
         if self.Ycar>350:
-            self.angle=-10
-        elif self.Ycar<100:
-            self.angle=10
+            self.angle=-15
+        elif self.Ycar<110:
+            self.angle=15
         
         if self.Xcar>400:
             self.speed=0
         elif self.Xcar<125:
-            self.speed=80
+            self.speed=100
         
         # self.get_logger().info('Command calculate: speed {} angle {}'.format(self.speed,self.angle))
         

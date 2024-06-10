@@ -31,11 +31,14 @@ class Security(Node):
 
     def car_sub_function(self, msg):
         if len(msg.data)!=0:
+            self.no_detected=0
             self.Xcar,self.Ycar,self.car_angle=msg.data[:3]
             self.time_detect_car=time.time()
         else:
             self.get_logger().info("Car not detected")
-            self.send_stop_treadmill()
+            self.no_detected+=1
+            if  self.no_detected>30:
+                self.send_stop_treadmill()
             
     def command_sub_function(self,msg):
         if len(msg.data)!=0:
