@@ -114,15 +114,17 @@ class Control(Node):
 
 
         cross_track_error = self.Yinput - self.Ycar
-        k_stanley = 1.0 
+        k_stanley = 1e-1
         # Stanley controller
         heading_error = self.car_angle
-        stanley_control = heading_error + np.atan2(k_stanley * cross_track_error, self.speed)
-        self.angle = int(stanley_control * 180 / m.pi)
+        stanley_control = heading_error + m.atan2(k_stanley * cross_track_error, self.speed)* 180 / m.pi
+        self.angle = int(stanley_control)
+        # self.get_logger().info('Error angle: {} {:.3f} {:.3f}'.format(self.angle,heading_error,m.atan2(k_stanley * cross_track_error, self.speed)*180/m.pi))
+        
 
         
         
-        max_angle=10
+        max_angle=15
         if (self.car_angle>max_angle and self.angle<0) or (self.car_angle<-max_angle and self.angle>0):
             self.angle=0     
         # self.get_logger().info('Command calculate: speed {} angle {}'.format(self.speed,self.angle)) 

@@ -28,11 +28,11 @@ def generate_launch_description():
             executable='display_node',
             name='display_node',
         ),
-        Node(
-            package='rqt_graph',
-            executable='rqt_graph',
-            name='rqt_graph',
-        ),
+        # Node(
+        #     package='rqt_graph',
+        #     executable='rqt_graph',
+        #     name='rqt_graph',
+        # ),
         Node(
             package='jf_package_waterloo',
             executable='treadmill_control_node',

@@ -20,7 +20,7 @@ class Input(Node):
 
     def send_input(self,x,y):
         self.Linput=[self.Xinput,self.Yinput]
-        if self.Linput!=self.LastInput:
+        if self.Linput!=self.LastInput or self.Linput==[200,200]:
             msg = Float32MultiArray()
             msg.data = [float(x),float(y)]
             self.publisher_.publish(msg)
@@ -40,6 +40,7 @@ class Input(Node):
 
     def define_input(self):
         if len(self.Lobstacle)==0:
+            self.get_logger().info("No obstacles detected") 
             self.send_input(self.Xinput,200)
             return
         i=5
