@@ -11,24 +11,24 @@ Servo steeringServo;
 
 int speed = 0;
 int angle = 100;
+int lastAngle = 100;
 
 
 void setup() {
-  Serial.begin(9600); 
   bluetooth.begin(9600); 
 
   // Set the motor control pins as outputs
   pinMode(motorSpeedPin, OUTPUT);
 
 
-  steeringServo.attach(10);
+  steeringServo.attach(5);
 }
 
 
 void loop() {
 
   unsigned long previousTime, currentTime = 0;
-  const unsigned long interval = 2000;
+  const unsigned long interval = 500;
   
 
   // Check if there's any data available to read
@@ -74,19 +74,19 @@ void loop() {
       }
 
 
-        Serial.print("Vitesse : ");
-        Serial.println(speed);
-        Serial.print("Angles : ");
-        Serial.println(angle);
+
 
         previousTime = millis();
 
        }
 
       }
-
-    // Control the angle
-    steeringServo.write(angle);
+    if (angle != lastAngle){
+          // Control the angle
+      steeringServo.write(angle);
+      lastAngle=angle;
+      delay(15);
+    }
 
       
     }
@@ -94,15 +94,12 @@ void loop() {
     currentTime = millis();
     if (currentTime - previousTime > interval){
       speed = 0;
-      angle = 90;
+      angle = 100;
     }
                 // Control speed with PWM
          analogWrite(motorSpeedPin, speed);
 
  
-    
-
-   
 
 }
 
