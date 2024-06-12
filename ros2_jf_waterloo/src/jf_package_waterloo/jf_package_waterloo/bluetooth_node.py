@@ -16,12 +16,7 @@ class SerialCommunication(Node):
         self.speed = 0
         self.t0=time.time()
         
-        # timer_period = 0.01  # seconds
-        # self.timer = self.create_timer(timer_period, self.timer_callback)
-        # self.information_flag = 0
-        # self.bluetooth_status = False
-        
-        # Ouvrir la liaison bluetooth
+        # Open bluetooth connection
         bd_addr = '58:56:00:01:06:67'
         port = 1
         try:
@@ -30,16 +25,15 @@ class SerialCommunication(Node):
             # self.bluetooth_status = True
             self.get_logger().info("Bluetooth connection established.")
         except Exception as e:
+            # If error we stop the treadmill
             msg=String()
             msg.data='{:.2f} bluetooth connection'.format(time.time-self.t0)
             self.error_pub.publish(msg)
 
-    # def timer_callback(self):
-    #     if self.bluetooth_status and self.information_flag:
-    #         self.Send_message()
-    #         self.information_flag = 0
-
     def Send_message(self):
+        """
+        Send the message by bluetooth
+        """
         if not (0 <= self.speed <= 250):
             self.get_logger().info('Invalid speed value')
             return
@@ -55,12 +49,16 @@ class SerialCommunication(Node):
             self.sock.send(msb_bytes)
             # self.get_logger().info('Message sent: speed {} angle {}'.format(self.speed, self.angle))
         except Exception as e:
+            # If error we stop the treadmill
             self.get_logger().error("Error sending message: {}".format(e))
             msg=String()
             msg.data='{:.2f} bluetooth connection'.format(time.time-self.t0)
             self.error_pub.publish(msg)
     
     def callback_sub(self, msg):
+        """
+        Read the command give in command topic 
+        """
         self.speed = msg.data[0]
         self.angle = msg.data[1]
         # self.get_logger().info("Command receive: speed {} angle {}".format(self.speed,self.angle))

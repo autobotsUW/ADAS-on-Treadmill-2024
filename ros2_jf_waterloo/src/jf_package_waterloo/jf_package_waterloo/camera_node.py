@@ -34,29 +34,35 @@ class Camera(Node):
         self.Xinput=320
         self.Yinput=240
         self.window=False
-        self.affichage=False
+        self.display=False
         self.launch_camera()
     
-    # def input_sub_function(self, msg):
-    #     self.Xinput=int(msg.data[0])
-    #     self.Yinput=int(msg.data[1])
-    #     self.get_logger().info("New input.")
-
     def launch_camera(self):
+        """
+        Open the camera, find the position of car, and the obstacles and send to topic car_position and obstacles_position
+        """
+        # Parameter of camera 640*480 and 30 FPS
         cap = cv2.VideoCapture(0)
         cap.set(cv2.CAP_PROP_FRAME_WIDTH,640)
         cap.set(cv2.CAP_PROP_FRAME_HEIGHT,480)
         cap.set(cv2.CAP_PROP_FPS,30)
+
+
         while True:
-            Lcenter=[]
+            # read a picture from the camera
             ret,frame=cap.read()
+        
             if not ret:
+                # If problem with the camera we stop the treadmill
                 self.get_logger().info("Can't receive frame (stream end?).")
                 msg=String()
                 msg.data='camera connection'
                 self.error_pub.publish(msg)
             else:
+                # Search cars and obstacles
                 treadmill,car,obstacles=self.find_the_car(frame[40:453,:])
+
+                # Send the informations of cars [x,y,angle,height,width]
                 if len(car)>1:
                     msg=Float32MultiArray()
                     car[2]=car[2]-treadmill[2]
@@ -64,11 +70,13 @@ class Camera(Node):
                     self.publisher_car.publish(msg)
                     # self.get_logger().info("Car detected in {} angle:{:.1f}".format(car[0:2],car[2]))
                 else:
+                    # If no car
                     msg=Float32MultiArray()
                     msg.data = []
                     self.publisher_car.publish(msg)
                     # self.get_logger().info("Car not detected")
                 
+                # Send the informations of obstacles [x,y,radius]
                 if len(obstacles)>0:
                     msg=Float32MultiArray()
                     L=[]
@@ -83,6 +91,7 @@ class Camera(Node):
                     self.publisher_obstacles.publish(msg)
                     # self.get_logger().info("Obstacles detected in {}".format(L))
                 else:
+                    # If no obtsacle
                     msg=Float32MultiArray()
                     msg.data = []
                     self.publisher_obstacles.publish(msg)
@@ -96,10 +105,16 @@ class Camera(Node):
         cv2.destroyAllWindows()
 
     def initialize_window(self,title="Image"):
+        """
+        Initializes a display
+        """
         self.window=True
         cv2.namedWindow(title)
         
     def show_image(self,img, title="Image"):
+        """
+        Display the camera picture after image processing
+        """
         if not self.window:
             self.initialize_window(title)
         cv2.circle(img, (self.Xinput,self.Yinput), 5, (0, 0, 255), -1)
@@ -107,6 +122,11 @@ class Camera(Node):
         cv2.waitKey(1)
 
     def find_the_car(self,img):
+        """
+        Search car and obstacles in the image
+        Input: image with a good size
+        Output: information of tradmill, cars and obstacles 
+        """
         # Crop and resize the image
         color_img = cv2.resize(img[:, :], (640, 480))
 
@@ -135,8 +155,8 @@ class Camera(Node):
                 
                 width,height=rect[1]
                 if width>200 and height>200:
-                    
-                    if self.affichage:
+                    # This is the treadmill
+                    if self.display:
                         cv2.drawContours(color_img, [box], 0, (255, 0, 0), 3)
                     # Calculate the center of the rectangle
                     center = (int(640-rect[0][0]), int(rect[0][1]))
@@ -144,23 +164,17 @@ class Camera(Node):
                     if height<width:
                         angle+=90
                     treadmill=list(center)+[angle]
-                    
-                    # cv2.arrowedLine(color_img, center, [center[0]+50,center[1]], (0,0,0), 2)
-                    # cv2.arrowedLine(color_img, center, [center[0],center[1]+50], (0,0,0), 2)
-                    
-                    
-                    # cv2.putText(color_img, 'x', [center[0]+40,center[1]+20], cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0,0,0), 2)
-                    # cv2.putText(color_img, 'y', [center[0]+5,center[1]+50], cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0,0,0), 2)
                 
                 elif 0.8<width/height<1.2 and 800<area<2800:
-                    # cv2.drawContours(color_img, [box], 0, (0, 0, 255), 3)
+                    # This is an obstacle
                     # Calculate the center of the rectangle
                     center = (int(640-rect[0][0]), int(rect[0][1]))
                     radius=int(max(width,height)/2)+1
-                    if self.affichage:
+                    if self.display:
                         cv2.circle(color_img, center, radius, (0, 0, 255), 3)
                     Lobstacle.append(list(center)+[radius])
                 elif area>3000:
+                    # This is a car
                     # Calculate the center of the rectangle
                     center = (int(640-rect[0][0]), int(rect[0][1]))
                     
@@ -173,7 +187,8 @@ class Camera(Node):
                         car=list(center)+[angle,height,width]
                     # print("Angle: {:.2f} degrees".format(angle))
                     
-                    if self.affichage:
+                    if self.display:
+                        # Display
                         # Draw the rotated rectangle on the color image
                         cv2.drawContours(color_img, [box], 0, (0, 255, 0), 3)
                         
@@ -195,7 +210,7 @@ class Camera(Node):
                         cv2.line(color_img, (x_start, y_start), (x_end, y_end), (255, 0, 0), 2)   
 
         # Display the image with rectangles, center points, and orthogonal lines
-        if self.affichage:
+        if self.display:
             self.show_image(color_img, "Rotated Rectangles, Center Points, and Orthogonal Lines")
         #  cv2.imwrite("output.jpg", color_img)
         end_time = time.time()
@@ -205,14 +220,8 @@ class Camera(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-
     minimal_publisher = Camera()
-
     rclpy.spin(minimal_publisher)
-
-    # Destroy the node explicitly
-    # (optional - otherwise it will be done automatically
-    # when the garbage collector destroys the node object)
     minimal_publisher.destroy_node()
     rclpy.shutdown()
 

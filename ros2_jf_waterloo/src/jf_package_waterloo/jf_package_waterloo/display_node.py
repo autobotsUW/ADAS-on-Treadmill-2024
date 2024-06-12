@@ -34,15 +34,27 @@ class Display(Node):
         self.timer = self.create_timer(timer_period, self.timer_callback)
  
     def timer_callback(self):
+        """
+        Update display
+        """
         self.update_display()
     
     def command_sub_function(self, msg):
+        """
+        Read command
+        """
         self.command = msg.data
 
     def car_sub_function(self, msg):
+        """
+        Read car_position topic
+        """
         self.Lcar = msg.data
 
     def obstacles_sub_function(self, msg):
+        """
+        Read obstacles_position topic
+        """
         self.Lobstacle = msg.data
 
     def input_sub_function(self, msg):

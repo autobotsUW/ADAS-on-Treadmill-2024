@@ -32,7 +32,6 @@ class Control(Node):
             self.speed=150
         elif self.speed<0:
             self.speed=0
-            # self.angle=0
         
         # self.get_logger().info('Send calculate: speed {} angle {}'.format(self.speed,self.angle)) 
         self.angle+=center_servo
@@ -55,10 +54,6 @@ class Control(Node):
             self.Xcar=msg.data[0]
             self.Ycar=msg.data[1]
             self.car_angle=msg.data[2]
-            # self.get_logger().info('Input position x: {}'.format(self.Xcar))
-            # self.get_logger().info('Input position y: {}'.format(self.Ycar))
-            # self.get_logger().info('Input position angle: {}'.format(self.car_angle))
-            
             self.calculate_command()
             self.send_command()
         else:
@@ -71,8 +66,6 @@ class Control(Node):
         """
         self.Xinput=msg.data[0]
         self.Yinput=msg.data[1]
-        # self.get_logger().info('Input position x: {}'.format(self.Xinput))
-        # self.get_logger().info('Input position y: {}'.format(self.Yinput))
 
     def calculate_command(self):
         """
@@ -117,16 +110,13 @@ class Control(Node):
         k_stanley = 1e-1
         heading_error = self.car_angle
         self.angle=int(heading_error + m.atan2(k_stanley * cross_track_error, self.speed)* 180 / m.pi)
-        # self.get_logger().info('Error angle: {} {:.3f} {:.3f}'.format(self.angle,heading_error,m.atan2(k_stanley * cross_track_error, self.speed)*180/m.pi))
         
-
-        
-        
+        # angle saturation: the car cannot be at too great an angle to the axis of the treadmill
         max_angle=15
         if (self.car_angle>max_angle and self.angle<0) or (self.car_angle<-max_angle and self.angle>0):
             self.angle=0     
-        # self.get_logger().info('Command calculate: speed {} angle {}'.format(self.speed,self.angle)) 
             
+        # managing the car that goes to the edge of the treadmill
         if self.Ycar>350:
             self.angle=-15
         elif self.Ycar<110:
