@@ -73,6 +73,6 @@ To allow communication between these nodes, several topics are used:
 - **Description**: Commands for the treadmill.
 
 ## Launch files:
-- **ADAS_on_treadmill_launch**: The car go to the position that you define.
+- **ADAS_on_treadmill_launch**: the car go to the position that you define.
 - **ADAS_on_treadmill_launch_with_obstacles**: the car avoid obstacles.
 
