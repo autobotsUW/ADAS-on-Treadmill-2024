@@ -97,20 +97,20 @@ class Control(Node):
         # Kd_angle = 0
 
         error_speed = self.Xinput - self.Xcar
-        # error_angle = self.Yinput - self.Ycar
+        error_angle = self.Yinput - self.Ycar
 
         if self.Xcar<300:
             self.error_sum_speed += error_speed * delta_time
-            # self.error_sum_angle += error_angle * delta_time
+            self.error_sum_angle += error_angle * delta_time
         
         
         # self.get_logger().info('Error speed: {:.3f}'.format(error_speed))
         # self.get_logger().info('Error angle: {:.3f}'.format(error_angle))
         self.speed = int(Kp_speed * error_speed + Ki_speed * self.error_sum_speed + Kd_speed * (error_speed-self.last_error_speed)/delta_time)
-        # self.angle = int(Kp_angle * error_angle + Ki_angle * self.error_sum_angle + Kd_angle * (error_angle-self.last_error_angle)/delta_time)
+        self.angle = int(Kp_angle * error_angle + Ki_angle * self.error_sum_angle + Kd_angle * (error_angle-self.last_error_angle)/delta_time)
 
         self.last_error_speed=error_speed
-        # self.last_error_angle=error_angle
+        self.last_error_angle=error_angle
 
 
         cross_track_error = self.Yinput - self.Ycar
