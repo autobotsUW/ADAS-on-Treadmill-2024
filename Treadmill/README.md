@@ -7,23 +7,23 @@ The second, which indicates "PXXX", where XXX is a number, corresponds to the va
 The third corresponds to the value you wish to associate with the parameter selected in the previous mode.
 
 ## Local use:
-For local use, certain parameters must be selected:
-P100 = 0
-P101 = 3
-P110 = 0
-P131 = "speed between 0 and 600 Hz".
+For local use, certain parameters must be selected:  
+P100 = 0  
+P101 = 3  
+P110 = 0  
+P131 = "speed between 0 and 600 Hz".  
 To start the treadmill, go to the first mode and press the green button.
 To change speed, modify the value associated with P131.
 
 ## Network operation:
-For use via the network, with an Ethernet connection, certain parameters must be selected:
-P100 = 3
-P101 = 6
-P121 = 9
-P140 = 14
-P142 = 14
-P400 = 5
-P410-P413 = "Modification of IP address".
+For use via the network, with an Ethernet connection, certain parameters must be selected:  
+P100 = 3  
+P101 = 6  
+P121 = 9  
+P140 = 14  
+P142 = 14  
+P400 = 5  
+P410-P413 = "Modification of IP address".  
 Once these parameters have been set, you need to configure the computer to be on the same local network, e.g. 192.168.124.16.
 Connecting to the IP address from a browser, an interface opens, allowing us to modify the parameters.
 To start the treadmill, set parameter P65 to 0, to stop the tepis, or 97, to start it.
