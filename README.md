@@ -3,7 +3,7 @@
 
 We use ROS2 Humble with ubuntu 22.04
 
-Oh to launch the system:
+Oh to launch car controller:
 ```
 cd ros2_jf_waterloo
 source install/setup.bash
@@ -11,6 +11,8 @@ colcon build
 cd launch
 ros2 launch <launch_file>
 ```
+
+To launch the treadmill: use treadmill_control.py with a good configuration.
 
 # Package
 
