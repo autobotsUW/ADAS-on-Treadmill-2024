@@ -14,12 +14,18 @@ class Input(Node):
         self.create_root()
 
     def send_input(self,x,y):
+        """
+        Send the input to input_position topic
+        """
         msg = Float32MultiArray()
         msg.data = [float(x),float(y)]
         self.publisher_.publish(msg)
         self.get_logger().info('Publishing: "%s"' % msg.data)
 
     def create_root(self):
+        """
+        create the window to give input_position
+        """
         root = Tk()
         root.title("ADAS on Treadmill : Input")
         root.option_add("*Font", "Arial 16")

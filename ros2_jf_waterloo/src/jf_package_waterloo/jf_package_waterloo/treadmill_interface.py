@@ -19,6 +19,9 @@ class Treadmill(Node):
         
 
     def send_to_treadmill(self,parameter, value):
+        """
+        Send the parameter to the treadmill with Selenium
+        """
         # Set Chrome options for headless mode
         chrome_options = Options()
         chrome_options.add_argument('--headless')  # Run Chrome in headless mode
@@ -51,12 +54,18 @@ class Treadmill(Node):
             driver.quit()
 
     def update_speed(self,val):
+        """
+        Update speed value
+        """
         self.send_to_treadmill(61, val)
         self.label_speed.config(text="Speed : {:.2f} m/s".format(int(val)*0.00541))
         if int(val)==0:
             self.send_to_treadmill(65,0)
 
     def create_window(self):
+        """
+        Display to command treadmill
+        """
         global root
         root = tk.Tk()
         root.title("ADAS on Treadmill : Control the treadmill")

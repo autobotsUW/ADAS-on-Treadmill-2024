@@ -28,9 +28,15 @@ class Security(Node):
         
              
     def error_sub_function(self,msg):
+        """
+        Read error node. This topic stop the treadmill
+        """
         self.send_stop_treadmill()
 
     def car_sub_function(self, msg):
+        """
+        Read the position of the car
+        """
         if len(msg.data)!=0:
             self.no_detected=0
             self.Xcar,self.Ycar,self.car_angle=msg.data[:3]
@@ -42,6 +48,9 @@ class Security(Node):
                 self.send_stop_treadmill()
             
     def command_sub_function(self,msg):
+        """
+        Read the command of the car
+        """
         if len(msg.data)!=0:
             self.speed,self.angle=msg.data[:2]
             self.time_detect_command=time.time()
@@ -50,21 +59,31 @@ class Security(Node):
             self.send_stop_treadmill()
         
     def send_stop_treadmill(self):
+        """
+        Send stop at the treadmill
+        """
         msg=String()
         msg.data='STOP'
         self.publisher_treadmill.publish(msg)
         
     def send_start_treadmill(self):
+        """
+        Send start at the treadmill
+        """
         msg=String()
         msg.data='START'
         self.publisher_treadmill.publish(msg)
     
     def detect_error(self):
+        """
+        Error detection
+        """
         t=time.time()
+        # Car problems
         if (t-self.time_detect_car)>1000  or self.Xcar<50:
             self.get_logger().info("Problem car {:.2f} {}".format(t-self.time_detect_car,self.angle))
             self.send_stop_treadmill()
-        
+        # Command problems
         if (t-self.time_detect_command)>1000:
             self.get_logger().info("Problem command {:.2f}".format(t-self.time_detect_command))
             self.send_stop_treadmill()

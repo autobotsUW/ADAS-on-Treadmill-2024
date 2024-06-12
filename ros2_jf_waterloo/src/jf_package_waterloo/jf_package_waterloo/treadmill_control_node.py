@@ -19,6 +19,9 @@ class Treadmill(Node):
         self.subscription  # prevent unused variable warning
         
     def treadmill_sub_function(self,msg):
+        """
+        Read informations in the treadmill topic
+        """
         # self.get_logger().info("Treadmill sub function.\n")
         if msg.data=='STOP':
             self.send_to_treadmill(65,0)
@@ -27,6 +30,9 @@ class Treadmill(Node):
             self.send_to_treadmill(65,97)
 
     def send_to_treadmill(self,parameter, value):
+        """
+        Send the parameter to the treadmill with Selenium
+        """
         # Set Chrome options for headless mode
         chrome_options = Options()
         chrome_options.add_argument('--headless')  # Run Chrome in headless mode

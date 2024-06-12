@@ -19,6 +19,9 @@ class Input(Node):
         self.send_input(self.Xinput,self.Yinput)
 
     def send_input(self,x,y):
+        """
+        Send input position to input_position topic
+        """
         self.Linput=[self.Xinput,self.Yinput]
         if self.Linput!=self.LastInput or self.Linput==[200,200]:
             msg = Float32MultiArray()
@@ -28,17 +31,26 @@ class Input(Node):
             self.LastInput=self.Linput     
         
     def car_sub_function(self, msg):
+        """
+        Read car position
+        """
         if len(msg.data)>0:
             self.Lcar = msg.data
             self.car_position=msg.data[:2]
             self.define_input()
 
     def obstacles_sub_function(self, msg):
+        """
+        Read obstacles positions
+        """
         self.Lobstacle=[]
         for i in range(0, len(msg.data), 3):
             self.Lobstacle.append(msg.data[i:i+4])
 
     def define_input(self):
+        """
+        Calculate new input for the car with space invaders methods
+        """
         if len(self.Lobstacle)==0:
             self.get_logger().info("No obstacles detected") 
             self.send_input(self.Xinput,200)
@@ -79,6 +91,9 @@ class Input(Node):
         return
     
     def distance_car_obstacle(self,car):
+        """
+        Calculate distance between the car and the obstacles
+        """
         distance=0
         for obstacle in self.Lobstacle:
             if obstacle[0]>self.Lcar[0]:

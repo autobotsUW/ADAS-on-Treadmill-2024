@@ -58,20 +58,29 @@ class Display(Node):
         self.Lobstacle = msg.data
 
     def input_sub_function(self, msg):
+        """
+        Read the input position
+        """
         self.input = msg.data
     
     def update_display(self):
+        """
+        Update the display 
+        """
         # self.get_logger().info('I am updating the display')
+        # Remove last plot
         for object in self.Lobject:
             object.remove()
         self.Lobject = []
 
-        # Tracer la voiture
+        # Plot car
         for i in range(0, len(self.Lcar), 5):
+            # Plot center of the car
             car_center= patches.Circle((self.Lcar[0], self.Lcar[1]), 2, edgecolor='green', facecolor='green',linewidth=5)
             self.ax.add_patch(car_center)
             self.Lobject.append(car_center)
             
+            # Plot the rectnagle of the car
             x_center, y_center, angle, width, height = self.Lcar[i:i+5]
             print(width,height,x_center,y_center,angle)
             angle_rad=-angle*np.pi/180
@@ -83,23 +92,26 @@ class Display(Node):
             self.ax.add_patch(car)
             self.Lobject.append(car)
 
-        # Tracer les obstacles
+        # Plot obstacles
         for i in range(0, len(self.Lobstacle), 3):
             obstacle = patches.Circle((self.Lobstacle[i], self.Lobstacle[i+1]), self.Lobstacle[i+2], edgecolor='red', facecolor='red')
             self.ax.add_patch(obstacle)
             self.Lobject.append(obstacle)
         
-        # Tracer les points d'entrée
+        # Plot input
         input= patches.Circle((self.input[0], self.input[1]), 2, edgecolor='black', facecolor='black',linewidth=2)
         self.ax.add_patch(input)
         self.Lobject.append(input)
 
-        # Redessiner la figure
+        # update figure
         self.fig.canvas.draw()
         plt.pause(0.005)
         # self.get_logger().info(str(self.Lobject))
     
     def init_display(self):
+        """
+        Initialise display 
+        """
         self.get_logger().info('I am initializing the display')
         self.fig, self.ax = plt.subplots()
         self.ax.set_xlim(0, 640)
