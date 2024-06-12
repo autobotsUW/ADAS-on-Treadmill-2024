@@ -24,7 +24,7 @@ P140 = 14
 P142 = 14  
 P400 = 5  
 P410-P413 = "Modification of IP address".  
-Once these parameters have been set, you need to configure the computer to be on the same local network, e.g. 192.168.124.16.
-Connecting to the IP address from a browser, an interface opens, allowing us to modify the parameters.
-To start the treadmill, set parameter P65 to 0, to stop the tepis, or 97, to start it.
+Once these parameters have been set, you need to configure the computer to be on the same local network, e.g. 192.168.124.16.  
+Connecting from a browser to the IP address, an interface opens, allowing us to modify the parameters.  
+To start the treadmill, set P65 to 97, and 0 to stop it.  
 To adjust speed, set parameter P61 to between 0 and 600.
