@@ -1,3 +1,5 @@
+# Treadmill
+
 The treadmill is controlled by a Lenze SMVector. It can be controlled locally by the keypad or via an ethernet network connection.
 
 ## Parameter modification:
