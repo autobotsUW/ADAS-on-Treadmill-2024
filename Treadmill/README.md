@@ -1,10 +1,10 @@
 The treadmill is controlled by a Lenze SMVector. It can be controlled locally by the keypad or via an ethernet network connection.
 
 ## Parameter modification:
-The display has three modes, and the "M" button is used to switch between them. 
-The first mode, which indicates "stop" when the belt is at a standstill, gives information on the belt's status.
-The second, which indicates "PXXX", where XXX is a number, corresponds to the value of the parameter being modified. There are many parameters, so please refer to the controller datasheet to find out what they are used for. 
-The third corresponds to the value you wish to associate with the parameter selected in the previous mode.
+The display has three modes, and the "M" button is used to switch between them.   
+The first mode, which indicates "stop" when the belt is at a standstill, gives information on the belt's status.  
+The second, which indicates "PXXX", where XXX is a number, corresponds to the value of the parameter being modified. There are many parameters, so please refer to the controller datasheet to find out what they are used for.   
+The third corresponds to the value you wish to associate with the parameter selected in the previous mode.  
 
 ## Local use:
 For local use, certain parameters must be selected:  
