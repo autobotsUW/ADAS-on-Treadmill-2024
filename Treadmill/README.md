@@ -28,3 +28,8 @@ Once these parameters have been set, you need to configure the computer to be on
 Connecting from a browser to the IP address, an interface opens, allowing us to modify the parameters.  
 To start the treadmill, set P65 to 97, and 0 to stop it.  
 To adjust speed, set parameter P61 to between 0 and 600.
+
+## Programm:
+The programm create a tkinter windows to control in speed the treadmill. 
+It use Selinum to connect at the pages, to complet the form and send the value.
+Speed is modify by a frequency (if you want 12.3Hz you send 123 at parameter 61).
