@@ -1,7 +1,7 @@
 # ADAS-on-Treadmill-2024
 
 
-Oh to launch the system:
+How to launch the system:
 
 cd ros2_jf_waterloo
 
