@@ -15,13 +15,13 @@ int lastAngle = 100;
 
 
 void setup() {
-  bluetooth.begin(9600); 
-
+  bluetooth.begin(9600);
+  Serial.begin(9600);
   // Set the motor control pins as outputs
   pinMode(motorSpeedPin, OUTPUT);
 
 
-  steeringServo.attach(5);
+  steeringServo.attach(11);
 }
 
 
