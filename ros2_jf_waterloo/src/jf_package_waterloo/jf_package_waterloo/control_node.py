@@ -112,13 +112,11 @@ class Control(Node):
         self.last_error_speed=error_speed
         self.last_error_angle=error_angle
 
-
+         # Stanley controller
         cross_track_error = self.Yinput - self.Ycar
         k_stanley = 1e-1
-        # Stanley controller
         heading_error = self.car_angle
-        stanley_control = heading_error + m.atan2(k_stanley * cross_track_error, self.speed)* 180 / m.pi
-        self.angle = int(stanley_control)
+        self.angle=int(heading_error + m.atan2(k_stanley * cross_track_error, self.speed)* 180 / m.pi)
         # self.get_logger().info('Error angle: {} {:.3f} {:.3f}'.format(self.angle,heading_error,m.atan2(k_stanley * cross_track_error, self.speed)*180/m.pi))
         
 
