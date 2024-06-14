@@ -67,17 +67,20 @@ def find_the_car(img):
       r2 = H[:, 1]
       # Calculer l'angle de rotation
       angle_radians = np.arctan2(r2[1], r2[0])
-      angle_degrees = np.degrees(angle_radians)
-      car+=[tag.tag_id]+list(tag.center)+[angle_degrees]
-      cv2.circle(color_img, tag.center, 5, (0, 0, 255), -1)
+      angle_degrees = np.degrees(angle_radians)+180
+      car+=[tag.tag_id]+[int(640-tag.center[0])]+[int(tag.center[1])]+[int(angle_degrees)]
+      cv2.circle(color_img, [int(tag.center[0]),int(tag.center[1])], 5, (0, 0, 255), -1)
+      
+      for corner in tag.corners:
+         cv2.circle(color_img, [int(corner[0]),int(corner[1])], 5, (0, 0, 255), -1)
       line_length = 100  # You can adjust this value
 
       # Calculate the end points of the orthogonal line
       orthogonal_angle_rad = np.deg2rad(angle_degrees)  # Adjust by 90 degrees
-      x_end = int(center[0] + line_length * np.cos(orthogonal_angle_rad))
-      y_end = int(center[1] + line_length * np.sin(orthogonal_angle_rad))
-      x_start = int(center[0] - line_length * np.cos(orthogonal_angle_rad))
-      y_start = int(center[1] - line_length * np.sin(orthogonal_angle_rad))
+      x_end = int(tag.center[0] + line_length * np.cos(orthogonal_angle_rad))
+      y_end = int(tag.center[1] + line_length * np.sin(orthogonal_angle_rad))
+      x_start = int(tag.center[0])
+      y_start = int(tag.center[1])
 
       # Draw the orthogonal line through the center with the calculated angle
       cv2.line(color_img, (x_start, y_start), (x_end, y_end), (255, 0, 0), 2)    
@@ -90,7 +93,6 @@ def find_the_car(img):
    # Find contours in the binary image
    contours, hierarchy = cv2.findContours(binary_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
-   car = []
    treadmill=[]
    Lobstacle=[]
    for cnt in contours:
@@ -102,39 +104,48 @@ def find_the_car(img):
          box = np.int0(box)
          
          width,height=rect[1]
-         # print(width,height,width/height)
-         # print(area)
-         if width>200 and height>200:
-            cv2.drawContours(color_img, [box], 0, (255, 0, 0), 3)
-            # Calculate the center of the rectangle
-            center = (int(rect[0][0]), int(rect[0][1]))
-            angle = rect[2]
-            if height<width:
-               angle+=90
-            treadmill=list(center)+[angle]
-            
-            # cv2.arrowedLine(color_img, center, [center[0]+50,center[1]], (0,0,0), 2)
-            # cv2.arrowedLine(color_img, center, [center[0],center[1]+50], (0,0,0), 2)
-            
-            
-            # cv2.putText(color_img, 'x', [center[0]+40,center[1]+20], cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0,0,0), 2)
-            # cv2.putText(color_img, 'y', [center[0]+5,center[1]+50], cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0,0,0), 2)
-            
-         elif 0.7<width/height<1.3 and 800<area<2800:
-            
+           
+         if 0.7<width/height<1.3 and 1000<area<2800:
+            print(area)
             # cv2.drawContours(color_img, [box], 0, (0, 0, 255), 3)
             # Calculate the center of the rectangle
             center = (int(rect[0][0]), int(rect[0][1]))
             radius=int(max(width,height)/2)+1
             cv2.circle(color_img, center, radius, (0, 0, 255), 3)
             Lobstacle.append(list(center)+[radius])
+         
+         elif 5000>area>3000:
+               # Draw the rotated rectangle on the color image
+               cv2.drawContours(color_img, [box], 0, (0, 255, 0), 3)                        
+
+               # Calculate the center of the rectangle
+               center = (int(rect[0][0]), int(rect[0][1]))
+
+               # Get the angle of the rectangle
+               angle = rect[2]
+               if height<width:
+                  angle+=90
+               
+               # Calculate the length of the line to draw
+               line_length = 100  # You can adjust this value
+
+               # Calculate the end points of the orthogonal line
+               orthogonal_angle_rad = np.deg2rad(angle+90)  # Adjust by 90 degrees
+               x_end = int(center[0] + line_length * np.cos(orthogonal_angle_rad))
+               y_end = int(center[1] + line_length * np.sin(orthogonal_angle_rad))
+               x_start = int(center[0])
+               y_start = int(center[1])
+
+               # Draw the orthogonal line through the center with the calculated angle
+               cv2.line(color_img, (x_start, y_start), (x_end, y_end), (0, 0, 255), 2)    
+
             
    # Display the image with rectangles, center points, and orthogonal lines
    show_image(color_img, "Rotated Rectangles, Center Points, and Orthogonal Lines")
    #  cv2.imwrite("output.jpg", color_img)
    end_time = time.time()
    processing_time = end_time - start_time
-   #  print("Processing time: {:.6f} seconds".format(processing_time))
+   print("Processing time: {:.6f} seconds".format(processing_time))
    return treadmill, car,Lobstacle
 fichier=open('violet.txt','w')
 fichier.close()
@@ -152,11 +163,11 @@ while True:
    
    if not ret:
       break
-   find_the_car(frame[30:450,:])
+   print(find_the_car(frame[30:450,:]))
       
    if cv2.waitKey(1) & 0xFF == ord('q'):
       break
-   break
+
    end_time = time.time()
    processing_time = end_time - start_time
    # print("End time: {:.6f} seconds".format(processing_time))
