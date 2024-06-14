@@ -88,7 +88,7 @@ def find_the_car(img):
 
    # Apply a threshold to get a binary image
    ret, binary_img = cv2.threshold(gray_img, 50, 255, cv2.THRESH_BINARY)
-   cv2.imwrite("binaire.jpg", binary_img)
+   # cv2.imwrite("binaire.jpg", binary_img)
 
    # Find contours in the binary image
    contours, hierarchy = cv2.findContours(binary_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -159,7 +159,7 @@ i=0
 while True:
    start_time=time.time()
    ret, frame = cap.read()
-   cv2.imwrite("output.png", frame)
+   # cv2.imwrite("output.png", frame)
    
    if not ret:
       break
