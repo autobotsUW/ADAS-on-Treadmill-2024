@@ -1,6 +1,6 @@
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import String,Float32MultiArray
+from std_msgs.msg import String,Float32MultiArray,Int32MultiArray
 from tkinter import * 
 
 class Input(Node):
@@ -8,7 +8,7 @@ class Input(Node):
     def __init__(self):
         super().__init__('input_node')
         self.get_logger().info("Input Node started.\n")
-        self.publisher_ = self.create_publisher(Float32MultiArray, 'input_position', 10)
+        self.publisher_ = self.create_publisher(Int32MultiArray, 'input_position', 10)
         self.Xinput,self.Yinput=320,200
         self.send_input(self.Xinput,self.Yinput)
         self.create_root()
@@ -17,8 +17,8 @@ class Input(Node):
         """
         Send the input to input_position topic
         """
-        msg = Float32MultiArray()
-        msg.data = [float(x),float(y)]
+        msg = Int32MultiArray()
+        msg.data = [int(x),int(y)]
         self.publisher_.publish(msg)
         self.get_logger().info('Publishing: "%s"' % msg.data)
 

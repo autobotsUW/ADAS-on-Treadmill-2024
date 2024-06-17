@@ -45,10 +45,8 @@ def show_image(img, title="Image"):
     cv2.waitKey(1)
 
 # Function to find the car in the image
-def find_the_car(img):
-   # Crop and resize the image
-   color_img = cv2.resize(img[:, :], (640, 480))
-
+def find_the_car(color_img):
+   L=np.shape(color_img)[1]
    # Convert to grayscale
    gray_img = cv2.cvtColor(color_img, cv2.COLOR_BGR2GRAY)
 
@@ -69,7 +67,7 @@ def find_the_car(img):
    #    angle_radians = np.arctan2(r2[1], r2[0])
    #    angle_degrees = np.degrees(angle_radians)+180
       angle_degrees=0
-      car+=[tag.tag_id]+[int(640-tag.center[0])]+[int(tag.center[1])]+[int(angle_degrees)]
+      car+=[tag.tag_id]+[int(L-tag.center[0])]+[int(tag.center[1])]+[int(angle_degrees)]
       cv2.circle(color_img, [int(tag.center[0]),int(tag.center[1])], 5, (0, 0, 255), -1)
       
       # for corner in tag.corners:
@@ -138,8 +136,8 @@ def find_the_car(img):
                
                for i in range(0,len(car),4):
                   # print(car[i])
-                  # print((((640-car[i+1])-center[0])**2+(car[i+2]-center[1])**2)**0.5)
-                  if (((640-car[i+1])-center[0])**2+(car[i+2]-center[1])**2)**0.5<15:
+                  print((((L-car[i+1])-center[0])**2+(car[i+2]-center[1])**2)**0.5)
+                  if (((L-car[i+1])-center[0])**2+(car[i+2]-center[1])**2)**0.5<25:
                      car[i+3]=angle
 
                      # Calculate the length of the line to draw
@@ -165,12 +163,9 @@ def find_the_car(img):
    return treadmill, car,Lobstacle
 
 
-
-fichier=open('violet.txt','w')
-fichier.close()
 cap = cv2.VideoCapture(0)
-cap.set(cv2.CAP_PROP_FRAME_WIDTH,640)
-cap.set(cv2.CAP_PROP_FRAME_HEIGHT,480)
+# cap.set(cv2.CAP_PROP_FRAME_WIDTH,640)
+# cap.set(cv2.CAP_PROP_FRAME_HEIGHT,480)
 cap.set(cv2.CAP_PROP_FPS,30)
 options = apriltag.DetectorOptions(families="tag36h11")
 detector = apriltag.Detector(options)
@@ -178,11 +173,11 @@ i=0
 while True:
    start_time=time.time()
    ret, frame = cap.read()
-   # cv2.imwrite("output.png", frame)
+   cv2.imwrite("output.png", frame)
    
    if not ret:
       break
-   print(find_the_car(frame[30:450,:]))
+   print(find_the_car(frame[20:420,65:783]))
       
    if cv2.waitKey(1) & 0xFF == ord('q'):
       break

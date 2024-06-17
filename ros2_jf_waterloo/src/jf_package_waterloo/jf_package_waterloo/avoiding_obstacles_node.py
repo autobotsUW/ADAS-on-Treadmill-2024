@@ -1,43 +1,68 @@
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import String,Float32MultiArray
+from std_msgs.msg import String,Float32MultiArray,Int32MultiArray
 from tkinter import * 
+
+
+class car_Class():
+    def __init__(self,id):
+        self.id=id
+        self.Xcar,self.Ycar,self.Xinput,self.Yinput=0,0,320,200
 
 class Input(Node):
 
     def __init__(self):
         super().__init__('input_node')
         self.get_logger().info("Input Node started.\n")
-        self.publisher_ = self.create_publisher(Float32MultiArray, 'input_position', 10)
-        self.car_sub = self.create_subscription(Float32MultiArray, 'car_position', self.car_sub_function, 10)
-        self.obstacles_sub = self.create_subscription(Float32MultiArray, 'obstacles_position', self.obstacles_sub_function, 10)
-        self.Xinput,self.Yinput=200,200
-        self.Linput=[self.Xinput,self.Yinput]
-        self.LastInput=self.Linput
+        self.publisher_ = self.create_publisher(Int32MultiArray, 'input_position', 10)
+        self.car_sub = self.create_subscription(Int32MultiArray, 'car_position', self.car_sub_function, 10)
+        self.obstacles_sub = self.create_subscription(Int32MultiArray, 'obstacles_position', self.obstacles_sub_function, 10)
+        self.treadmill_sub = self.create_subscription(Int32MultiArray, 'treadmill_position', self.treadmill_sub_function, 1)
         self.Lobstacle=[]
-        self.Lcar=[]
-        self.send_input(self.Xinput,self.Yinput)
+        self.DictCar={}
+        self.Linput=[]
+        self.Lkeys=[]
+        self.treadmill=[640,480]
 
-    def send_input(self,x,y):
+    def treadmill_sub_function(self,msg):
+        """
+        Read treadmill position
+        """
+        if self.treadmill!=msg.data:
+            self.treadmill=msg.data
+
+
+    def send_input(self):
         """
         Send input position to input_position topic
         """
-        self.Linput=[self.Xinput,self.Yinput]
-        if self.Linput!=self.LastInput or self.Linput==[200,200]:
-            msg = Float32MultiArray()
-            msg.data = [float(x),float(y)]
-            self.publisher_.publish(msg)
-            self.get_logger().info('Input {} {}'.format(self.Xinput,self.Yinput))
-            self.LastInput=self.Linput     
+        msg = Int32MultiArray()
+        msg.data = [int(i) for i in self.Linput]
+        self.publisher_.publish(msg)
+        # self.get_logger().info('Input {}'.format(msg.data))
         
     def car_sub_function(self, msg):
         """
         Read car position
         """
-        if len(msg.data)>0:
-            self.Lcar = msg.data
-            self.car_position=msg.data[:2]
-            self.define_input()
+        self.Lkeys=[]
+        for i in range(0,len(msg.data),6):
+            id,x,y,angle=msg.data[i:i+4]
+            if id in self.DictCar.keys():
+                car=self.DictCar[id]
+                car.Xcar=x
+                car.Ycar=y
+                car.car_angle=angle
+            else:
+                car=car_Class(id)
+                car.Xcar=x
+                car.Ycar=y
+                car.car_angle=angle
+                self.DictCar[id]=car
+            self.Lkeys.append(id)
+        self.Lkeys.sort()
+        self.define_input()
+        self.send_input()
 
     def obstacles_sub_function(self, msg):
         """
@@ -52,9 +77,30 @@ class Input(Node):
         Calculate new input for the car with space invaders methods
         """
         if len(self.Lobstacle)==0:
-            self.get_logger().info("No obstacles detected") 
-            self.send_input(self.Xinput,200)
+            # self.get_logger().info("No obstacles detected") 
+            if len(self.Lkeys)==1:
+                self.Linput=[self.Lkeys[0],150,self.treadmill[1]]
+                return
+            
+            self.Linput=[]
+            self.Lkeys.reverse()
+            # 1/3 of the treadmill
+            l1_3=self.treadmill[1]*2/3
+            i=0
+            plus=True
+            y=l1_3
+            for id in self.Lkeys:
+                self.Linput+=[id,150+i*100,y]
+                if plus:
+                    plus=False
+                    y+=l1_3
+                else:
+                    plus=True
+                    y-=l1_3
+                i+=1
             return
+        
+
         i=5
 
         current_distance = self.distance_car_obstacle(self.Linput)

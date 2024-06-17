@@ -19,7 +19,7 @@ import numpy as np
 import time
 import apriltag
 
-from std_msgs.msg import String,Float32MultiArray
+from std_msgs.msg import String,Float32MultiArray,Int32MultiArray
 
 
 
@@ -29,8 +29,9 @@ class Camera(Node):
     def __init__(self):
         super().__init__('camera_node')
         self.get_logger().info("Camera Node started.\n")
-        self.publisher_car = self.create_publisher(Float32MultiArray, 'car_position', 10)
-        self.publisher_obstacles = self.create_publisher(Float32MultiArray, 'obstacles_position', 10)
+        self.publisher_car = self.create_publisher(Int32MultiArray, 'car_position', 10)
+        self.publisher_treadmill = self.create_publisher(Int32MultiArray, 'treadmill_position', 10)
+        self.publisher_obstacles = self.create_publisher(Int32MultiArray, 'obstacles_position', 10)
         self.error_pub = self.create_publisher(String, 'error', 10)
         self.Xinput=320
         self.Yinput=240
@@ -44,10 +45,10 @@ class Camera(Node):
         """
         Open the camera, find the position of car, and the obstacles and send to topic car_position and obstacles_position
         """
-        # Parameter of camera 640*480 and 30 FPS
+        # Parameter of camera 
         cap = cv2.VideoCapture(0)
-        cap.set(cv2.CAP_PROP_FRAME_WIDTH,640)
-        cap.set(cv2.CAP_PROP_FRAME_HEIGHT,480)
+        # cap.set(cv2.CAP_PROP_FRAME_WIDTH,640)
+        # cap.set(cv2.CAP_PROP_FRAME_HEIGHT,480)
         cap.set(cv2.CAP_PROP_FPS,30)
 
 
@@ -63,39 +64,44 @@ class Camera(Node):
                 self.error_pub.publish(msg)
             else:
                 # Search cars and obstacles
-                treadmill,car,obstacles=self.find_the_car(frame[40:453,:])
+                treadmill,car,obstacles=self.find_the_car(frame[20:420,65:783])
+                if len(treadmill)>1:
+                    msg=Int32MultiArray()
+                    msg.data = [int(i) for i in treadmill]
+                    self.publisher_treadmill.publish(msg)
 
                 # Send the informations of cars [number,x,y,angle]
                 if len(car)>1:
-                    msg=Float32MultiArray()
-                    car[2]=car[2]-treadmill[2]
-                    msg.data = [float(i) for i in car]
+                    for i in range(0,len(car),6):
+                            car[i+3]=car[i+3]-treadmill[2]
+                    msg=Int32MultiArray()
+                    msg.data = [int(i) for i in car]
                     self.publisher_car.publish(msg)
                     # self.get_logger().info("Car detected in {} angle:{:.1f}".format(car[0:2],car[2]))
                 else:
                     # If no car
-                    msg=Float32MultiArray()
+                    msg=Int32MultiArray()
                     msg.data = []
                     self.publisher_car.publish(msg)
                     # self.get_logger().info("Car not detected")
                 
                 # Send the informations of obstacles [x,y,radius]
                 if len(obstacles)>0:
-                    msg=Float32MultiArray()
+                    msg=Int32MultiArray()
                     L=[]
                     for obstacle in obstacles:
                         # self.get_logger().info(str(obstacle))
                         if len(car)>1:
                             if (car[0]-obstacle[0])**2+(car[1]-obstacle[1])**2>obstacle[2]**2:
-                                L+=[float(i) for i in obstacle]
+                                L+=[int(i) for i in obstacle]
                         else:
-                            L+=[float(i) for i in obstacle]
+                            L+=[int(i) for i in obstacle]
                     msg.data=L
                     self.publisher_obstacles.publish(msg)
                     # self.get_logger().info("Obstacles detected in {}".format(L))
                 else:
                     # If no obtsacle
-                    msg=Float32MultiArray()
+                    msg=Int32MultiArray()
                     msg.data = []
                     self.publisher_obstacles.publish(msg)
                     # self.get_logger().info("No obstacles detected") 
@@ -124,15 +130,13 @@ class Camera(Node):
         cv2.imshow(title, img)
         cv2.waitKey(1)
 
-    def find_the_car(self,img):
+    def find_the_car(self,color_img):
         """
         Search car and obstacles in the image
         Input: image with a good size
         Output: information of tradmill, cars and obstacles 
         """
-        # Crop and resize the image
-        color_img = cv2.resize(img[:, :], (640, 480))
-
+        L=np.shape(color_img)[1]
         # Convert to grayscale
         gray_img = cv2.cvtColor(color_img, cv2.COLOR_BGR2GRAY)
 
@@ -153,8 +157,10 @@ class Camera(Node):
         #    angle_radians = np.arctan2(r2[1], r2[0])
         #    angle_degrees = np.degrees(angle_radians)+180
             angle_degrees=0
-            car+=[tag.tag_id]+[int(640-tag.center[0])]+[int(tag.center[1])]+[int(angle_degrees)]
-            cv2.circle(color_img, [int(tag.center[0]),int(tag.center[1])], 5, (0, 0, 255), -1)
+            car+=[tag.tag_id]+[int(L-tag.center[0])]+[int(tag.center[1])]+[int(angle_degrees)]+[0,0]
+            if self.display:
+                cv2.circle(color_img, [int(tag.center[0]),int(tag.center[1])], 5, (0, 0, 255), -1)
+            # self.get_logger().info(str(car))
             
             # for corner in tag.corners:
             #    cv2.circle(color_img, [int(corner[0]),int(corner[1])], 5, (0, 0, 255), -1)
@@ -190,7 +196,8 @@ class Camera(Node):
                 
                 width,height=rect[1]
                 if width>200 and height>200:
-                    cv2.drawContours(color_img, [box], 0, (255, 0, 0), 3)
+                    if self.display:
+                        cv2.drawContours(color_img, [box], 0, (255, 0, 0), 3)
                     # Calculate the center of the rectangle
                     center = (int(rect[0][0]), int(rect[0][1]))
                     angle = rect[2]
@@ -204,48 +211,57 @@ class Camera(Node):
                     # Calculate the center of the rectangle
                     center = (int(rect[0][0]), int(rect[0][1]))
                     radius=int(max(width,height)/2)+1
-                    cv2.circle(color_img, center, radius, (0, 0, 255), 3)
+                    if self.display:
+                        cv2.circle(color_img, center, radius, (0, 0, 255), 3)
                     Lobstacle.append(list(center)+[radius])
                 
                 elif 5000>area>3000:
                     # this is a car
-                    # Draw the rotated rectangle on the color image
-                    cv2.drawContours(color_img, [box], 0, (0, 255, 0), 3)                        
+                                          
 
                     # Calculate the center of the rectangle
                     center = (int(rect[0][0]), int(rect[0][1]))
-                    cv2.circle(color_img, center, 5, (0, 255, 0), -1)
+                    if self.display:
+                        cv2.circle(color_img, center, 5, (0, 255, 0), -1)
+                        # Draw the rotated rectangle on the color image
+                        cv2.drawContours(color_img, [box], 0, (0, 255, 0), 3)  
                     # Get the angle of the rectangle
                     angle = rect[2]
+                    # self.get_logger().info('{} {} {}'.format(height<width,height,width))
                     if height<width:
                         angle+=90
+                    else:
+                        height,width=width,height
+
                     
-                    for i in range(0,len(car),4):
-                        # print(car[i])
-                        # print((((640-car[i+1])-center[0])**2+(car[i+2]-center[1])**2)**0.5)
-                        if (((640-car[i+1])-center[0])**2+(car[i+2]-center[1])**2)**0.5<15:
+                    for i in range(0,len(car),6):
+                        if (((L-car[i+1])-center[0])**2+(car[i+2]-center[1])**2)**0.5<25:
                             car[i+3]=angle
+                            car[i+4]=width
+                            car[i+5]=height
+                            # self.get_logger().info(str(car))
+                            if self.display:
+                                # Calculate the length of the line to draw
+                                line_length = 100  # You can adjust this value
 
-                            # Calculate the length of the line to draw
-                            line_length = 100  # You can adjust this value
+                                # Calculate the end points of the orthogonal line
+                                orthogonal_angle_rad = np.deg2rad(angle+90)  # Adjust by 90 degrees
+                                x_end = int(center[0] + line_length * np.cos(orthogonal_angle_rad))
+                                y_end = int(center[1] + line_length * np.sin(orthogonal_angle_rad))
+                                x_start = int(center[0])
+                                y_start = int(center[1])
 
-                            # Calculate the end points of the orthogonal line
-                            orthogonal_angle_rad = np.deg2rad(angle+90)  # Adjust by 90 degrees
-                            x_end = int(center[0] + line_length * np.cos(orthogonal_angle_rad))
-                            y_end = int(center[1] + line_length * np.sin(orthogonal_angle_rad))
-                            x_start = int(center[0])
-                            y_start = int(center[1])
-
-                            # Draw the orthogonal line through the center with the calculated angle
-                            cv2.line(color_img, (x_start, y_start), (x_end, y_end), (0, 255, 0), 2)    
+                                # Draw the orthogonal line through the center with the calculated angle
+                                cv2.line(color_img, (x_start, y_start), (x_end, y_end), (0, 255, 0), 2)    
 
                     
         # Display the image with rectangles, center points, and orthogonal lines
-        self.show_image(color_img, "Rotated Rectangles, Center Points, and Orthogonal Lines")
+        if self.display:
+            self.show_image(color_img, "Rotated Rectangles, Center Points, and Orthogonal Lines")
         #  cv2.imwrite("output.jpg", color_img)
         end_time = time.time()
         processing_time = end_time - start_time
-        print("Processing time: {:.6f} seconds".format(processing_time))
+        # self.get_logger().info("Processing time: {:.6f} seconds".format(processing_time))
         return treadmill, car,Lobstacle
 
 def main(args=None):

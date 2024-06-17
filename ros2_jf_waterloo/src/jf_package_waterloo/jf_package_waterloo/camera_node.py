@@ -18,7 +18,7 @@ import cv2
 import numpy as np
 import time
 
-from std_msgs.msg import String,Float32MultiArray
+from std_msgs.msg import String,Float32MultiArray,Int32MultiArray
 
 
 
@@ -28,8 +28,8 @@ class Camera(Node):
     def __init__(self):
         super().__init__('camera_node')
         self.get_logger().info("Camera Node started.\n")
-        self.publisher_car = self.create_publisher(Float32MultiArray, 'car_position', 10)
-        self.publisher_obstacles = self.create_publisher(Float32MultiArray, 'obstacles_position', 10)
+        self.publisher_car = self.create_publisher(Int32MultiArray, 'car_position', 10)
+        self.publisher_obstacles = self.create_publisher(Int32MultiArray, 'obstacles_position', 10)
         self.error_pub = self.create_publisher(String, 'error', 10)
         self.Xinput=320
         self.Yinput=240
@@ -64,35 +64,35 @@ class Camera(Node):
 
                 # Send the informations of cars [x,y,angle,height,width]
                 if len(car)>1:
-                    msg=Float32MultiArray()
+                    msg=Int32MultiArray()
                     car[2]=car[2]-treadmill[2]
-                    msg.data = [float(i) for i in car]
+                    msg.data = [int(0)]+[int(i) for i in car]
                     self.publisher_car.publish(msg)
                     # self.get_logger().info("Car detected in {} angle:{:.1f}".format(car[0:2],car[2]))
                 else:
                     # If no car
-                    msg=Float32MultiArray()
+                    msg=Int32MultiArray()
                     msg.data = []
                     self.publisher_car.publish(msg)
                     # self.get_logger().info("Car not detected")
                 
                 # Send the informations of obstacles [x,y,radius]
                 if len(obstacles)>0:
-                    msg=Float32MultiArray()
+                    msg=Int32MultiArray()
                     L=[]
                     for obstacle in obstacles:
                         # self.get_logger().info(str(obstacle))
                         if len(car)>1:
                             if (car[0]-obstacle[0])**2+(car[1]-obstacle[1])**2>obstacle[2]**2:
-                                L+=[float(i) for i in obstacle]
+                                L+=[int(i) for i in obstacle]
                         else:
-                            L+=[float(i) for i in obstacle]
+                            L+=[int(i) for i in obstacle]
                     msg.data=L
                     self.publisher_obstacles.publish(msg)
                     # self.get_logger().info("Obstacles detected in {}".format(L))
                 else:
                     # If no obtsacle
-                    msg=Float32MultiArray()
+                    msg=Int32MultiArray()
                     msg.data = []
                     self.publisher_obstacles.publish(msg)
                     # self.get_logger().info("No obstacles detected") 

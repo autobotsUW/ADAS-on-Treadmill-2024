@@ -3,76 +3,25 @@ from rclpy.node import Node
 import math as m
 import numpy as np
 from std_msgs.msg import String,Int32MultiArray,Float32MultiArray
+import time as t
 
 
-
-class Control(Node):
-
-    def __init__(self):
-        super().__init__('Control_node')
-        self.get_logger().info("Control Node started.\n")
-        self.serial_pu = self.create_publisher(Int32MultiArray, 'command', 10)
-        self.camera_sub = self.create_subscription(Float32MultiArray, 'car_position', self.camera_sub_function, 10)
-        self.input_sub = self.create_subscription(Float32MultiArray, 'input_position', self.input_sub_function, 10)
+class car_Class():
+    def __init__(self,id):
+        self.id=id
         self.speed,self.angle,self.Xcar,self.Ycar,self.Xinput,self.Yinput,self.car_angle=0,0,0,0,320,200,0
         self.error_sum_speed = 0
         self.error_sum_angle = 0
-        self.previous_time = self.get_clock().now()
+        self.previous_time = t.time()
         self.last_error_speed=0
         self.last_error_angle=0
-
-    def send_command(self):
-        """
-        Send the speed,angle to command topic
-
-        """
-        center_servo=100
-        delta_servo=20
-        if self.speed>150:
-            self.speed=150
-        elif self.speed<0:
-            self.speed=0
-        
-        # self.get_logger().info('Send calculate: speed {} angle {}'.format(self.speed,self.angle)) 
-        self.angle+=center_servo
-        if self.angle>center_servo+delta_servo:
-            self.angle=center_servo+delta_servo
-        elif self.angle<center_servo-delta_servo:
-            self.angle=center_servo-delta_servo
-
-        # self.speed=0
-        msg = Int32MultiArray()
-        msg.data = [self.speed, self.angle]
-        self.serial_pu.publish(msg)
-        # self.get_logger().info("Send to car: {}".format(msg.data))
-
-    def camera_sub_function(self, msg):
-        """
-        Read the car_position topic
-        """
-        if len(msg.data)>0:
-            self.Xcar=msg.data[0]
-            self.Ycar=msg.data[1]
-            self.car_angle=msg.data[2]
-            self.calculate_command()
-            self.send_command()
-        else:
-            self.error_sum_speed = 0
-            self.error_sum_angle = 0
-    
-    def input_sub_function(self, msg):
-        """
-        Read the input topic
-        """
-        self.Xinput=msg.data[0]
-        self.Yinput=msg.data[1]
 
     def calculate_command(self):
         """
         Calculate speed and angle with the input and the position of the car
         """
-        current_time = self.get_clock().now()
-        delta_time = (current_time - self.previous_time).nanoseconds / 1e9
+        current_time = t.time()
+        delta_time = (current_time - self.previous_time)
         self.previous_time = current_time
 
         Kp_speed = 0.8
@@ -128,7 +77,83 @@ class Control(Node):
             self.speed=100
         
         # self.get_logger().info('Command calculate: speed {} angle {}'.format(self.speed,self.angle))
+
+        center_servo=100
+        delta_servo=20
+        if self.speed>150:
+            self.speed=150
+        elif self.speed<0:
+            self.speed=0
         
+        self.angle+=center_servo
+        if self.angle>center_servo+delta_servo:
+            self.angle=center_servo+delta_servo
+        elif self.angle<center_servo-delta_servo:
+            self.angle=center_servo-delta_servo
+
+
+
+class Control(Node):
+
+    def __init__(self):
+        super().__init__('Control_node')
+        self.get_logger().info("Control Node started.\n")
+        self.serial_pu = self.create_publisher(Int32MultiArray, 'command', 10)
+        self.camera_sub = self.create_subscription(Int32MultiArray, 'car_position', self.camera_sub_function, 10)
+        self.input_sub = self.create_subscription(Int32MultiArray, 'input_position', self.input_sub_function, 10)
+        self.error_pub = self.create_publisher(String, 'error', 10)
+        self.DictCar={}
+        self.command=[]
+
+    def send_command(self):
+        """
+        Send the speed,angle to command topic
+        """
+        # self.speed=0
+        msg = Int32MultiArray()
+        msg.data = [int(i) for i in self.command]
+        self.serial_pu.publish(msg)
+        # self.get_logger().info("Send to car: {}".format(msg.data))
+
+    def camera_sub_function(self, msg):
+        """
+        Read the car_position topic
+        """
+        self.command=[]
+        for i in range(0,len(msg.data),6):
+            id,x,y,angle=msg.data[i:i+4]
+            if id in self.DictCar.keys():
+                car=self.DictCar[id]
+                car.Xcar=x
+                car.Ycar=y
+                car.car_angle=angle
+            else:
+                car=car_Class(id)
+                car.Xcar=x
+                car.Ycar=y
+                car.car_angle=angle
+                self.DictCar[id]=car
+            car.calculate_command()
+            self.command+=[id,car.speed,car.angle]
+        self.send_command()
+    
+    def input_sub_function(self, msg):
+        """
+        Read the input topic
+        """
+        # self.get_logger().info(str(msg.data))
+        for i in range(0,len(msg.data),3):
+            id,x,y=msg.data[i:i+3]
+            if id in self.DictCar.keys():
+                car=self.DictCar[id]
+                car.Xinput=x
+                car.Yinput=y
+            else:
+                self.get_logger().info("Car no exist")
+                msg=String()
+                msg.data='input: car no exist'
+                self.error_pub.publish(msg)
+
 def main(args=None):
     rclpy.init(args=args)
 

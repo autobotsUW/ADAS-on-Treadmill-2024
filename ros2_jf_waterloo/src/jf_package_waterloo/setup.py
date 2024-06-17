@@ -29,7 +29,7 @@ setup(
             'treadmill_control_node=jf_package_waterloo.treadmill_control_node:main',
             'security_node=jf_package_waterloo.security_node:main',
             'treadmill_interface=jf_package_waterloo.treadmill_interface:main',
-            
+            'camera_with_apriltags_node=jf_package_waterloo.camera_with_apriltags_node:main',
         ],
     },
 )

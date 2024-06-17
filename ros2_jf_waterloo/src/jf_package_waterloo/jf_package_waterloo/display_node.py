@@ -17,18 +17,20 @@ class Display(Node):
         super().__init__('minimal_subscriber')
         self.get_logger().info("Display Node started.\n")
         self.serial_sub = self.create_subscription(Int32MultiArray, 'command',self.command_sub_function, 10)
-        self.car_sub = self.create_subscription(Float32MultiArray, 'car_position', self.car_sub_function, 10)
-        self.obstacles_sub = self.create_subscription(Float32MultiArray, 'obstacles_position', self.obstacles_sub_function, 10)
-        self.input_sub = self.create_subscription(Float32MultiArray, 'input_position', self.input_sub_function, 10)
+        self.car_sub = self.create_subscription(Int32MultiArray, 'car_position', self.car_sub_function, 10)
+        self.obstacles_sub = self.create_subscription(Int32MultiArray, 'obstacles_position', self.obstacles_sub_function, 10)
+        self.input_sub = self.create_subscription(Int32MultiArray, 'input_position', self.input_sub_function, 10)
+        self.treadmill_sub = self.create_subscription(Int32MultiArray, 'treadmill_position', self.treadmill_sub_function, 1)
         self.serial_sub
         self.car_sub
         self.obstacles_sub
         self.input_sub
         self.Lobstacle = []
         self.Lcar = []
-        self.input = [320,240]
+        self.input = []
         self.command = []
         self.Lobject = []
+        self.treadmill=[640,480]
         timer_period = 0.01  # seconds
         self.init_display()
         self.timer = self.create_timer(timer_period, self.timer_callback)
@@ -38,6 +40,15 @@ class Display(Node):
         Update display
         """
         self.update_display()
+
+    def treadmill_sub_function(self,msg):
+        """
+        Read treadmill position
+        """
+        if self.treadmill!=msg.data:
+            self.treadmill=msg.data
+            self.ax.set_xlim(0, 2*int(msg.data[0]))
+            self.ax.set_ylim(0, 2*int(msg.data[1]))
     
     def command_sub_function(self, msg):
         """
@@ -74,20 +85,22 @@ class Display(Node):
         self.Lobject = []
 
         # Plot car
-        for i in range(0, len(self.Lcar), 5):
+        for i in range(0, len(self.Lcar), 6):
+            number,x_center, y_center, angle, width, height = self.Lcar[i:i+6]
+
             # Plot center of the car
-            car_center= patches.Circle((self.Lcar[0], self.Lcar[1]), 2, edgecolor='green', facecolor='green',linewidth=5)
-            self.ax.add_patch(car_center)
-            self.Lobject.append(car_center)
-            
+            # car_center= patches.Circle((x_center, y_center), 2, edgecolor='green', facecolor='green',linewidth=5)
+            # self.ax.add_patch(car_center)
+            # self.Lobject.append(car_center)
+            text=self.ax.text(x_center, y_center, str(int(number)), horizontalalignment='center', verticalalignment='center', fontsize=16, color='green')
+            self.Lobject.append(text)
+
             # Plot the rectnagle of the car
-            x_center, y_center, angle, width, height = self.Lcar[i:i+5]
-            print(width,height,x_center,y_center,angle)
             angle_rad=-angle*np.pi/180
             x_corner, y_corner = x_center - width/2, y_center - height/2
             x_corner_rotated = x_center + (x_corner - x_center) * np.cos(angle_rad) - (y_corner - y_center) * np.sin(angle_rad)
             y_corner_rotated =y_center + (x_corner - x_center) * np.sin(angle_rad) + (y_corner - y_center) * np.cos(angle_rad)
-            car = patches.Rectangle([x_corner_rotated, y_corner_rotated], width=self.Lcar[i+3], height=self.Lcar[i+4], edgecolor='green', facecolor='none', linewidth=3)
+            car = patches.Rectangle([x_corner_rotated, y_corner_rotated], width=width, height=height, edgecolor='green', facecolor='none', linewidth=3)
             car.set_angle(-angle)
             self.ax.add_patch(car)
             self.Lobject.append(car)
@@ -99,23 +112,27 @@ class Display(Node):
             self.Lobject.append(obstacle)
         
         # Plot input
-        input= patches.Circle((self.input[0], self.input[1]), 2, edgecolor='black', facecolor='black',linewidth=2)
-        self.ax.add_patch(input)
-        self.Lobject.append(input)
+        for i in range(0,len(self.input),3):
+            input= patches.Circle((self.input[i+1], self.input[i+2]), 2, edgecolor='black', facecolor='black',linewidth=2)
+            self.ax.add_patch(input)
+            self.Lobject.append(input)
 
         # update figure
         self.fig.canvas.draw()
         plt.pause(0.005)
         # self.get_logger().info(str(self.Lobject))
     
-    def init_display(self):
+    def init_display(self,xlim=640,ylim=480):
         """
         Initialise display 
         """
+        current_fig = plt.gcf()
+        if current_fig is not None:
+            plt.close()
         self.get_logger().info('I am initializing the display')
         self.fig, self.ax = plt.subplots()
-        self.ax.set_xlim(0, 640)
-        self.ax.set_ylim(0, 480)
+        self.ax.set_xlim(0, xlim)
+        self.ax.set_ylim(0, ylim)
         self.ax.set_aspect('equal')
         # self.ax.set_axis_off()
         self.ax.set_title('Display')

@@ -17,52 +17,54 @@ class SerialCommunication(Node):
         self.t0=time.time()
         
         # Open bluetooth connection
-        bd_addr = '58:56:00:01:06:67'
-        port = 1
-        try:
-            self.sock = bluetooth.BluetoothSocket(Protocols.RFCOMM)
-            self.sock.connect((bd_addr, port))
-            # self.bluetooth_status = True
-            self.get_logger().info("Bluetooth connection established.")
-        except Exception as e:
-            # If error we stop the treadmill
-            msg=String()
-            msg.data='{:.2f} bluetooth connection'.format(time.time-self.t0)
-            self.error_pub.publish(msg)
+        self.DictAddr={0:'58:56:00:01:06:67'}
+        self.DictSock={}
+        for key in self.DictAddr.keys:
+            bd_addr=self.DictAddr[key]
+            port = 1
+            try:
+                sock = bluetooth.BluetoothSocket(Protocols.RFCOMM)
+                sock.connect((bd_addr, port))
+                # self.bluetooth_status = True
+                self.get_logger().info("Bluetooth connection established.")
+                self.DictSock[key]=sock
+            except Exception as e:
+                # If error we stop the treadmill
+                msg=String()
+                msg.data='{:.2f} bluetooth connection'.format(time.time-self.t0)
+                self.error_pub.publish(msg)
 
     def Send_message(self):
         """
         Send the message by bluetooth
         """
-        if not (0 <= self.speed <= 250):
-            self.get_logger().info('Invalid speed value')
-            return
-        
-        if not (50 <= self.angle <= 130):
-            self.get_logger().info('Invalid angle value')
-            return
-        
-        msg = "[{},{}]".format(int(self.speed), int(self.angle))
-        msb_bytes = msg.encode('UTF-8')
-        # self.get_logger().error("Sending message...")
-        try:
-            self.sock.send(msb_bytes)
-            # self.get_logger().info('Message sent: speed {} angle {}'.format(self.speed, self.angle))
-        except Exception as e:
-            # If error we stop the treadmill
-            self.get_logger().error("Error sending message: {}".format(e))
-            msg=String()
-            msg.data='{:.2f} bluetooth connection'.format(time.time-self.t0)
-            self.error_pub.publish(msg)
+        for i in range(0,len(self.command),3):
+            id,speed,angle=self.command[i:i+3]
+            if id in self.DictSock.keys:
+                msg = "[{},{}]".format(int(speed), int(angle))
+                msb_bytes = msg.encode('UTF-8')
+                # self.get_logger().error("Sending message...")
+                try:
+                    self.sock.send(msb_bytes)
+                    # self.get_logger().info('Message sent: speed {} angle {}'.format(self.speed, self.angle))
+                except Exception as e:
+                    # If error we stop the treadmill
+                    self.get_logger().error("Error sending message: {}".format(e))
+                    msg=String()
+                    msg.data='{:.2f} bluetooth connection'.format(time.time-self.t0)
+                    self.error_pub.publish(msg)
+            else:
+                self.get_logger().error("Error sending message: car no exist")
+                msg=String()
+                msg.data='{:.2f} Error sending message: car no exist'.format(time.time-self.t0)
+                self.error_pub.publish(msg)
+
     
     def callback_sub(self, msg):
         """
         Read the command give in command topic 
         """
-        self.speed = msg.data[0]
-        self.angle = msg.data[1]
-        # self.get_logger().info("Command receive: speed {} angle {}".format(self.speed,self.angle))
-        # self.information_flag=1
+        self.command=msg.data
         self.Send_message()
         
 
