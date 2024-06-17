@@ -2,7 +2,8 @@ import bluetooth
 from bluetooth import Protocols
 import time
 
-bd_addr = '58:56:00:01:06:67'
+# bd_addr = '58:56:00:01:06:67'
+bd_addr = '28:CD:C1:09:63:09'
 port = 1
 sock = bluetooth.BluetoothSocket(Protocols.RFCOMM)
 sock.connect((bd_addr, port))
