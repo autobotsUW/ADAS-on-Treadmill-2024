@@ -209,7 +209,7 @@ class Camera(Node):
                     print(area)
                     # cv2.drawContours(color_img, [box], 0, (0, 0, 255), 3)
                     # Calculate the center of the rectangle
-                    center = (int(rect[0][0]), int(rect[0][1]))
+                    center = (int(L-rect[0][0]), int(rect[0][1]))
                     radius=int(max(width,height)/2)+1
                     if self.display:
                         cv2.circle(color_img, center, radius, (0, 0, 255), 3)

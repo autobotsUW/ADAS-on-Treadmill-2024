@@ -100,51 +100,84 @@ class Input(Node):
                 i+=1
             return
         
+        # we have obstacles
+        car=self.DictCar[self.Lkeys[0]]
+        first_car_input=[car.Xinput,car.Yinput]
+        # self.get_logger().info(str(first_car_input)) 
 
         i=5
 
-        current_distance = self.distance_car_obstacle(self.Linput)
-        right_distance = self.distance_car_obstacle([self.Linput[0],self.Linput[1]-i])
-        left_distance = self.distance_car_obstacle([self.Linput[0],self.Linput[1]+i])
-        
-        if current_distance>left_distance and current_distance>right_distance:
+        current_distance = self.distance_car_obstacle(first_car_input)
+        right_distance = self.distance_car_obstacle([first_car_input[0],first_car_input[1]-i])
+        left_distance = self.distance_car_obstacle([first_car_input[0],first_car_input[1]+i])
+        # self.get_logger().info('{:.2f} {:.2f} {:.2f}'.format(left_distance,current_distance,right_distance)) 
+
+        if current_distance>=left_distance and current_distance>=right_distance:
             # Keep position
-            pass
+            Yinput=first_car_input[1]
             
         elif right_distance>current_distance and right_distance>left_distance:
             # Go to the right
-            distance=self.distance_car_obstacle([self.Linput[0],self.Linput[1]-i])
+            i+=5
+            distance=self.distance_car_obstacle([first_car_input[0],first_car_input[1]-i])
             while right_distance<distance and i<=100:
+                self.get_logger().info('right {} {:.2f} {:.2f}'.format(first_car_input[1]-i,distance,right_distance)) 
                 right_distance=distance
-                i+=10
+                i+=5
+                distance=self.distance_car_obstacle([first_car_input[0],first_car_input[1]-i])
                 
-            self.Yinput=self.Linput[1]-i
+            Yinput=first_car_input[1]-i
+            self.get_logger().info('{}'.format(Yinput)) 
         
         elif left_distance>current_distance and left_distance>right_distance:
             # Go to the left
-            distance=self.distance_car_obstacle([self.Linput[0],self.Linput[1]+i])
+            i+=5
+            distance=self.distance_car_obstacle([first_car_input[0],first_car_input[1]+i])
             while left_distance<distance and i<=100:
+                self.get_logger().info('left {:.2f} {:.2f}'.format(distance,left_distance)) 
                 left_distance=distance
-                i+=10
+                i+=5
+                distance=self.distance_car_obstacle([first_car_input[0],first_car_input[1]+i])
                 
-            self.Yinput=self.Linput[1]+i
+            Yinput=first_car_input[1]+i
+        else:
+            self.get_logger().info('error') 
+            Yinput=first_car_input[1]
+
         
-        if self.Yinput>350:
-            self.Yinput=350
-        elif self.Yinput<100:
-            self.Yinput=100        
-        self.send_input(self.Xinput,self.Yinput)  
+        if Yinput>350:
+            Yinput=350
+        elif Yinput<100:
+            Yinput=100
+        
+        self.Linput=[]
+        self.Lkeys.reverse()
+        i=0
+        for id in self.Lkeys:
+            self.Linput+=[id,150+i*100,Yinput]
+            i+=1 
         return
-    
+
     def distance_car_obstacle(self,car):
         """
         Calculate distance between the car and the obstacles
         """
-        distance=0
+        distance=[]
         for obstacle in self.Lobstacle:
-            if obstacle[0]>self.Lcar[0]:
-                distance+=(car[0]-obstacle[0])**2+(car[1]-obstacle[1])**2
-        return distance**0.5
+            if obstacle[0]>car[0]:
+                distance.append(abs(car[1]-obstacle[1]))
+        distance.sort()
+        return distance[0]
+
+    # def distance_car_obstacle(self,car):
+    #     """
+    #     Calculate distance between the car and the obstacles
+    #     """
+    #     distance=0
+    #     for obstacle in self.Lobstacle:
+    #         if obstacle[0]>car[0]:
+    #             distance+=(car[0]-obstacle[0])**2+(car[1]-obstacle[1])**2
+    #     return distance**0.5
 
 def main(args=None):
     rclpy.init(args=args)
