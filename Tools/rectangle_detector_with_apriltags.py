@@ -109,7 +109,7 @@ def find_the_car(color_img):
                center = (int(rect[0][0]), int(rect[0][1]))
                angle = rect[2]
                if height<width:
-                  angle+=90
+                  angle-=90
                treadmill=list(center)+[angle]
            
          elif 0.7<width/height<1.3 and 1000<area<2800:

@@ -22,7 +22,7 @@ class Input(Node):
         self.DictCar={}
         self.Linput=[]
         self.Lkeys=[]
-        self.treadmill=[640,480]
+        self.treadmill=[320,240]
 
     def treadmill_sub_function(self,msg):
         """
@@ -79,7 +79,7 @@ class Input(Node):
         if len(self.Lobstacle)==0:
             # self.get_logger().info("No obstacles detected") 
             if len(self.Lkeys)==1:
-                self.Linput=[self.Lkeys[0],150,self.treadmill[1]]
+                self.Linput=[self.Lkeys[0],300,self.treadmill[1]]
                 return
             
             self.Linput=[]
@@ -90,7 +90,7 @@ class Input(Node):
             plus=True
             y=l1_3
             for id in self.Lkeys:
-                self.Linput+=[id,150+i*100,y]
+                self.Linput+=[id,200+i*100,y]
                 if plus:
                     plus=False
                     y+=l1_3
@@ -121,7 +121,7 @@ class Input(Node):
             i+=5
             distance=self.distance_car_obstacle([first_car_input[0],first_car_input[1]-i])
             while right_distance<distance and i<=100:
-                self.get_logger().info('right {} {:.2f} {:.2f}'.format(first_car_input[1]-i,distance,right_distance)) 
+                # self.get_logger().info('right {} {:.2f} {:.2f}'.format(first_car_input[1]-i,distance,right_distance)) 
                 right_distance=distance
                 i+=5
                 distance=self.distance_car_obstacle([first_car_input[0],first_car_input[1]-i])
@@ -134,7 +134,7 @@ class Input(Node):
             i+=5
             distance=self.distance_car_obstacle([first_car_input[0],first_car_input[1]+i])
             while left_distance<distance and i<=100:
-                self.get_logger().info('left {:.2f} {:.2f}'.format(distance,left_distance)) 
+                # self.get_logger().info('left {:.2f} {:.2f}'.format(distance,left_distance)) 
                 left_distance=distance
                 i+=5
                 distance=self.distance_car_obstacle([first_car_input[0],first_car_input[1]+i])

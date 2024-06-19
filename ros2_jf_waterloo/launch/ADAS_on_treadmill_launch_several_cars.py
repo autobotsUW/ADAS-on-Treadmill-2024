@@ -3,11 +3,11 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
     return LaunchDescription([
-        # Node(
-        #     package='jf_package_waterloo',
-        #     executable='bluetooth_node',
-        #     name='bluetooth_node',
-        # ),
+        Node(
+            package='jf_package_waterloo',
+            executable='bluetooth_node',
+            name='bluetooth_node',
+        ),
         Node(
             package='jf_package_waterloo',
             executable='avoiding_obstacles_node',
@@ -28,11 +28,11 @@ def generate_launch_description():
             executable='display_node',
             name='display_node',
         ),
-        # Node(
-        #     package='rqt_graph',
-        #     executable='rqt_graph',
-        #     name='rqt_graph',
-        # ),
+        Node(
+            package='jf_package_waterloo',
+            executable='save_topic',
+            name='save_topic',
+        ),
         # Node(
         #     package='jf_package_waterloo',
         #     executable='treadmill_control_node',

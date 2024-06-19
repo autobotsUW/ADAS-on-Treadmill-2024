@@ -24,12 +24,12 @@ class car_Class():
         delta_time = (current_time - self.previous_time)
         self.previous_time = current_time
 
-        Kp_speed = 0.8
-        Ki_speed = 0.2
+        Kp_speed = 0.5
+        Ki_speed = 0.08
         Kd_speed = 0.1
-        Kp_angle = 1e-1
-        Ki_angle = 5e-3
-        Kd_angle = 0
+        # Kp_angle = 1e-1
+        # Ki_angle = 5e-3
+        # Kd_angle = 0
 
         # Kp_speed = 0.8
         # Ki_speed = 0.2
@@ -49,7 +49,7 @@ class car_Class():
         # self.get_logger().info('Error speed: {:.3f}'.format(error_speed))
         # self.get_logger().info('Error angle: {:.3f}'.format(error_angle))
         self.speed = int(Kp_speed * error_speed + Ki_speed * self.error_sum_speed + Kd_speed * (error_speed-self.last_error_speed)/delta_time)
-        self.angle = int(Kp_angle * error_angle + Ki_angle * self.error_sum_angle + Kd_angle * (error_angle-self.last_error_angle)/delta_time)
+        # self.angle = int(Kp_angle * error_angle + Ki_angle * self.error_sum_angle + Kd_angle * (error_angle-self.last_error_angle)/delta_time)
 
         self.last_error_speed=error_speed
         self.last_error_angle=error_angle
@@ -61,7 +61,7 @@ class car_Class():
         self.angle=int(heading_error + m.atan2(k_stanley * cross_track_error, self.speed)* 180 / m.pi)
         
         # angle saturation: the car cannot be at too great an angle to the axis of the treadmill
-        max_angle=15
+        max_angle=10
         if (self.car_angle>max_angle and self.angle<0) or (self.car_angle<-max_angle and self.angle>0):
             self.angle=0     
             
@@ -73,10 +73,8 @@ class car_Class():
         
         if self.Xcar>400:
             self.speed=0
-        elif self.Xcar<125:
-            self.speed=100
-        
-        # self.get_logger().info('Command calculate: speed {} angle {}'.format(self.speed,self.angle))
+        elif self.Xcar<150:
+            self.speed=60
 
         center_servo=100
         delta_servo=20

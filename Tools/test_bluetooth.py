@@ -8,13 +8,12 @@ port = 1
 sock = bluetooth.BluetoothSocket(Protocols.RFCOMM)
 sock.connect((bd_addr, port))
 bluetooth_status = True
-speed=0
-angle=0
+speed=20
+angle=100
 while True:
-        angle=80
     # for angle in range(70,111,10):
-        print(angle)
         msg = "[{},{}]".format(int(speed), int(angle))
+        print(msg)
         msb_bytes = msg.encode('UTF-8')
         sock.send(msb_bytes)
         time.sleep(0.1)

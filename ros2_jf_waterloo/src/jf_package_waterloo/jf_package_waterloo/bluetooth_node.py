@@ -19,20 +19,22 @@ class SerialCommunication(Node):
         # Open bluetooth connection
         self.DictAddr={0:'58:56:00:01:06:67'}
         self.DictSock={}
-        for key in self.DictAddr.keys:
+        for key in self.DictAddr.keys():
             bd_addr=self.DictAddr[key]
+            self.get_logger().info(bd_addr)
             port = 1
             try:
                 sock = bluetooth.BluetoothSocket(Protocols.RFCOMM)
-                sock.connect((bd_addr, port))
+                self.get_logger().info(sock.connect((bd_addr, port)))
                 # self.bluetooth_status = True
                 self.get_logger().info("Bluetooth connection established.")
                 self.DictSock[key]=sock
             except Exception as e:
                 # If error we stop the treadmill
                 msg=String()
-                msg.data='{:.2f} bluetooth connection'.format(time.time-self.t0)
+                msg.data='{:.2f} bluetooth connection'.format(time.time()-self.t0)
                 self.error_pub.publish(msg)
+            self.get_logger().info('Fin')
 
     def Send_message(self):
         """
@@ -40,23 +42,24 @@ class SerialCommunication(Node):
         """
         for i in range(0,len(self.command),3):
             id,speed,angle=self.command[i:i+3]
-            if id in self.DictSock.keys:
+            if id in self.DictSock.keys():
                 msg = "[{},{}]".format(int(speed), int(angle))
                 msb_bytes = msg.encode('UTF-8')
                 # self.get_logger().error("Sending message...")
+                sock=self.DictSock[id]
                 try:
-                    self.sock.send(msb_bytes)
+                    sock.send(msb_bytes)
                     # self.get_logger().info('Message sent: speed {} angle {}'.format(self.speed, self.angle))
                 except Exception as e:
                     # If error we stop the treadmill
                     self.get_logger().error("Error sending message: {}".format(e))
                     msg=String()
-                    msg.data='{:.2f} bluetooth connection'.format(time.time-self.t0)
+                    msg.data='{:.2f} bluetooth connection'.format(time.time()-self.t0)
                     self.error_pub.publish(msg)
             else:
                 self.get_logger().error("Error sending message: car no exist")
                 msg=String()
-                msg.data='{:.2f} Error sending message: car no exist'.format(time.time-self.t0)
+                msg.data='{:.2f} Error sending message: car no exist'.format(time.time()-self.t0)
                 self.error_pub.publish(msg)
 
     
