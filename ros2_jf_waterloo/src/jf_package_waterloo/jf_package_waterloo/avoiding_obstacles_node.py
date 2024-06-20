@@ -61,8 +61,10 @@ class Input(Node):
                 self.DictCar[id]=car
             self.Lkeys.append(id)
         self.Lkeys.sort()
-        self.define_input()
-        self.send_input()
+        if len(self.Lkeys)>=1:
+            # self.get_logger().info("Car obstacles detected") 
+            self.define_input()
+            self.send_input()
 
     def obstacles_sub_function(self, msg):
         """
@@ -79,7 +81,7 @@ class Input(Node):
         if len(self.Lobstacle)==0:
             # self.get_logger().info("No obstacles detected") 
             if len(self.Lkeys)==1:
-                self.Linput=[self.Lkeys[0],300,self.treadmill[1]]
+                self.Linput=[self.Lkeys[0],200,self.treadmill[1]]
                 return
             
             self.Linput=[]
@@ -110,7 +112,7 @@ class Input(Node):
         current_distance = self.distance_car_obstacle(first_car_input)
         right_distance = self.distance_car_obstacle([first_car_input[0],first_car_input[1]-i])
         left_distance = self.distance_car_obstacle([first_car_input[0],first_car_input[1]+i])
-        # self.get_logger().info('{:.2f} {:.2f} {:.2f}'.format(left_distance,current_distance,right_distance)) 
+        self.get_logger().info('{:.2f} {:.2f} {:.2f}'.format(left_distance,current_distance,right_distance)) 
 
         if current_distance>=left_distance and current_distance>=right_distance:
             # Keep position
@@ -154,7 +156,7 @@ class Input(Node):
         self.Lkeys.reverse()
         i=0
         for id in self.Lkeys:
-            self.Linput+=[id,150+i*100,Yinput]
+            self.Linput+=[id,200+i*100,Yinput]
             i+=1 
         return
 
@@ -164,10 +166,12 @@ class Input(Node):
         """
         distance=[]
         for obstacle in self.Lobstacle:
-            if obstacle[0]>car[0]:
+            if obstacle[0]>=car[0]:
                 distance.append(abs(car[1]-obstacle[1]))
         distance.sort()
-        return distance[0]
+        if len(distance)>=1:
+            return distance[0]
+        return 1000
 
     # def distance_car_obstacle(self,car):
     #     """

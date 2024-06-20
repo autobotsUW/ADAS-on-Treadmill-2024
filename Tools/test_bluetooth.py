@@ -8,7 +8,7 @@ port = 1
 sock = bluetooth.BluetoothSocket(Protocols.RFCOMM)
 sock.connect((bd_addr, port))
 bluetooth_status = True
-speed=20
+speed=0
 angle=100
 while True:
     # for angle in range(70,111,10):
