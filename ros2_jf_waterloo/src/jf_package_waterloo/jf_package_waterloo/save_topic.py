@@ -24,7 +24,7 @@ class MinimalSubscriber(Node):
     def __init__(self):
         super().__init__('minimal_subscriber')
         self.subscription = self.create_subscription(Int32MultiArray,'car_position',self.listener_callback,10)
-        self.file_name='PID.csv'
+        self.file_name='Stanley2.csv'
 
         self.t0=t.time()
         # self.file_name='/Desktop/'+self.file_name
