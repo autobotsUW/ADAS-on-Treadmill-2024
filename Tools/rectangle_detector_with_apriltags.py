@@ -173,7 +173,7 @@ i=0
 while True:
    start_time=time.time()
    ret, frame = cap.read()
-   cv2.imwrite("output.png", frame)
+   # cv2.imwrite("output.png", frame)
    
    if not ret:
       break
