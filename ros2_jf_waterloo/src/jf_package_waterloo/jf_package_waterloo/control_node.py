@@ -9,7 +9,7 @@ import time as t
 class car_Class():
     def __init__(self,id):
         self.id=id
-        self.speed,self.angle,self.Xcar,self.Ycar,self.Xinput,self.Yinput,self.car_angle=0,0,0,0,320,200,0
+        self.speed,self.angle,self.Xcar,self.Ycar,self.Xinput,self.Yinput,self.car_angle=0,0,0,0,400,200,0
         self.error_sum_speed = 0
         self.error_sum_angle = 0
         self.previous_time = t.time()
@@ -41,13 +41,13 @@ class car_Class():
         error_speed = self.Xinput - self.Xcar
         error_angle = self.Yinput - self.Ycar
 
-        if self.Xcar<300:
+        if self.Xcar<600:
             self.error_sum_speed += error_speed * delta_time
             self.error_sum_angle += error_angle * delta_time
         
         
-        # self.get_logger().info('Error speed: {:.3f}'.format(error_speed))
-        # self.get_logger().info('Error angle: {:.3f}'.format(error_angle))
+        # minimal_publisher.get_logger().info('Error {} speed: {:.3f}'.format(self.id,error_speed))
+        # self.get_logger().info('Error {} angle: {:.3f}'.format(self.id,error_angle))
         self.speed = int(Kp_speed * error_speed + Ki_speed * self.error_sum_speed + Kd_speed * (error_speed-self.last_error_speed)/delta_time)
         # self.angle = int(Kp_angle * error_angle + Ki_angle * self.error_sum_angle + Kd_angle * (error_angle-self.last_error_angle)/delta_time)
 
@@ -73,7 +73,7 @@ class car_Class():
         
         if self.Xcar>400:
             self.speed=0
-        elif self.Xcar<150:
+        elif self.Xcar<100:
             self.speed=60
 
         center_servo=100
@@ -125,6 +125,7 @@ class Control(Node):
                 car.Xcar=x
                 car.Ycar=y
                 car.car_angle=angle
+                # self.get_logger().info("Car {} xcar {} ycar {} xinput {} yinput {}".format(car.id,car.Xcar,car.Ycar,car.Xinput,car.Yinput))
             else:
                 car=car_Class(id)
                 car.Xcar=x
@@ -146,6 +147,7 @@ class Control(Node):
                 car=self.DictCar[id]
                 car.Xinput=x
                 car.Yinput=y
+                # self.get_logger().info("Car {} xinput {} yinput {}".format(car.id,car.Xinput,car.Yinput))
             else:
                 self.get_logger().info("Car no exist")
                 msg=String()
@@ -154,7 +156,7 @@ class Control(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-
+    global minimal_publisher
     minimal_publisher = Control()
 
     rclpy.spin(minimal_publisher)

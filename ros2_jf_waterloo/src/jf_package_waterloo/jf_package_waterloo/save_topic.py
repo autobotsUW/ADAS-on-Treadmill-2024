@@ -23,9 +23,8 @@ class MinimalSubscriber(Node):
 
     def __init__(self):
         super().__init__('minimal_subscriber')
-        self.subscription = self.create_subscription(Int32MultiArray,'car_position',self.listener_callback,10)
-        self.input = self.create_subscription(Int32MultiArray,'input_position',self.input_listener_callback,10)
-        self.file_name='Obstacles1ms.csv'
+        self.subscription = self.create_subscription(Int32MultiArray,'command',self.listener_callback,10)
+        self.file_name='2car.csv'
         self.input=[300,200]
         self.t0=t.time()
         # self.file_name='/Desktop/'+self.file_name
@@ -38,12 +37,17 @@ class MinimalSubscriber(Node):
     def input_listener_callback(self,msg):
         if len(msg.data)>=1:
             # self.get_logger().info('I heard: {} {}'.format(self.input[0],self.input[1]))
-            self.input=msg.data[1:]
+            self.input=msg.data
 
     def listener_callback(self, msg):
         if len(msg.data)>3:
+            data="{:.3f}".format(t.time()-self.t0)
+            for i in msg.data:
+                data+=";"+str(i)
+            for input in self.input:
+                data+=";"+str(input)
             file=open(self.file_name,'a')
-            file.write('{:.3f};{};{};{};{}\n'.format(t.time()-self.t0,msg.data[1],msg.data[2],self.input[0],self.input[1]))
+            file.write(data+'\n')
             file.close()
             # self.get_logger().info('I heard: "%s"' % msg.data)
 

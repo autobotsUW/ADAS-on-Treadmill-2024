@@ -12,8 +12,8 @@ class Security(Node):
         
         self.error_sub = self.create_subscription(String,'error',self.error_sub_function,10)
         
-        timer_period = 0.1  # seconds
-        self.timer_function = self.create_timer(timer_period, self.detect_error)
+        # timer_period = 0.1  # seconds
+        # self.timer_function = self.create_timer(timer_period, self.detect_error)
         
         self.car_sub = self.create_subscription(Int32MultiArray,'car_position',self.car_sub_function,10)
         self.Xcar,self.Ycar,self.car_angle=0,0,0

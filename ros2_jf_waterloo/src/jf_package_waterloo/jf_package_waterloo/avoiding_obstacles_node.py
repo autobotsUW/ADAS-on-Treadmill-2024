@@ -92,7 +92,7 @@ class Input(Node):
             plus=True
             y=l1_3
             for id in self.Lkeys:
-                self.Linput+=[id,200+i*100,y]
+                self.Linput+=[id,200+i*120,y]
                 if plus:
                     plus=False
                     y+=l1_3
@@ -156,7 +156,7 @@ class Input(Node):
         self.Lkeys.reverse()
         i=0
         for id in self.Lkeys:
-            self.Linput+=[id,200+i*100,Yinput]
+            self.Linput+=[id,200+i*150,Yinput]
             i+=1 
         return
 
