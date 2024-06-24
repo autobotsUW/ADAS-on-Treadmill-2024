@@ -56,6 +56,7 @@ def find_the_car(color_img):
    # Search april tags
    tags = detector.detect(gray_img)
    car=[]
+   print("Nombre de tag: {}".format(len(tags)))
    for tag in tags:
    #    H = tag.homography
    #          # Normaliser la matrice d'homographie
@@ -136,7 +137,7 @@ def find_the_car(color_img):
                
                for i in range(0,len(car),4):
                   # print(car[i])
-                  print((((L-car[i+1])-center[0])**2+(car[i+2]-center[1])**2)**0.5)
+                  # print((((L-car[i+1])-center[0])**2+(car[i+2]-center[1])**2)**0.5)
                   if (((L-car[i+1])-center[0])**2+(car[i+2]-center[1])**2)**0.5<25:
                      car[i+3]=angle
 

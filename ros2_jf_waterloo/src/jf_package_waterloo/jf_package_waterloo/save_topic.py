@@ -29,6 +29,7 @@ class MinimalSubscriber(Node):
         self.t0=t.time()
         # self.file_name='/Desktop/'+self.file_name
         fichier=open(self.file_name,'w')
+        fichier.write("Time (s);id;Xcar;Ycar;speed;direction\n")
         fichier.close()
         self.input 
         self.subscription  # prevent unused variable warning

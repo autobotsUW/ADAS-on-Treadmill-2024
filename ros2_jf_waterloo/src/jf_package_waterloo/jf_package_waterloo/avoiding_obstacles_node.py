@@ -81,7 +81,7 @@ class Input(Node):
         if len(self.Lobstacle)==0:
             # self.get_logger().info("No obstacles detected") 
             if len(self.Lkeys)==1:
-                self.Linput=[self.Lkeys[0],200,self.treadmill[1]]
+                self.Linput=[self.Lkeys[0],300,self.treadmill[1]]
                 return
             
             self.Linput=[]
@@ -92,7 +92,7 @@ class Input(Node):
             plus=True
             y=l1_3
             for id in self.Lkeys:
-                self.Linput+=[id,200+i*120,y]
+                self.Linput+=[id,300+i*120,y]
                 if plus:
                     plus=False
                     y+=l1_3
@@ -156,7 +156,7 @@ class Input(Node):
         self.Lkeys.reverse()
         i=0
         for id in self.Lkeys:
-            self.Linput+=[id,200+i*150,Yinput]
+            self.Linput+=[id,300+i*150,Yinput]
             i+=1 
         return
 

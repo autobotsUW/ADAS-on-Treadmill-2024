@@ -21,20 +21,19 @@ class SerialCommunication(Node):
         self.DictSock={}
         for key in self.DictAddr.keys():
             bd_addr=self.DictAddr[key]
-            self.get_logger().info(bd_addr)
             port = 1
             try:
                 sock = bluetooth.BluetoothSocket(Protocols.RFCOMM)
-                self.get_logger().info(sock.connect((bd_addr, port)))
+                sock.connect((bd_addr, port))
                 # self.bluetooth_status = True
-                self.get_logger().info("Bluetooth connection established.")
+                self.get_logger().info("Bluetooth connection established. {} {}".format(key,bd_addr))
                 self.DictSock[key]=sock
             except Exception as e:
                 # If error we stop the treadmill
                 msg=String()
                 msg.data='{:.2f} bluetooth connection'.format(time.time()-self.t0)
                 self.error_pub.publish(msg)
-            self.get_logger().info('Fin')
+            self.get_logger().info('Finish initialize {}'.format(key))
 
     def Send_message(self):
         """

@@ -24,8 +24,8 @@ class car_Class():
         delta_time = (current_time - self.previous_time)
         self.previous_time = current_time
 
-        Kp_speed = 0.5
-        Ki_speed = 0.08
+        Kp_speed = 0.8
+        Ki_speed = 0.2
         Kd_speed = 0.1
         # Kp_angle = 1e-2
         # Ki_angle = 5e-4
@@ -41,7 +41,7 @@ class car_Class():
         error_speed = self.Xinput - self.Xcar
         error_angle = self.Yinput - self.Ycar
 
-        if self.Xcar<600:
+        if self.Xcar<500:
             self.error_sum_speed += error_speed * delta_time
             self.error_sum_angle += error_angle * delta_time
         
@@ -73,8 +73,8 @@ class car_Class():
         
         if self.Xcar>400:
             self.speed=0
-        elif self.Xcar<100:
-            self.speed=60
+        elif self.Xcar<=100:
+            self.speed=80
 
         center_servo=100
         delta_servo=20

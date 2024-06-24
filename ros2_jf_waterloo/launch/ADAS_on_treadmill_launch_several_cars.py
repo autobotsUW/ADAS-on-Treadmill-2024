@@ -33,14 +33,14 @@ def generate_launch_description():
             executable='save_topic',
             name='save_topic',
         ),
-        Node(
-            package='jf_package_waterloo',
-            executable='treadmill_control_node',
-            name='treadmill_control_node',
-        ),
-        Node(
-            package='jf_package_waterloo',
-            executable='security_node',
-            name='security_node',
-        )
+        # Node(
+        #     package='jf_package_waterloo',
+        #     executable='treadmill_control_node',
+        #     name='treadmill_control_node',
+        # ),
+        # Node(
+        #     package='jf_package_waterloo',
+        #     executable='security_node',
+        #     name='security_node',
+        # )
     ])

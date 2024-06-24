@@ -85,7 +85,7 @@ class Security(Node):
             self.send_stop_treadmill()
         for i in range(0,len(self.car)):
             if self.car[i+1]<50 or self.car[i+3]:
-                self.get_logger().info("Problem  position or angle car {}x={} angle={}".format(self.car[i],self.car[i+1],self.car[i+3]))
+                self.get_logger().info("Problem  position or angle car {} x={} angle={}".format(self.car[i],self.car[i+1],self.car[i+3]))
                 self.send_stop_treadmill()
         
         # Command problems
