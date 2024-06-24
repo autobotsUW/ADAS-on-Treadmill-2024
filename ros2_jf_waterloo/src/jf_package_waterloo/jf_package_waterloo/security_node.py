@@ -16,12 +16,12 @@ class Security(Node):
         # self.timer_function = self.create_timer(timer_period, self.detect_error)
         
         self.car_sub = self.create_subscription(Int32MultiArray,'car_position',self.car_sub_function,10)
-        self.Xcar,self.Ycar,self.car_angle=0,0,0
+        self.car=6*[0]
         self.time_detect_car=time.time()
         self.car_sub  # prevent unused variable warning
         
         self.command_sub = self.create_subscription(Int32MultiArray,'command',self.command_sub_function,10)
-        self.speed,self.angle=0,0
+        self.command=3*[0]
         self.time_detect_command=time.time()
         self.car_sub  # prevent unused variable warning
         self.no_detected=0
@@ -52,7 +52,7 @@ class Security(Node):
         Read the command of the car
         """
         if len(msg.data)!=0:
-            self.speed,self.angle=msg.data[:2]
+            self.command=msg.data
             self.time_detect_command=time.time()
         else:
             self.get_logger().info("No command")
@@ -80,13 +80,19 @@ class Security(Node):
         """
         t=time.time()
         # Car problems
-        if (t-self.time_detect_car)>1000  or self.Xcar<50:
-            self.get_logger().info("Problem car {:.2f} {}".format(t-self.time_detect_car,self.angle))
+        if (t-self.time_detect_car)>1000:
+            self.get_logger().info("Problem car {:.2f} time detection".format(t-self.time_detect_car))
             self.send_stop_treadmill()
+        for i in range(0,len(self.car)):
+            if self.car[i+1]<50 or self.car[i+3]:
+                self.get_logger().info("Problem  position or angle car {}x={} angle={}".format(self.car[i],self.car[i+1],self.car[i+3]))
+                self.send_stop_treadmill()
+        
         # Command problems
         if (t-self.time_detect_command)>1000:
             self.get_logger().info("Problem command {:.2f}".format(t-self.time_detect_command))
             self.send_stop_treadmill()
+        
         
 
 def main(args=None):
