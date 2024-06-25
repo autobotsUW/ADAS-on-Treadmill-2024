@@ -25,8 +25,10 @@ class MinimalSubscriber(Node):
         super().__init__('minimal_subscriber')
         self.subscription = self.create_subscription(Int32MultiArray,'car_position',self.listener_callback,10)
         self.subscription = self.create_subscription(Int32MultiArray,'input_position',self.input_listener_callback,10)
+        self.subscription = self.create_subscription(Int32MultiArray,'command',self.command_callback,10)
         self.file_name='2car.csv'
         self.input=[300,200]
+        self.command=[0,0]
         self.t0=t.time()
         # self.file_name='/Desktop/'+self.file_name
         fichier=open(self.file_name,'w')
@@ -35,6 +37,8 @@ class MinimalSubscriber(Node):
         self.input 
         self.subscription  # prevent unused variable warning
 
+    def command_callback(self,msg):
+        self.command=msg.data
 
     def input_listener_callback(self,msg):
         if len(msg.data)>=1:
@@ -50,6 +54,9 @@ class MinimalSubscriber(Node):
             data+=';    '
             for input in self.input:
                 data+=";"+str(input)
+            data+=';    '
+            for command in self.command:
+                data+=";"+str(command)
             file=open(self.file_name,'a')
             file.write(data+'\n')
             file.close()
