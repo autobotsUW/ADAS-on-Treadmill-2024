@@ -36,7 +36,7 @@ class Camera(Node):
         self.Xinput=320
         self.Yinput=240
         self.window=False
-        self.display=False
+        self.display=True  #True to display the image from the camera
         options = apriltag.DetectorOptions(families="tag36h11")
         self.detector = apriltag.Detector(options)
         self.launch_camera()
