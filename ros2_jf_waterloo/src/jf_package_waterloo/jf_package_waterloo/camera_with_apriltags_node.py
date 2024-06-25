@@ -53,6 +53,7 @@ class Camera(Node):
 
 
         while True:
+            start_time = time.time()
             # read a picture from the camera
             ret,frame=cap.read()
         
@@ -108,6 +109,9 @@ class Camera(Node):
                     
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
+            end_time=time.time()
+            processing_time = end_time - start_time
+            # self.get_logger().info("Processing time: {:.3f} seconds".format(processing_time))
         cap.release()
         cv2.destroyAllWindows()
         cv2.waitKey(0)
@@ -261,7 +265,7 @@ class Camera(Node):
         #  cv2.imwrite("output.jpg", color_img)
         end_time = time.time()
         processing_time = end_time - start_time
-        # self.get_logger().info("Processing time: {:.6f} seconds".format(processing_time))
+        # self.get_logger().info("Processing time: {:.3f} seconds".format(processing_time))
         return treadmill, car,Lobstacle
 
 def main(args=None):

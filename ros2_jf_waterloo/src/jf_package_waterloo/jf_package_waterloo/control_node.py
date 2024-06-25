@@ -4,6 +4,7 @@ import math as m
 import numpy as np
 from std_msgs.msg import String,Int32MultiArray,Float32MultiArray
 import time as t
+from message_filters import TimeSynchronizer, Subscriber
 
 
 class car_Class():
@@ -24,9 +25,10 @@ class car_Class():
         delta_time = (current_time - self.previous_time)
         self.previous_time = current_time
 
-        Kp_speed = 0.8
-        Ki_speed = 0.2
+        Kp_speed = 0.5
+        Ki_speed = 0.1
         Kd_speed = 0.1
+        k_stanley = 1e-1
         # Kp_angle = 1e-2
         # Ki_angle = 5e-4
         # Kd_angle = 0
@@ -41,9 +43,12 @@ class car_Class():
         error_speed = self.Xinput - self.Xcar
         error_angle = self.Yinput - self.Ycar
 
-        if self.Xcar<500:
+        if self.Xcar<600:
             self.error_sum_speed += error_speed * delta_time
             self.error_sum_angle += error_angle * delta_time
+        
+        if self.Xcar<120:
+            self.error_sum_speed=0
         
         
         # minimal_publisher.get_logger().info('Error {} speed: {:.3f}'.format(self.id,error_speed))
@@ -56,7 +61,7 @@ class car_Class():
 
          # Stanley controller
         cross_track_error = self.Yinput - self.Ycar
-        k_stanley = 1e-1
+        
         heading_error = self.car_angle
         self.angle=int(heading_error + m.atan2(k_stanley * cross_track_error, self.speed)* 180 / m.pi)
         
@@ -74,7 +79,7 @@ class car_Class():
         if self.Xcar>400:
             self.speed=0
         elif self.Xcar<=100:
-            self.speed=80
+            self.speed=60
 
         center_servo=100
         delta_servo=20
@@ -102,6 +107,12 @@ class Control(Node):
         self.error_pub = self.create_publisher(String, 'error', 10)
         self.DictCar={}
         self.command=[]
+    
+    def camera_callback(self, msg):
+        self.get_logger().info(f"Received camera position: {msg.data}")
+
+    def input_callback(self, msg):
+        self.get_logger().info(f"Received input position: {msg.data}")
 
     def send_command(self):
         """

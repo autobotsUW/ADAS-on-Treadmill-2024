@@ -23,7 +23,8 @@ class MinimalSubscriber(Node):
 
     def __init__(self):
         super().__init__('minimal_subscriber')
-        self.subscription = self.create_subscription(Int32MultiArray,'command',self.listener_callback,10)
+        self.subscription = self.create_subscription(Int32MultiArray,'car_position',self.listener_callback,10)
+        self.subscription = self.create_subscription(Int32MultiArray,'input_position',self.input_listener_callback,10)
         self.file_name='2car.csv'
         self.input=[300,200]
         self.t0=t.time()
@@ -43,8 +44,10 @@ class MinimalSubscriber(Node):
     def listener_callback(self, msg):
         if len(msg.data)>3:
             data="{:.3f}".format(t.time()-self.t0)
+            data+=';    '
             for i in msg.data:
                 data+=";"+str(i)
+            data+=';    '
             for input in self.input:
                 data+=";"+str(input)
             file=open(self.file_name,'a')

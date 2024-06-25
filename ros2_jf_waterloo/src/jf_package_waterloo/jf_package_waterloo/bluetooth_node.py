@@ -17,7 +17,7 @@ class SerialCommunication(Node):
         self.t0=time.time()
         
         # Open bluetooth connection
-        self.DictAddr={0:'58:56:00:01:06:67',1:'98:D3:71:FE:AB:41'}
+        self.DictAddr={1:'58:56:00:01:06:67',0:'98:D3:71:FE:AB:41'}
         self.DictSock={}
         for key in self.DictAddr.keys():
             bd_addr=self.DictAddr[key]
@@ -44,7 +44,7 @@ class SerialCommunication(Node):
             if id in self.DictSock.keys():
                 msg = "[{},{}]".format(int(speed), int(angle))
                 msb_bytes = msg.encode('UTF-8')
-                # self.get_logger().error("Sending message...")
+                # self.get_logger().error("Sending message: {}".format(msg))
                 sock=self.DictSock[id]
                 try:
                     sock.send(msb_bytes)

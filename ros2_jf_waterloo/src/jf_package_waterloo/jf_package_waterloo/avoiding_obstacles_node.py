@@ -102,63 +102,64 @@ class Input(Node):
                 i+=1
             return
         
-        # we have obstacles
-        car=self.DictCar[self.Lkeys[0]]
-        first_car_input=[car.Xinput,car.Yinput]
-        # self.get_logger().info(str(first_car_input)) 
+        self.get_logger().info(self.Lobstacle)
+        # # we have obstacles
+        # car=self.DictCar[self.Lkeys[0]]
+        # first_car_input=[car.Xinput,car.Yinput]
+        # # self.get_logger().info(str(first_car_input)) 
 
-        i=5
+        # i=5
 
-        current_distance = self.distance_car_obstacle(first_car_input)
-        right_distance = self.distance_car_obstacle([first_car_input[0],first_car_input[1]-i])
-        left_distance = self.distance_car_obstacle([first_car_input[0],first_car_input[1]+i])
-        self.get_logger().info('{:.2f} {:.2f} {:.2f}'.format(left_distance,current_distance,right_distance)) 
+        # current_distance = self.distance_car_obstacle(first_car_input)
+        # right_distance = self.distance_car_obstacle([first_car_input[0],first_car_input[1]-i])
+        # left_distance = self.distance_car_obstacle([first_car_input[0],first_car_input[1]+i])
+        # self.get_logger().info('{:.2f} {:.2f} {:.2f}'.format(left_distance,current_distance,right_distance)) 
 
-        if current_distance>=left_distance and current_distance>=right_distance:
-            # Keep position
-            Yinput=first_car_input[1]
+        # if current_distance>=left_distance and current_distance>=right_distance:
+        #     # Keep position
+        #     Yinput=first_car_input[1]
             
-        elif right_distance>current_distance and right_distance>left_distance:
-            # Go to the right
-            i+=5
-            distance=self.distance_car_obstacle([first_car_input[0],first_car_input[1]-i])
-            while right_distance<distance and i<=100:
-                # self.get_logger().info('right {} {:.2f} {:.2f}'.format(first_car_input[1]-i,distance,right_distance)) 
-                right_distance=distance
-                i+=5
-                distance=self.distance_car_obstacle([first_car_input[0],first_car_input[1]-i])
+        # elif right_distance>current_distance and right_distance>left_distance:
+        #     # Go to the right
+        #     i+=5
+        #     distance=self.distance_car_obstacle([first_car_input[0],first_car_input[1]-i])
+        #     while right_distance<distance and i<=100:
+        #         # self.get_logger().info('right {} {:.2f} {:.2f}'.format(first_car_input[1]-i,distance,right_distance)) 
+        #         right_distance=distance
+        #         i+=5
+        #         distance=self.distance_car_obstacle([first_car_input[0],first_car_input[1]-i])
                 
-            Yinput=first_car_input[1]-i
-            self.get_logger().info('{}'.format(Yinput)) 
+        #     Yinput=first_car_input[1]-i
+        #     self.get_logger().info('{}'.format(Yinput)) 
         
-        elif left_distance>current_distance and left_distance>right_distance:
-            # Go to the left
-            i+=5
-            distance=self.distance_car_obstacle([first_car_input[0],first_car_input[1]+i])
-            while left_distance<distance and i<=100:
-                # self.get_logger().info('left {:.2f} {:.2f}'.format(distance,left_distance)) 
-                left_distance=distance
-                i+=5
-                distance=self.distance_car_obstacle([first_car_input[0],first_car_input[1]+i])
+        # elif left_distance>current_distance and left_distance>right_distance:
+        #     # Go to the left
+        #     i+=5
+        #     distance=self.distance_car_obstacle([first_car_input[0],first_car_input[1]+i])
+        #     while left_distance<distance and i<=100:
+        #         # self.get_logger().info('left {:.2f} {:.2f}'.format(distance,left_distance)) 
+        #         left_distance=distance
+        #         i+=5
+        #         distance=self.distance_car_obstacle([first_car_input[0],first_car_input[1]+i])
                 
-            Yinput=first_car_input[1]+i
-        else:
-            self.get_logger().info('error') 
-            Yinput=first_car_input[1]
+        #     Yinput=first_car_input[1]+i
+        # else:
+        #     self.get_logger().info('error') 
+        #     Yinput=first_car_input[1]
 
         
-        if Yinput>350:
-            Yinput=350
-        elif Yinput<100:
-            Yinput=100
+        # if Yinput>350:
+        #     Yinput=350
+        # elif Yinput<100:
+        #     Yinput=100
         
-        self.Linput=[]
-        self.Lkeys.reverse()
-        i=0
-        for id in self.Lkeys:
-            self.Linput+=[id,300+i*150,Yinput]
-            i+=1 
-        return
+        # self.Linput=[]
+        # self.Lkeys.reverse()
+        # i=0
+        # for id in self.Lkeys:
+        #     self.Linput+=[id,300+i*150,Yinput]
+        #     i+=1 
+        # return
 
     def distance_car_obstacle(self,car):
         """
