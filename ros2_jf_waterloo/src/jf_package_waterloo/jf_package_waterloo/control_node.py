@@ -26,7 +26,7 @@ class car_Class():
         self.previous_time = current_time
 
         Kp_speed = 0.5
-        Ki_speed = 0.1
+        Ki_speed = 0.2
         Kd_speed = 0.1
         k_stanley = 1e-1
         # Kp_angle = 1e-2
@@ -76,7 +76,7 @@ class car_Class():
         elif self.Ycar<110:
             self.angle=15
         
-        if self.Xcar>400:
+        if self.Xcar>600:
             self.speed=0
         elif self.Xcar<=100:
             self.speed=60
@@ -93,7 +93,6 @@ class car_Class():
             self.angle=center_servo+delta_servo
         elif self.angle<center_servo-delta_servo:
             self.angle=center_servo-delta_servo
-
 
 
 class Control(Node):
