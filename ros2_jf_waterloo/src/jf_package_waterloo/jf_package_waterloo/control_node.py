@@ -71,7 +71,7 @@ class car_Class():
         self.angle=int(heading_error + m.atan2(k_stanley * cross_track_error, self.speed)* 180 / m.pi)
         
         # angle saturation: the car cannot be at too great an angle to the axis of the treadmill
-        max_angle=10
+        max_angle=20
         if (self.car_angle>max_angle and self.angle<0) or (self.car_angle<-max_angle and self.angle>0):
             self.angle=0     
             

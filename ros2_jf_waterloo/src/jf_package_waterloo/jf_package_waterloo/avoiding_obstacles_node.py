@@ -87,7 +87,7 @@ class Input(Node):
             self.Linput=[]
             self.Lkeys.reverse()
             # 1/3 of the treadmill
-            l1_3=100
+            l1_3=80
             i=0
             plus=True
             y=150
@@ -116,7 +116,7 @@ class Input(Node):
         left_distance = self.distance_car_obstacle([first_car_input[0],first_car_input[1]+i])
         # self.get_logger().info('{:.2f} {:.2f} {:.2f}'.format(left_distance,current_distance,right_distance)) 
 
-        if current_distance>=left_distance and current_distance>=right_distance:
+        if current_distance>=left_distance and current_distance>=right_distance or current_distance>50:
             # Keep position
             Yinput=first_car_input[1]
             
@@ -124,7 +124,7 @@ class Input(Node):
             # Go to the right
             i+=5
             distance=self.distance_car_obstacle([first_car_input[0],first_car_input[1]-i])
-            while right_distance<distance and i<=100:
+            while right_distance<distance and right_distance<50 and i<=100:
                 # self.get_logger().info('right {} {:.2f} {:.2f}'.format(first_car_input[1]-i,distance,right_distance)) 
                 right_distance=distance
                 i+=5
@@ -137,7 +137,7 @@ class Input(Node):
             # Go to the left
             i+=5
             distance=self.distance_car_obstacle([first_car_input[0],first_car_input[1]+i])
-            while left_distance<distance and i<=100:
+            while left_distance<distance and left_distance<50 and i<=100:
                 # self.get_logger().info('left {:.2f} {:.2f}'.format(distance,left_distance)) 
                 left_distance=distance
                 i+=5
