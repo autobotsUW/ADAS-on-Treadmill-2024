@@ -157,7 +157,7 @@ def find_the_car(color_img):
             
    # Display the image with rectangles, center points, and orthogonal lines
    show_image(color_img, "Rotated Rectangles, Center Points, and Orthogonal Lines")
-   #  cv2.imwrite("output.jpg", color_img)
+   # cv2.imwrite("aprilDetection.png", color_img)
    end_time = time.time()
    processing_time = end_time - start_time
    print("Processing time: {:.6f} seconds".format(processing_time))
