@@ -78,21 +78,24 @@ class Input(Node):
         """
         Calculate new input for the car with space invaders methods
         """
+        Xmin=150
+        Xcar=120
+
         if len(self.Lobstacle)==0:
             # self.get_logger().info("No obstacles detected") 
             if len(self.Lkeys)==1:
-                self.Linput=[self.Lkeys[0],200,self.treadmill[1]]
+                self.Linput=[self.Lkeys[0],Xmin,self.treadmill[1]]
                 return
             
             self.Linput=[]
             self.Lkeys.reverse()
             # 1/3 of the treadmill
-            l1_3=80
+            l1_3=50
             i=0
             plus=True
             y=150
             for id in self.Lkeys:
-                self.Linput+=[id,200+i*120,y]
+                self.Linput+=[id,Xmin+i*Xcar,y]
                 if plus:
                     plus=False
                     y+=l1_3
@@ -158,7 +161,7 @@ class Input(Node):
         self.Lkeys.reverse()
         i=0
         for id in self.Lkeys:
-            self.Linput+=[id,200+i*120,Yinput]
+            self.Linput+=[id,Xmin+i*Xcar,Yinput]
             i+=1 
         return
 
