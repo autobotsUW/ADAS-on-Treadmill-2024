@@ -81,7 +81,7 @@ class Input(Node):
         if len(self.Lobstacle)==0:
             # self.get_logger().info("No obstacles detected") 
             if len(self.Lkeys)==1:
-                self.Linput=[self.Lkeys[0],300,self.treadmill[1]]
+                self.Linput=[self.Lkeys[0],200,self.treadmill[1]]
                 return
             
             self.Linput=[]
@@ -92,7 +92,7 @@ class Input(Node):
             plus=True
             y=150
             for id in self.Lkeys:
-                self.Linput+=[id,300+i*120,y]
+                self.Linput+=[id,200+i*120,y]
                 if plus:
                     plus=False
                     y+=l1_3
@@ -102,7 +102,7 @@ class Input(Node):
                 i+=1
             return
         
-        self.get_logger().info(str(self.Lobstacle))
+        # self.get_logger().info(str(self.Lobstacle))
 
         # we have obstacles
         car=self.DictCar[self.Lkeys[0]]
@@ -114,7 +114,7 @@ class Input(Node):
         current_distance = self.distance_car_obstacle(first_car_input)
         right_distance = self.distance_car_obstacle([first_car_input[0],first_car_input[1]-i])
         left_distance = self.distance_car_obstacle([first_car_input[0],first_car_input[1]+i])
-        self.get_logger().info('{:.2f} {:.2f} {:.2f}'.format(left_distance,current_distance,right_distance)) 
+        # self.get_logger().info('{:.2f} {:.2f} {:.2f}'.format(left_distance,current_distance,right_distance)) 
 
         if current_distance>=left_distance and current_distance>=right_distance:
             # Keep position
@@ -158,7 +158,7 @@ class Input(Node):
         self.Lkeys.reverse()
         i=0
         for id in self.Lkeys:
-            self.Linput+=[id,300+i*150,Yinput]
+            self.Linput+=[id,200+i*120,Yinput]
             i+=1 
         return
 

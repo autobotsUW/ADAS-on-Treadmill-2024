@@ -28,6 +28,9 @@ class car_Class():
         Kp_speed = 0.48
         Ki_speed = 0.24
         Kd_speed = 0.24
+        Kp_angle = 1
+        Ki_angle = 0
+        Kd_angle = 0
         k_stanley = 1e-1
         
         # Kp_speed = 0.4
@@ -49,19 +52,20 @@ class car_Class():
             self.error_sum_angle += error_angle * delta_time
         
         if self.Xcar<100:
-            self.error_sum_speed=0
+            self.error_sum_speed = 0
+            self.error_sum_angle = 0
         
         
         # minimal_publisher.get_logger().info('Error {} speed: {:.3f}'.format(self.id,error_speed))
         # self.get_logger().info('Error {} angle: {:.3f}'.format(self.id,error_angle))
         self.speed = int(Kp_speed * error_speed + Ki_speed * self.error_sum_speed + Kd_speed * (error_speed-self.last_error_speed)/delta_time)
-        # self.angle = int(Kp_angle * error_angle + Ki_angle * self.error_sum_angle + Kd_angle * (error_angle-self.last_error_angle)/delta_time)
+        cross_track_error = int(Kp_angle * error_angle + Ki_angle * self.error_sum_angle + Kd_angle * (error_angle-self.last_error_angle)/delta_time)
 
         self.last_error_speed=error_speed
         self.last_error_angle=error_angle
 
          # Stanley controller
-        cross_track_error = self.Yinput - self.Ycar
+        # cross_track_error = self.Yinput - self.Ycar
         
         heading_error = self.car_angle
         self.angle=int(heading_error + m.atan2(k_stanley * cross_track_error, self.speed)* 180 / m.pi)
@@ -77,10 +81,10 @@ class car_Class():
         elif self.Ycar<50:
             self.angle=15
         
-        if self.Xcar>600:
+        if self.Xcar>550:
             self.speed=0
         elif self.Xcar<=50:
-            self.speed=60
+            self.speed= Kp_speed * error_speed
 
        
         if self.speed>150:
@@ -88,7 +92,7 @@ class car_Class():
         elif self.speed<0:
             self.speed=0
         
-        center_servo=90
+        center_servo=97
         delta_servo=40
         self.angle+=center_servo
         if self.angle>center_servo+delta_servo:
