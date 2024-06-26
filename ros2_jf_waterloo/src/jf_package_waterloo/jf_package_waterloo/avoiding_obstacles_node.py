@@ -87,10 +87,10 @@ class Input(Node):
             self.Linput=[]
             self.Lkeys.reverse()
             # 1/3 of the treadmill
-            l1_3=self.treadmill[1]*2/3
+            l1_3=100
             i=0
             plus=True
-            y=l1_3
+            y=150
             for id in self.Lkeys:
                 self.Linput+=[id,300+i*120,y]
                 if plus:
@@ -102,7 +102,7 @@ class Input(Node):
                 i+=1
             return
         
-        self.get_logger().info(self.Lobstacle)
+        self.get_logger().info(str(self.Lobstacle))
         # # we have obstacles
         # car=self.DictCar[self.Lkeys[0]]
         # first_car_input=[car.Xinput,car.Yinput]
