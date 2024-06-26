@@ -17,7 +17,8 @@ from rclpy.node import Node
 
 from std_msgs.msg import String,Int32MultiArray
 import time as t
-
+from datetime import datetime
+import os
 
 class MinimalSubscriber(Node):
 
@@ -26,13 +27,14 @@ class MinimalSubscriber(Node):
         self.subscription = self.create_subscription(Int32MultiArray,'car_position',self.listener_callback,10)
         self.subscription = self.create_subscription(Int32MultiArray,'input_position',self.input_listener_callback,10)
         self.subscription = self.create_subscription(Int32MultiArray,'command',self.command_callback,10)
-        self.file_name='2car.csv'
+
+
+        self.file_name=os.path.expanduser('~/ADAS-on-Treadmill-2024/Mesure/Mesure {}.csv'.format(datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
         self.input=[300,200]
         self.command=[0,0]
         self.t0=t.time()
-        # self.file_name='/Desktop/'+self.file_name
         fichier=open(self.file_name,'w')
-        fichier.write("Time (s);id;Xcar;Ycar;speed;direction\n")
+        fichier.write("Time (s);    ;car_position;   ;input;    ;command\n")
         fichier.close()
         self.input 
         self.subscription  # prevent unused variable warning
