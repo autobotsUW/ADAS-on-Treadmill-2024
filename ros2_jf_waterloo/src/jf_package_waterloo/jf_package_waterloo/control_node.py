@@ -25,7 +25,7 @@ class car_Class():
         delta_time = (current_time - self.previous_time)
         self.previous_time = current_time
 
-        Kp_speed = 0.48
+        Kp_speed = 0.8
         Ki_speed = 0.24
         Kd_speed = 0.24
         Kp_angle = 1
@@ -51,7 +51,7 @@ class car_Class():
             self.error_sum_speed += error_speed * delta_time
             self.error_sum_angle += error_angle * delta_time
         
-        if self.Xcar<100:
+        if self.Xcar<25:
             self.error_sum_speed = 0
             self.error_sum_angle = 0
         
@@ -76,15 +76,15 @@ class car_Class():
             self.angle=0     
             
         # managing the car that goes to the edge of the treadmill
-        if self.Ycar>350:
-            self.angle=-15
-        elif self.Ycar<50:
-            self.angle=15
+        if self.Ycar>375:
+            self.angle=-30
+        elif self.Ycar<25:
+            self.angle=30
         
         if self.Xcar>550:
             self.speed=0
         elif self.Xcar<=50:
-            self.speed= Kp_speed * error_speed
+            self.speed= 2*Kp_speed * error_speed
 
        
         if self.speed>150:

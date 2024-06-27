@@ -12,7 +12,7 @@ bluetooth_status = True
 speed=50
 angle=45
 while True:
-    # for angle in range(70,111,10):
+    # for angle in range(70,111,10):           
         # msg = "{},{}\n".format(int(speed), int(angle))
         msg = "[{},{}]".format(int(speed), int(angle))
         print(msg)

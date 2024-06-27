@@ -1,7 +1,7 @@
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String,Float32MultiArray,Int32MultiArray
-from tkinter import * 
+import time as time
 
 
 class car_Class():
@@ -22,6 +22,7 @@ class Input(Node):
         self.DictCar={}
         self.Linput=[]
         self.Lkeys=[]
+        self.tobstacle=0
         self.treadmill=[320,240]
 
     def treadmill_sub_function(self,msg):
@@ -80,29 +81,27 @@ class Input(Node):
         """
         Xmin=150
         Xcar=120
+        Ymiddle=self.treadmill[1]
+        deltaYmax=50
 
         if len(self.Lobstacle)==0:
             # self.get_logger().info("No obstacles detected") 
             if len(self.Lkeys)==1:
-                self.Linput=[self.Lkeys[0],Xmin,self.treadmill[1]]
+                self.Linput=[self.Lkeys[0],Xmin,Ymiddle]
                 return
             
             self.Linput=[]
-            self.Lkeys.reverse()
+            self.Lkeys.sort()
             # 1/3 of the treadmill
-            l1_3=50
-            i=0
+            deltaY=min(int(time.time()-self.tobstacle)-60,deltaYmax)
+            if deltaY<0:
+                deltaY=0
+            i=len(self.Lkeys)-1
             plus=True
-            y=150
             for id in self.Lkeys:
-                self.Linput+=[id,Xmin+i*Xcar,y]
-                if plus:
-                    plus=False
-                    y+=l1_3
-                else:
-                    plus=True
-                    y-=l1_3
-                i+=1
+                self.Linput+=[id,Xmin+i*Xcar,Ymiddle+deltaY]
+                deltaY*=-1
+                i-=1
             return
         
         # self.get_logger().info(str(self.Lobstacle))
@@ -110,6 +109,7 @@ class Input(Node):
         # we have obstacles
         car=self.DictCar[self.Lkeys[0]]
         first_car_input=[car.Xinput,car.Yinput]
+        self.tobstacle=time.time()
         # self.get_logger().info(str(first_car_input)) 
 
         i=5
@@ -127,7 +127,7 @@ class Input(Node):
             # Go to the right
             i+=5
             distance=self.distance_car_obstacle([first_car_input[0],first_car_input[1]-i])
-            while right_distance<distance and right_distance<50 and i<=100:
+            while right_distance<distance and right_distance<100 and i<=100:
                 # self.get_logger().info('right {} {:.2f} {:.2f}'.format(first_car_input[1]-i,distance,right_distance)) 
                 right_distance=distance
                 i+=5
@@ -140,7 +140,7 @@ class Input(Node):
             # Go to the left
             i+=5
             distance=self.distance_car_obstacle([first_car_input[0],first_car_input[1]+i])
-            while left_distance<distance and left_distance<50 and i<=100:
+            while left_distance<distance and left_distance<100 and i<=100:
                 # self.get_logger().info('left {:.2f} {:.2f}'.format(distance,left_distance)) 
                 left_distance=distance
                 i+=5
@@ -154,8 +154,8 @@ class Input(Node):
         
         if Yinput>350:
             Yinput=350
-        elif Yinput<80:
-            Yinput=80
+        elif Yinput<50:
+            Yinput=50
         
         self.Linput=[]
         self.Lkeys.reverse()
