@@ -1,6 +1,8 @@
 # ADAS-on-Treadmill-2024
 
-
+## Introduction
+The University of Waterloo’s Real-time Embedded Systems Lab hosts an autonomous driving system operating radio-controlled (RC) cars on a treadmill. The aim of this project is to simulate ADAS on RC cars. The cars move on a treadmill. A camera is placed above the system to detect both the position of the vehicles and obstacles. Obstacles can be studs, which move only on one axis, or balls. The cars maintain a position on the conveyor belt until an obstacle is detected. They must then move to avoid it. 
+Information from the camera is received on a PC and processed by ROS 2, before being transmitted to the cars via Bluetooth.
 We use ROS2 Humble with ubuntu 22.04
 
 Oh to launch car controller:
