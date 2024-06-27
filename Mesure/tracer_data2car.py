@@ -1,7 +1,6 @@
 import matplotlib.pyplot as plt 
 
-
-fichier=open("2car (3).csv","r")
+fichier=open("Mesure 2024-06-27 09:03:15.csv","r")
 lignes=fichier.readlines()
 fichier.close()
 
