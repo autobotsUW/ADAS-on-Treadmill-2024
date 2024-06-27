@@ -10,8 +10,9 @@ const int motorSpeedPin = 6; // ENA for PWM speed control
 Servo steeringServo;
 
 int speed = 0;
-int angle = 100;
-int lastAngle = 100;
+unsigned long angle = 100;
+int lastAngle = 0;
+unsigned long tempsServo = 0;
 
 
 void setup() {
@@ -69,7 +70,7 @@ void loop() {
          speed = newSpeed;
      }
 
-       if (newAngle >= 55 && newAngle <= 145){
+       if (newAngle >= 45 && newAngle <= 155){
          angle = newAngle;
       }
 
@@ -83,11 +84,26 @@ void loop() {
       }
     if (angle != lastAngle){
           // Control the angle
-      steeringServo.write(angle);
+      // steeringServo.write(angle);
+      Serial.print("Angle: ");
+      Serial.println(angle);
+      tempsServo =angle*1000;
+      Serial.print("Aff 1: ");
+      Serial.println(tempsServo);
+      tempsServo =angle*1000/180;
+      Serial.print("Aff 2: ");
+      Serial.println(tempsServo);
+      tempsServo =angle*1000/180+1000;
+      Serial.print("Aff 3: ");
+      Serial.println(tempsServo);
+      steeringServo.writeMicroseconds(int(tempsServo));
       lastAngle=angle;
       delay(15);
+      
+      
+      
     }
-
+  
       
     }
 
