@@ -1,7 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
-from tkinter import *
+from tkinter import Tk, Frame, Button, Label, Scale, Spinbox, Entry, IntVar
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
 import numpy as np
@@ -45,7 +45,7 @@ def update_speed(val):
         send_to_treadmill(65,0)
 
 def create_window():
-    global label, canvas,label_speed  # Declare as global to update in other functions
+    global label_speed, scale, speed_entry  # Declare as global to update in other functions
     root = Tk()
     root.title("ADAS on Treadmill : Control the treadmill")
     root.option_add("*Font", "Arial 16")
@@ -70,6 +70,16 @@ def create_window():
     scale = Scale(frame_scale, from_=0, to=600, orient='horizontal', command=update_speed, length=400)
     scale.grid(column=0, row=1, columnspan=2, pady=10)
 
+    # Entry for Speed
+    label_speed_entry = Label(frame_scale, text="Enter speed (m/s):", justify='center')
+    label_speed_entry.grid(column=0, row=2, pady=5)
+
+    speed_entry = Entry(frame_scale, width=10, justify='center')
+    speed_entry.grid(column=1, row=2, pady=5)
+
+    button_set_speed = Button(frame_scale, text="Set speed", command=lambda: set_speed(speed_entry.get()))
+    button_set_speed.grid(column=0, row=3, columnspan=2, pady=10)
+
     # Frame for Other Parameters
     frame_parameters = Frame(root, padx=20, pady=20)
     frame_parameters.pack()
@@ -93,6 +103,20 @@ def create_window():
     button_set_input.grid(column=0, row=3, columnspan=2, pady=10)
 
     root.mainloop()
+
+def set_speed(speed_str):
+    try:
+        speed = float(speed_str)
+        # Update label or send speed to treadmill
+        val=int(speed/0.00541)
+        if val > 600:
+            val = 600
+            speed_entry.delete(0, 'end')  # Efface le contenu actuel de l'Entry
+            speed_entry.insert(0, "{:.2f}".format(val * 0.00541))  # Insère la nouvelle valeur dans l'Entry
+
+        scale.set(val)
+    except ValueError:
+        print("Error", "Please enter a valid speed (a number).")
 
 create_window()
 
