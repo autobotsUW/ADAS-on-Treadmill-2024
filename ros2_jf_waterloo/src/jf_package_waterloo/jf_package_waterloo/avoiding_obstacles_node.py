@@ -7,7 +7,7 @@ import time as time
 class car_Class():
     def __init__(self,id):
         self.id=id
-        self.Xcar,self.Ycar,self.Xinput,self.Yinput=0,0,320,200
+        self.Xcar,self.Ycar,self.Xinput,self.Yinput=0,0,500,200
 
 class Input(Node):
 
@@ -24,6 +24,7 @@ class Input(Node):
         self.Lkeys=[]
         self.tobstacle=0
         self.treadmill=[320,240]
+        self.t0=0
 
     def treadmill_sub_function(self,msg):
         """
@@ -46,6 +47,11 @@ class Input(Node):
         """
         Read car position
         """
+        if len(msg.data)==0:
+            return
+        if self.t0==0 and msg.data[1]<500:
+            self.t0=time.time()
+
         self.Lkeys=[]
         for i in range(0,len(msg.data),6):
             id,x,y,angle=msg.data[i:i+4]
@@ -80,9 +86,14 @@ class Input(Node):
         Calculate new input for the car with space invaders methods
         """
         Xmin=150
+        Xmax=300
+        if self.t0==0:
+            Xmin=Xmax
+        elif Xmax-5*(time.time()-self.t0)>Xmin:
+            Xmin=Xmax-5*(time.time()-self.t0)
         Xcar=120
         Ymiddle=self.treadmill[1]
-        deltaYmax=50
+        deltaYmax=25
 
         if len(self.Lobstacle)==0:
             # self.get_logger().info("No obstacles detected") 
@@ -93,7 +104,7 @@ class Input(Node):
             self.Linput=[]
             self.Lkeys.sort()
             # 1/3 of the treadmill
-            deltaY=min(int(time.time()-self.tobstacle)-60,deltaYmax)
+            deltaY=min(int(time.time()-self.tobstacle)-15,deltaYmax)
             if deltaY<0:
                 deltaY=0
             i=len(self.Lkeys)-1
@@ -127,7 +138,7 @@ class Input(Node):
             # Go to the right
             i+=5
             distance=self.distance_car_obstacle([first_car_input[0],first_car_input[1]-i])
-            while right_distance<distance and right_distance<100 and i<=100:
+            while right_distance<distance and right_distance<150 and i<=100:
                 # self.get_logger().info('right {} {:.2f} {:.2f}'.format(first_car_input[1]-i,distance,right_distance)) 
                 right_distance=distance
                 i+=5
@@ -140,7 +151,7 @@ class Input(Node):
             # Go to the left
             i+=5
             distance=self.distance_car_obstacle([first_car_input[0],first_car_input[1]+i])
-            while left_distance<distance and left_distance<100 and i<=100:
+            while left_distance<distance and left_distance<150 and i<=100:
                 # self.get_logger().info('left {:.2f} {:.2f}'.format(distance,left_distance)) 
                 left_distance=distance
                 i+=5

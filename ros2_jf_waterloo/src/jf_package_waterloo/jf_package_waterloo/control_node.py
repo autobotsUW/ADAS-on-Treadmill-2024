@@ -11,11 +11,17 @@ class car_Class():
     def __init__(self,id):
         self.id=id
         self.speed,self.angle,self.Xcar,self.Ycar,self.Xinput,self.Yinput,self.car_angle=0,0,0,0,400,200,0
+        self.begin=False
         self.error_sum_speed = 0
         self.error_sum_angle = 0
         self.previous_time = t.time()
         self.last_error_speed=0
         self.last_error_angle=0
+        self.center_servo=100
+        if id==0:
+            self.center_servo=97
+        if id==1:
+            self.center_servo=105
 
     def calculate_command(self):
         """
@@ -25,7 +31,7 @@ class car_Class():
         delta_time = (current_time - self.previous_time)
         self.previous_time = current_time
 
-        Kp_speed = 0.8
+        Kp_speed = 0.48
         Ki_speed = 0.24
         Kd_speed = 0.24
         Kp_angle = 1
@@ -47,13 +53,10 @@ class car_Class():
         error_speed = self.Xinput - self.Xcar
         error_angle = self.Yinput - self.Ycar
 
-        if self.Xcar<600:
+        if self.begin==True:
             self.error_sum_speed += error_speed * delta_time
             self.error_sum_angle += error_angle * delta_time
         
-        if self.Xcar<25:
-            self.error_sum_speed = 0
-            self.error_sum_angle = 0
         
         
         # minimal_publisher.get_logger().info('Error {} speed: {:.3f}'.format(self.id,error_speed))
@@ -71,7 +74,7 @@ class car_Class():
         self.angle=int(heading_error + m.atan2(k_stanley * cross_track_error, self.speed)* 180 / m.pi)
         
         # angle saturation: the car cannot be at too great an angle to the axis of the treadmill
-        max_angle=20
+        max_angle=10
         if (self.car_angle>max_angle and self.angle<0) or (self.car_angle<-max_angle and self.angle>0):
             self.angle=0     
             
@@ -81,10 +84,11 @@ class car_Class():
         elif self.Ycar<25:
             self.angle=30
         
-        if self.Xcar>550:
+        if self.Xcar>600:
             self.speed=0
-        elif self.Xcar<=50:
-            self.speed= 2*Kp_speed * error_speed
+        elif self.Xcar<=50 and self.speed<Kp_speed * error_speed:
+            self.speed= Kp_speed * error_speed
+            self.error_sum_angle = 0
 
        
         if self.speed>150:
@@ -92,13 +96,15 @@ class car_Class():
         elif self.speed<0:
             self.speed=0
         
-        center_servo=97
-        delta_servo=40
-        self.angle+=center_servo
-        if self.angle>center_servo+delta_servo:
-            self.angle=center_servo+delta_servo
-        elif self.angle<center_servo-delta_servo:
-            self.angle=center_servo-delta_servo
+        delta_servo=20
+        self.angle+=self.center_servo
+        if self.angle>self.center_servo+delta_servo:
+            self.angle=self.center_servo+delta_servo
+        elif self.angle<self.center_servo-delta_servo:
+            self.angle=self.center_servo-delta_servo
+
+        if self.speed>20:
+            self.begin=True
 
 
 class Control(Node):

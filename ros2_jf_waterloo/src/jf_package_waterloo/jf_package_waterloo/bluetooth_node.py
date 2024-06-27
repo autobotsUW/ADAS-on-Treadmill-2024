@@ -17,7 +17,10 @@ class SerialCommunication(Node):
         self.t0=time.time()
         
         # Open bluetooth connection
-        self.DictAddr={1:'98:D3:51:FE:EC:72',0:'98:D3:71:FE:AB:41'}
+        self.DictAddr={}
+        self.DictAddr[0]='98:D3:71:FE:AB:41'
+        self.DictAddr[1]='98:D3:51:FE:EC:72'
+
         self.DictSock={}
         for key in self.DictAddr.keys():
             bd_addr=self.DictAddr[key]
