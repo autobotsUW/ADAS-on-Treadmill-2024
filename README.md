@@ -1,7 +1,11 @@
 # ADAS-on-Treadmill-2024
 
 ## Introduction
-The University of Waterloo’s Real-time Embedded Systems Lab hosts an autonomous driving system operating radio-controlled (RC) cars on a treadmill. The aim of this project is to simulate ADAS on RC cars. The cars move on a treadmill. A camera is placed above the system to detect both the position of the vehicles and obstacles. Obstacles can be studs, which move only on one axis, or balls. The cars maintain a position on the conveyor belt until an obstacle is detected. They must then move to avoid it. 
+The University of Waterloo’s Real-time Embedded Systems Lab hosts an autonomous driving system operating radio-controlled (RC) cars on a treadmill. The aim of this project is to simulate Advanced Driver-Assistance Systems on RC cars. The cars move on a treadmill. A camera is placed above the system to detect both the position of the vehicles and obstacles. Obstacles can be studs, which move only on one axis, or balls. The cars maintain a position on the treadmill until an obstacle is detected. They must then move to avoid it. 
+
+ADD PICTURE
+
+
 Information from the camera is received on a PC and processed by ROS 2, before being transmitted to the cars via Bluetooth.
 We use ROS2 Humble with ubuntu 22.04
 
@@ -26,6 +30,9 @@ To launch the treadmill: use treadmill_control.py with a good configuration.
 ### camera_node
 - **Description**: This node captures images from the camera and provides the position of the cars and obstacles.
 
+### camera_node_with_apriltags
+- **Description**: This node captures images from the camera and provides the position of the cars and obstacles for cars with an apriltags.
+
 ### bluetooth_node
 - **Description**: This node sends commands to the car via Bluetooth.
 
@@ -43,6 +50,9 @@ To launch the treadmill: use treadmill_control.py with a good configuration.
 
 ### security_node
 - **Description**: This node detects anomalies.
+
+### save_topic
+- **Description**: This node is in charge to save data in several topics to plot these data.
 
 ## Topics
 
@@ -77,6 +87,7 @@ To allow communication between these nodes, several topics are used:
 - **Description**: Commands for the treadmill.
 
 ## Launch files:
-- **ADAS_on_treadmill_launch**: the car go to the position that you define.
-- **ADAS_on_treadmill_launch_with_obstacles**: the car avoid obstacles.
+- **ADAS_on_treadmill_launch**: one car go to the position that you define.
+- **ADAS_on_treadmill_launch_with_obstacles**: one car avoid obstacles.
+- **ADAS_on_treadmill_launch_several_cars**: the car avoid obstacles for several cars. Works for one car
 

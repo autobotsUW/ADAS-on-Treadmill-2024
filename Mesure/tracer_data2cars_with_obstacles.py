@@ -29,9 +29,12 @@ def tracer(path,aff=True):
     Ldirection0=[]
     Ldirection1=[]
 
-    LtObstacles=[]
-    LObstacles=[]    
-    LdimObstacles=[]
+    LtxObstacles=[]
+    LtyObstacles=[]
+    LObstaclesx=[]
+    LObstaclesy=[]    
+    LdimxObstacles=[]      
+    LdimyObstacles=[]
 
     for ligne in lignes[2:]:
         data=ligne.split("  ")
@@ -40,17 +43,20 @@ def tracer(path,aff=True):
         cars=data[2].split(";")
         cars.pop()
         cars.pop(0)
+        Lxcars=[]
         for i in range(0,len(cars),6):
             if cars[i]=="0":
                 Lt0.append(t)
                 Lx0.append(float(cars[i+1]))
                 Ly0.append(float(cars[i+2]))
                 Langle0.append(float(cars[i+3]))
+                Lxcars.append(float(cars[i+1]))
             elif cars[i]=="1":
                 Lt1.append(t)
                 Lx1.append(float(cars[i+1]))
                 Ly1.append(float(cars[i+2]))
                 Langle1.append(float(cars[i+3]))
+                Lxcars.append(float(cars[i+1]))
 
         input=data[4].split(";")
         input.pop()
@@ -83,9 +89,15 @@ def tracer(path,aff=True):
         # print(command)
         obstacles.pop(0)
         for i in range(0,len(obstacles),3):
-            LtObstacles.append(t)
-            LObstacles.append(float(obstacles[i+1]))
-            LdimObstacles.append(float(obstacles[i+2])/2)
+            LtxObstacles.append(t)
+            LObstaclesx.append(float(obstacles[i]))
+            LdimxObstacles.append(float(obstacles[i+2])/2)
+            Ld=[float(obstacles[i])-xcar for xcar in Lxcars] 
+            Ld.sort()
+            if len(Ld)>0 and Ld[0]<float(obstacles[i+2]):
+                LtyObstacles.append(t)
+                LObstaclesy.append(float(obstacles[i+1]))
+                LdimyObstacles.append(float(obstacles[i+2])/2)
 
     # fig, (ax1, ax2,ax3) = plt.subplots(3, 1, figsize=(10, 15))
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 15))
@@ -95,6 +107,7 @@ def tracer(path,aff=True):
     ax1.plot(Lt1, Lx1, '+b', label='car 1')
     ax1.plot(Lt0input, Lx0input, 'k', label='car 0 input')
     ax1.plot(Lt1input, Lx1input, 'k', label='car 1 input')
+    ax1.errorbar(LtxObstacles, LObstaclesx, yerr=LdimxObstacles, color='g', fmt='o', capsize=0, label='Obstacles')
     ax1.set_ylim(0, 716)
     ax1.legend()
     ax1.set_title('Graphique 1 : Position X')
@@ -104,7 +117,7 @@ def tracer(path,aff=True):
     ax2.plot(Lt1, Ly1, '+b', label='car 1')
     ax2.plot(Lt0input, Ly0input, 'k', label='car 0 input')
     ax2.plot(Lt1input, Ly1input, 'k', label='car 1 input')
-    ax2.errorbar(LtObstacles, LObstacles, yerr=LdimObstacles, color='g', fmt='o', capsize=0, label='Données avec erreurs')
+    ax2.errorbar(LtyObstacles, LObstaclesy, yerr=LdimyObstacles, color='g', fmt='o', capsize=0, label='Obstacles')
     ax2.set_ylim(0, 400)
     ax2.legend()
     ax2.set_title('Graphique 2 : Position Y')
