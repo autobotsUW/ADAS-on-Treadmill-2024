@@ -121,8 +121,9 @@ def tracer(path,aff=True):
     ax1.plot(Lt1input, Lx1input, 'k', label='car 1 input')
     ax1.errorbar(LtxObstacles, LObstaclesx, yerr=LdimxObstacles, color='g', fmt='+', capsize=0, label='Obstacles')
     ax1.set_ylim(0, 716)
+    ax1.set_xlabel("Time (s)")
     ax1.legend()
-    ax1.set_title('Graphique 1 : Position X')
+    ax1.set_title('Position X')
 
     # Deuxième sous-graphe
     ax2.plot(Lt0, Ly0, '+r', label='car 0')
@@ -133,8 +134,9 @@ def tracer(path,aff=True):
     ax2.plot(Lt1input, Ly1input, 'k', label='car 1 input')
     ax2.errorbar(LtyObstacles, LObstaclesy, yerr=LdimyObstacles, color='g', fmt='+', capsize=0, label='Obstacles')
     ax2.set_ylim(0, 400)
+    ax2.set_xlabel("Time (s)")
     ax2.legend()
-    ax2.set_title('Graphique 2 : Position Y')
+    ax2.set_title('Position Y')
 
     # Troisième sous-graphe
     # ax3.plot(Lt0command, Lspeed0, '+r', label='car 0')

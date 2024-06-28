@@ -113,7 +113,7 @@ class Input(Node):
             # self.get_logger().info("No obstacles detected") 
             if len(self.Lkeys)==1:
                 self.Linput=[self.Lkeys[0],Xmin,Ymiddle]
-                return
+                return 
             
             self.Linput=[]
             self.Lkeys.sort()
