@@ -59,6 +59,7 @@ class Treadmill(Node):
         """
         self.send_to_treadmill(61, val)
         self.label_speed.config(text="Speed : {:.2f} m/s".format(int(val)*0.00541))
+        self.label_real_speed.config(text="Equivalent real speed : {:.2f} km/h".format(int(val)*0.00541*18*3.6))
         if int(val)==0:
             self.send_to_treadmill(65,0)
 
@@ -87,6 +88,9 @@ class Treadmill(Node):
 
         self.label_speed = tk.Label(frame_scale, text="Speed : {:.2f} m/s".format(0))
         self.label_speed.grid(column=0, row=0, columnspan=2, pady=10)
+
+        self.label_real_speed = tk.Label(frame_scale, text="Equivalent real speed : {:.2f} m/s".format(0))
+        self.label_real_speed.grid(column=0, row=0, columnspan=2, pady=20)
 
         scale = tk.Scale(frame_scale, from_=0, to=600, orient='horizontal', command=self.update_speed, length=400)
         scale.grid(column=0, row=1, columnspan=2, pady=10)
