@@ -31,6 +31,10 @@ Connecting from a browser to the IP address, an interface opens, allowing us to 
 To start the treadmill, set P65 to 97, and 0 to stop it.  
 To adjust speed, set parameter P61 to between 0 and 600.
 
+## Important parameters:
+P104 = Acceleration Time from 0.0 to 3600 s
+P105 = Deceleration Time from 0.0 to 3600 s
+
 ## Program:
 The program create a tkinter windows to control in speed the treadmill. 
 It use Selinum to connect at the pages, to complet the form and send the value.
