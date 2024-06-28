@@ -21,7 +21,7 @@ class car_Class():
         if id==0:
             self.center_servo=97
         if id==1:
-            self.center_servo=105
+            self.center_servo=103
 
     def calculate_command(self):
         """
@@ -34,8 +34,8 @@ class car_Class():
         Kp_speed = 0.48
         Ki_speed = 0.24
         Kd_speed = 0.24
-        Kp_angle = 1
-        Ki_angle = 0
+        Kp_angle = 0.8
+        Ki_angle = 0.1
         Kd_angle = 0
         k_stanley = 1e-1
         
@@ -72,6 +72,7 @@ class car_Class():
         
         heading_error = self.car_angle
         self.angle=int(heading_error + m.atan2(k_stanley * cross_track_error, self.speed)* 180 / m.pi)
+
         
         # angle saturation: the car cannot be at too great an angle to the axis of the treadmill
         max_angle=10
@@ -96,7 +97,7 @@ class car_Class():
         elif self.speed<0:
             self.speed=0
         
-        delta_servo=20
+        delta_servo=40
         self.angle+=self.center_servo
         if self.angle>self.center_servo+delta_servo:
             self.angle=self.center_servo+delta_servo

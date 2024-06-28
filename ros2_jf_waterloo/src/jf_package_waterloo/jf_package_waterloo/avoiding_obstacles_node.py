@@ -25,6 +25,7 @@ class Input(Node):
         self.tobstacle=0
         self.treadmill=[320,240]
         self.t0=0
+        self.numberOfCar=1
 
     def treadmill_sub_function(self,msg):
         """
@@ -41,7 +42,12 @@ class Input(Node):
         msg = Int32MultiArray()
         msg.data = [int(i) for i in self.Linput]
         self.publisher_.publish(msg)
-        # self.get_logger().info('Input {}'.format(msg.data))
+        for i in range(0,len(msg.data),3):
+            id,x,y=msg.data[i:i+3]
+            if id in self.DictCar.keys():
+                car=self.DictCar[id]
+                car.Xinput=x
+                car.Yinput=y
         
     def car_sub_function(self, msg):
         """
@@ -52,6 +58,11 @@ class Input(Node):
         if self.t0==0 and msg.data[1]<500:
             self.t0=time.time()
 
+        numberOfCar=len(msg.data)/6
+        if numberOfCar>self.numberOfCar:
+            self.numberOfCar=numberOfCar
+            self.get_logger().info('{} cars'.format(self.numberOfCar))
+        
         self.Lkeys=[]
         for i in range(0,len(msg.data),6):
             id,x,y,angle=msg.data[i:i+4]
@@ -71,7 +82,10 @@ class Input(Node):
         if len(self.Lkeys)>=1:
             # self.get_logger().info("Car obstacles detected") 
             self.define_input()
-            self.send_input()
+            if len(self.Linput)/3==self.numberOfCar:
+                self.send_input()
+            else:
+                self.get_logger().info("Error number of cars") 
 
     def obstacles_sub_function(self, msg):
         """
@@ -85,15 +99,15 @@ class Input(Node):
         """
         Calculate new input for the car with space invaders methods
         """
-        Xmin=150
-        Xmax=300
+        Xmin=100
+        Xmax=400
         if self.t0==0:
             Xmin=Xmax
-        elif Xmax-5*(time.time()-self.t0)>Xmin:
-            Xmin=Xmax-5*(time.time()-self.t0)
-        Xcar=120
+        elif Xmax-10*(time.time()-self.t0)>Xmin:
+            Xmin=Xmax-10*(time.time()-self.t0)
+        Xcar=150
         Ymiddle=self.treadmill[1]
-        deltaYmax=25
+        deltaYmax=50
 
         if len(self.Lobstacle)==0:
             # self.get_logger().info("No obstacles detected") 
@@ -104,7 +118,7 @@ class Input(Node):
             self.Linput=[]
             self.Lkeys.sort()
             # 1/3 of the treadmill
-            deltaY=min(int(time.time()-self.tobstacle)-15,deltaYmax)
+            deltaY=min(int(time.time()-self.tobstacle)-5,deltaYmax)
             if deltaY<0:
                 deltaY=0
             i=len(self.Lkeys)-1
@@ -115,49 +129,57 @@ class Input(Node):
                 i-=1
             return
         
-        # self.get_logger().info(str(self.Lobstacle))
+        self.get_logger().info(str(self.Lobstacle))
 
         # we have obstacles
         car=self.DictCar[self.Lkeys[0]]
         first_car_input=[car.Xinput,car.Yinput]
         self.tobstacle=time.time()
-        # self.get_logger().info(str(first_car_input)) 
+        self.get_logger().info(str(first_car_input)) 
 
         i=5
+        distance_min=150
 
         current_distance = self.distance_car_obstacle(first_car_input)
         right_distance = self.distance_car_obstacle([first_car_input[0],first_car_input[1]-i])
         left_distance = self.distance_car_obstacle([first_car_input[0],first_car_input[1]+i])
         # self.get_logger().info('{:.2f} {:.2f} {:.2f}'.format(left_distance,current_distance,right_distance)) 
 
-        if current_distance>=left_distance and current_distance>=right_distance or current_distance>50:
+        # if current_distance>500 and left_distance>500 and right_distance>500:
+        #     if len(self.Lkeys)==1:
+        #         self.Linput=[self.Lkeys[0],Xmin,Ymiddle]
+        #         return
+
+        if current_distance>=left_distance and current_distance>=right_distance or current_distance>distance_min:
             # Keep position
+            self.get_logger().info('Current {:.2f}'.format(current_distance)) 
             Yinput=first_car_input[1]
             
         elif right_distance>current_distance and right_distance>left_distance:
             # Go to the right
             i+=5
             distance=self.distance_car_obstacle([first_car_input[0],first_car_input[1]-i])
-            while right_distance<distance and right_distance<150 and i<=100:
+            while right_distance<distance and right_distance<distance_min and i<=100:
                 # self.get_logger().info('right {} {:.2f} {:.2f}'.format(first_car_input[1]-i,distance,right_distance)) 
                 right_distance=distance
                 i+=5
                 distance=self.distance_car_obstacle([first_car_input[0],first_car_input[1]-i])
-                
+            self.get_logger().info('Right {:.2f} '.format(distance))   
             Yinput=first_car_input[1]-i
-            self.get_logger().info('{}'.format(Yinput)) 
+            # self.get_logger().info('{}'.format(Yinput)) 
         
         elif left_distance>current_distance and left_distance>right_distance:
             # Go to the left
             i+=5
             distance=self.distance_car_obstacle([first_car_input[0],first_car_input[1]+i])
-            while left_distance<distance and left_distance<150 and i<=100:
+            while left_distance<distance and left_distance<distance_min and i<=100:
                 # self.get_logger().info('left {:.2f} {:.2f}'.format(distance,left_distance)) 
                 left_distance=distance
                 i+=5
                 distance=self.distance_car_obstacle([first_car_input[0],first_car_input[1]+i])
-                
+            self.get_logger().info('left {:.2f} '.format(distance))    
             Yinput=first_car_input[1]+i
+
         else:
             self.get_logger().info('error') 
             Yinput=first_car_input[1]
