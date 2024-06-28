@@ -32,7 +32,7 @@ To start the treadmill, set P65 to 97, and 0 to stop it.
 To adjust speed, set parameter P61 to between 0 and 600.
 
 ## Important parameters:
-P104 = Acceleration Time from 0.0 to 3600 s
+P104 = Acceleration Time from 0.0 to 3600 s  
 P105 = Deceleration Time from 0.0 to 3600 s
 
 ## Program:
