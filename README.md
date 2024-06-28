@@ -30,8 +30,8 @@ To launch the treadmill: use treadmill_control.py with a good configuration.
 ### camera_node
 - **Description**: This node captures images from the camera and provides the position of the cars and obstacles.
 
-### camera_node_with_apriltags
-- **Description**: This node captures images from the camera and provides the position of the cars and obstacles for cars with an apriltags.
+### camera_with_apriltags_node
+- **Description**: This node captures images from the camera and provides the position of the cars and obstacles with apriltags to separate the cars.
 
 ### bluetooth_node
 - **Description**: This node sends commands to the car via Bluetooth.
@@ -51,32 +51,32 @@ To launch the treadmill: use treadmill_control.py with a good configuration.
 ### security_node
 - **Description**: This node detects anomalies.
 
-### save_topic
-- **Description**: This node is in charge to save data in several topics to plot these data.
+### save_topic
+- **Description**: This node saves data in several topics in a CSV file.
 
 ## Topics
 
 To allow communication between these nodes, several topics are used:
 
 ### /car_position
-- **Type**: Float32 list
+- **Type**: Int32 list
 - **Description**: List of car positions and their dimensions.
-- **Format**: `[x1, y1, θ1, height1, width1, x2, y2, θ2, height2, width2, ...]`
+- **Format**: `[id_1, x_1, y_1, θ_1, height_1, width_1, id_2, x_2, y_2, θ_2, height_2, width_2, ...]`
 
 ### /input_position
-- **Type**: Float32 list
-- **Description**: User input position.
-- **Format**: `[Xinput, Yinput]`
+- **Type**: Int32 list
+- **Description**: User input positions.
+- **Format**: `[id_1, X_input1, Y_input1, id_2, X_input2, Y_input2, ...]`
 
 ### /command
 - **Type**: Int32 list
 - **Description**: Speed and angle commands for the car.
-- **Format**: `[speed, angle]`
+- **Format**: `[id_1, speed_1, angle_1, id_2, speed_2, angle_2, ...]`
 
 ### /obstacles_position
-- **Type**: Float32 list
+- **Type**: Int32 list
 - **Description**: Position of obstacles.
-- **Format**: `[x1, y1, radius1, x2, y2, radius2, ...]`
+- **Format**: `[x_1, y_1, radius_1, x_2, y_2, radius_2, ...]`
 
 ### /error
 - **Type**: String
@@ -85,6 +85,7 @@ To allow communication between these nodes, several topics are used:
 ### /treadmill
 - **Type**: String
 - **Description**: Commands for the treadmill.
+
 
 ## Launch files:
 - **ADAS_on_treadmill_launch**: one car go to the position that you define.
