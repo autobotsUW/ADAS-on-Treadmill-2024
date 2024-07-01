@@ -8,6 +8,9 @@ from message_filters import TimeSynchronizer, Subscriber
 
 
 class car_Class():
+    """
+    Car class to manage the car
+    """
     def __init__(self,id):
         self.id=id
         self.speed,self.angle,self.Xcar,self.Ycar,self.Xinput,self.Yinput,self.car_angle=0,0,0,0,400,200,0
@@ -38,41 +41,25 @@ class car_Class():
         Ki_angle = 0.1
         Kd_angle = 0
         k_stanley = 1e-1
-        
-        # Kp_speed = 0.4
-        # Ki_speed = 0.2
-        # Kd_speed = 0.1
-
-        # Kp_speed = 0.8
-        # Ki_speed = 0.2
-        # Kd_speed = 0.1
-        # Kp_angle = 1e-2
-        # Ki_angle = 5e-4
-        # Kd_angle = 0
 
         error_speed = self.Xinput - self.Xcar
         error_angle = self.Yinput - self.Ycar
 
+        
+        # PID controller
         if self.begin==True:
             self.error_sum_speed += error_speed * delta_time
             self.error_sum_angle += error_angle * delta_time
         
-        
-        
-        # minimal_publisher.get_logger().info('Error {} speed: {:.3f}'.format(self.id,error_speed))
-        # self.get_logger().info('Error {} angle: {:.3f}'.format(self.id,error_angle))
         self.speed = int(Kp_speed * error_speed + Ki_speed * self.error_sum_speed + Kd_speed * (error_speed-self.last_error_speed)/delta_time)
         cross_track_error = int(Kp_angle * error_angle + Ki_angle * self.error_sum_angle + Kd_angle * (error_angle-self.last_error_angle)/delta_time)
 
         self.last_error_speed=error_speed
         self.last_error_angle=error_angle
 
-         # Stanley controller
-        # cross_track_error = self.Yinput - self.Ycar
-        
+        # Stanley controller
         heading_error = self.car_angle
         self.angle=int(heading_error + m.atan2(k_stanley * cross_track_error, self.speed)* 180 / m.pi)
-
         
         # angle saturation: the car cannot be at too great an angle to the axis of the treadmill
         max_angle=10
@@ -85,18 +72,20 @@ class car_Class():
         elif self.Ycar<25:
             self.angle=30
         
+        # managing the car that goes to the edge of the treadmill
         if self.Xcar>600:
             self.speed=0
         elif self.Xcar<=50 and self.speed<Kp_speed * error_speed:
             self.speed= Kp_speed * error_speed
             self.error_sum_angle = 0
 
-       
+        # speed saturation
         if self.speed>150:
             self.speed=150
         elif self.speed<0:
             self.speed=0
         
+        # angle saturation and adaptation at the servomotor
         delta_servo=40
         self.angle+=self.center_servo
         if self.angle>self.center_servo+delta_servo:
@@ -119,26 +108,18 @@ class Control(Node):
         self.error_pub = self.create_publisher(String, 'error', 10)
         self.DictCar={}
         self.command=[]
-    
-    def camera_callback(self, msg):
-        self.get_logger().info(f"Received camera position: {msg.data}")
-
-    def input_callback(self, msg):
-        self.get_logger().info(f"Received input position: {msg.data}")
 
     def send_command(self):
         """
         Send the speed,angle to command topic
         """
-        # self.speed=0
         msg = Int32MultiArray()
         msg.data = [int(i) for i in self.command]
         self.serial_pu.publish(msg)
-        # self.get_logger().info("Send to car: {}".format(msg.data))
 
     def camera_sub_function(self, msg):
         """
-        Read the car_position topic
+        Read the car_position topic and actuate the car information
         """
         self.command=[]
         for i in range(0,len(msg.data),6):
@@ -148,13 +129,14 @@ class Control(Node):
                 car.Xcar=x
                 car.Ycar=y
                 car.car_angle=angle
-                # self.get_logger().info("Car {} xcar {} ycar {} xinput {} yinput {}".format(car.id,car.Xcar,car.Ycar,car.Xinput,car.Yinput))
+            
             else:
                 car=car_Class(id)
                 car.Xcar=x
                 car.Ycar=y
                 car.car_angle=angle
                 self.DictCar[id]=car
+
             car.calculate_command()
             self.command+=[id,car.speed,car.angle]
         self.send_command()
@@ -163,14 +145,13 @@ class Control(Node):
         """
         Read the input topic
         """
-        # self.get_logger().info(str(msg.data))
         for i in range(0,len(msg.data),3):
             id,x,y=msg.data[i:i+3]
             if id in self.DictCar.keys():
                 car=self.DictCar[id]
                 car.Xinput=x
                 car.Yinput=y
-                # self.get_logger().info("Car {} xinput {} yinput {}".format(car.id,car.Xinput,car.Yinput))
+
             else:
                 self.get_logger().info("Car no exist")
                 msg=String()

@@ -8,6 +8,9 @@ import numpy as np
 
 
 def send_to_treadmill(parameter, value):
+    """
+    Send command to the treadmill with the web page completed by Selenium.
+    """
     # Set Chrome options for headless mode
     chrome_options = Options()
     chrome_options.add_argument('--headless')  # Run Chrome in headless mode
@@ -47,6 +50,9 @@ def update_speed(val):
 
 
 def create_window():
+    """
+    Tkinter window with buttons to start/stop the treadmill, a scale to set the speed, and entries to set other parameters.
+    """
     global label_speed, scale, speed_entry,label_real_speed  # Declare as global to update in other functions
     root = Tk()
     root.title("ADAS on Treadmill : Control the treadmill")

@@ -1,17 +1,3 @@
-# Copyright 2016 Open Source Robotics Foundation, Inc.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 import rclpy
 from rclpy.node import Node
 
@@ -42,17 +28,29 @@ class MinimalSubscriber(Node):
         self.subscription  # prevent unused variable warning
 
     def obstacles_callback(self,msg):
+        """
+        Save obstacles data received
+        """
         self.obstacles=msg.data
 
     def command_callback(self,msg):
+        """
+        Save command data received
+        """
         self.command=msg.data
 
     def input_listener_callback(self,msg):
+        """
+        Save input data received
+        """
         if len(msg.data)>=1:
             # self.get_logger().info('I heard: {} {}'.format(self.input[0],self.input[1]))
             self.input=msg.data
 
     def listener_callback(self, msg):
+        """
+        Write the data in a csv file for each car message received
+        """
         if len(msg.data)>3:
             data="{:.3f}".format(t.time()-self.t0)
             data+=';    '

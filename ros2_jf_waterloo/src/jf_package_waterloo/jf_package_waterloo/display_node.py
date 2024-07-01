@@ -30,6 +30,9 @@ class Display(Node):
         self.input = []
         self.command = []
         self.Lobject = []
+        self.CarObject = []
+        self.ObstaclesObject = []
+        self.InputObject = []
         self.treadmill=[640,480]
         timer_period = 0.01  # seconds
         self.init_display()
@@ -61,39 +64,18 @@ class Display(Node):
         Read car_position topic
         """
         self.Lcar = msg.data
-
-    def obstacles_sub_function(self, msg):
-        """
-        Read obstacles_position topic
-        """
-        self.Lobstacle = msg.data
-
-    def input_sub_function(self, msg):
-        """
-        Read the input position
-        """
-        self.input = msg.data
-    
-    def update_display(self):
-        """
-        Update the display 
-        """
-        # self.get_logger().info('I am updating the display')
-        # Remove last plot
-        for object in self.Lobject:
+        # remove last car plot
+        for object in self.CarObject:
             object.remove()
-        self.Lobject = []
+        self.CarObject = []
 
         # Plot car
         for i in range(0, len(self.Lcar), 6):
             number,x_center, y_center, angle, width, height = self.Lcar[i:i+6]
 
             # Plot center of the car
-            # car_center= patches.Circle((x_center, y_center), 2, edgecolor='green', facecolor='green',linewidth=5)
-            # self.ax.add_patch(car_center)
-            # self.Lobject.append(car_center)
             text=self.ax.text(x_center, y_center, str(int(number)), horizontalalignment='center', verticalalignment='center', fontsize=16, color='green')
-            self.Lobject.append(text)
+            self.CarObject.append(text)
 
             # Plot the rectnagle of the car
             angle_rad=-angle*np.pi/180
@@ -103,24 +85,44 @@ class Display(Node):
             car = patches.Rectangle([x_corner_rotated, y_corner_rotated], width=width, height=height, edgecolor='green', facecolor='none', linewidth=3)
             car.set_angle(-angle)
             self.ax.add_patch(car)
-            self.Lobject.append(car)
+            self.CarObject.append(car)
 
+        self.fig.canvas.draw()
+        plt.pause(0.001)
+
+    def obstacles_sub_function(self, msg):
+        """
+        Read obstacles_position topic
+        """
+        self.Lobstacle = msg.data
+        # remove last obstacles plot
+        for object in self.ObstaclesObject:
+            object.remove()
+        self.ObstaclesObject = []
         # Plot obstacles
         for i in range(0, len(self.Lobstacle), 3):
             obstacle = patches.Circle((self.Lobstacle[i], self.Lobstacle[i+1]), self.Lobstacle[i+2], edgecolor='red', facecolor='red')
             self.ax.add_patch(obstacle)
-            self.Lobject.append(obstacle)
-        
+            self.ObstaclesObject.append(obstacle)
+        self.fig.canvas.draw()
+        plt.pause(0.001)
+
+    def input_sub_function(self, msg):
+        """
+        Read the input position
+        """
+        self.input = msg.data
+        # remove last input plot
+        for object in self.InputObject:
+            object.remove()
+        self.InputObject = []
         # Plot input
         for i in range(0,len(self.input),3):
             input= patches.Circle((self.input[i+1], self.input[i+2]), 2, edgecolor='black', facecolor='black',linewidth=2)
             self.ax.add_patch(input)
-            self.Lobject.append(input)
-
-        # update figure
+            self.InputObject.append(input)
         self.fig.canvas.draw()
-        plt.pause(0.005)
-        # self.get_logger().info(str(self.Lobject))
+        plt.pause(0.001)
     
     def init_display(self,xlim=640,ylim=480):
         """
@@ -134,7 +136,6 @@ class Display(Node):
         self.ax.set_xlim(0, xlim)
         self.ax.set_ylim(0, ylim)
         self.ax.set_aspect('equal')
-        # self.ax.set_axis_off()
         self.ax.set_title('Display')
         plt.show(block=False)
 
