@@ -31,6 +31,8 @@ setup(
             'treadmill_interface=jf_package_waterloo.treadmill_interface:main',
             'camera_with_apriltags_node=jf_package_waterloo.camera_with_apriltags_node:main',
             'save_topic=jf_package_waterloo.save_topic:main',
+            'anomalies_input_node=jf_package_waterloo.anomalies_input_node:main',
+            'anomalies_node=jf_package_waterloo.anomalies_node:main',
         ],
     },
 )
