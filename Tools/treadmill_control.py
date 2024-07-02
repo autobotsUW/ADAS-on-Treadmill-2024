@@ -75,21 +75,21 @@ def create_window():
     label_speed = Label(frame_scale, text="Speed : {:.2f} m/s".format(0))
     label_speed.grid(column=0, row=0, columnspan=2, pady=10)
 
-    label_real_speed = Label(frame_scale, text="Equivalent real speed : {:.2f} m/s".format(0))
-    label_real_speed.grid(column=0, row=0, columnspan=2, pady=20)
+    label_real_speed = Label(frame_scale, text="Equivalent real speed : {:.2f} km/h".format(0))
+    label_real_speed.grid(column=0, row=1, columnspan=2, pady=10)
 
     scale = Scale(frame_scale, from_=0, to=600, orient='horizontal', command=update_speed, length=400)
-    scale.grid(column=0, row=1, columnspan=2, pady=10)
+    scale.grid(column=0, row=2, columnspan=2, pady=10)
 
     # Entry for Speed
     label_speed_entry = Label(frame_scale, text="Enter speed (m/s):", justify='center')
-    label_speed_entry.grid(column=0, row=2, pady=5)
+    label_speed_entry.grid(column=0, row=3, pady=5)
 
     speed_entry = Entry(frame_scale, width=10, justify='center')
-    speed_entry.grid(column=1, row=2, pady=5)
+    speed_entry.grid(column=1, row=3, pady=5)
 
     button_set_speed = Button(frame_scale, text="Set speed", command=lambda: set_speed(speed_entry.get()))
-    button_set_speed.grid(column=0, row=3, columnspan=2, pady=10)
+    button_set_speed.grid(column=0, row=4, columnspan=2, pady=10)
 
     # Frame for Other Parameters
     frame_parameters = Frame(root, padx=20, pady=20)
@@ -112,6 +112,8 @@ def create_window():
 
     button_set_input = Button(frame_parameters, text="Set input", command=lambda: send_to_treadmill(Xinput.get(), Yinput.get()))
     button_set_input.grid(column=0, row=3, columnspan=2, pady=10)
+
+    set_speed(1)
 
     root.mainloop()
 
