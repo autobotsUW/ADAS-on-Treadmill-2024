@@ -36,7 +36,7 @@ class Display(Node):
         self.treadmill=[640,480]
         timer_period = 0.01  # seconds
         self.init_display()
-        self.timer = self.create_timer(timer_period, self.timer_callback)
+        # self.timer = self.create_timer(timer_period, self.timer_callback)
  
     def timer_callback(self):
         """
