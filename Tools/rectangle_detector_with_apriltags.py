@@ -111,7 +111,7 @@ def find_the_car(color_img):
                angle = rect[2]
                if height<width:
                   angle-=90
-               treadmill=list(center)+[angle]
+               treadmill=list(center)+[abs(angle)]
            
          elif 0.7<width/height<1.3 and 1000<area<2800:
             print(area)
@@ -186,6 +186,7 @@ while True:
    end_time = time.time()
    processing_time = end_time - start_time
    # print("End time: {:.6f} seconds".format(processing_time))
+   time.sleep(0.5)
 cap.release()
 cv2.waitKey(0)
 cv2.destroyAllWindows()

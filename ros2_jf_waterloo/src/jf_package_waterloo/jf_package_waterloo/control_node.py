@@ -37,10 +37,10 @@ class car_Class():
         Kp_speed = 0.48
         Ki_speed = 0.24
         Kd_speed = 0.24
-        Kp_angle = 0.8
-        Ki_angle = 0.1
-        Kd_angle = 0
-        k_stanley = 1e-1
+        Kp_angle = 3
+        Ki_angle = 0.2
+        Kd_angle = 0.2
+        k_stanley = 5e-2
 
         error_speed = self.Xinput - self.Xcar
         error_angle = self.Yinput - self.Ycar
@@ -62,14 +62,16 @@ class car_Class():
         self.angle=int(heading_error + m.atan2(k_stanley * cross_track_error, self.speed)* 180 / m.pi)
         
         # angle saturation: the car cannot be at too great an angle to the axis of the treadmill
-        max_angle=10
+        max_angle=15
         if (self.car_angle>max_angle and self.angle<0) or (self.car_angle<-max_angle and self.angle>0):
+            minimal_publisher.get_logger().info("Saturation angle car {} {}".format(self.id,self.car_angle))
             self.angle=0     
             
+            
         # managing the car that goes to the edge of the treadmill
-        if self.Ycar>375:
+        if self.Ycar>360:
             self.angle=-30
-        elif self.Ycar<25:
+        elif self.Ycar<40:
             self.angle=30
         
         # managing the car that goes to the edge of the treadmill

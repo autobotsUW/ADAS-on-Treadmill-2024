@@ -182,7 +182,7 @@ class Camera(Node):
                     angle = rect[2]
                     if height<width:
                         angle+=90
-                    treadmill=list(center)+[angle]
+                    treadmill=list(center)+[abs(angle)]
                 
                 elif 0.7<width/height<1.3 and 1000<area<2800:
                     # Calculate the center of the rectangle
@@ -210,6 +210,8 @@ class Camera(Node):
                     # Add the angle, the width, and the height to the list
                     for i in range(0,len(car),6):
                         if (((L-car[i+1])-center[0])**2+(car[i+2]-center[1])**2)**0.5<25:
+                            # if not(70<angle<110):
+                            #     self.get_logger().info("Error angle: {} ".format(angle))
                             car[i+3]=angle
                             car[i+4]=width
                             car[i+5]=height

@@ -2,7 +2,7 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String,Float32MultiArray,Int32MultiArray
 import time as time
-
+import numpy as np
 
 class car_Class():
     """
@@ -30,6 +30,7 @@ class Input(Node):
         self.treadmill=[320,240]
         self.t0=0
         self.numberOfCar=1
+        self.car_independant=True
 
     def treadmill_sub_function(self,msg):
         """
@@ -65,11 +66,11 @@ class Input(Node):
             return
         
         # No movement of the treadmill
-        if self.t0==0 and msg.data[1]<500:
+        if self.t0==0 and msg.data[1]<550:
             self.t0=time.time()
 
         # Mannaging detection of several cars
-        numberOfCar=len(msg.data)/6
+        numberOfCar=len(msg.data)//6
         if numberOfCar>self.numberOfCar:
             self.numberOfCar=numberOfCar
             self.get_logger().info('{} cars'.format(self.numberOfCar))
@@ -114,7 +115,7 @@ class Input(Node):
         Calculate new input for the car with space invaders methods
         """
         # Begin at the middle of the treadmill and move back.
-        Xmin=100
+        Xmin=125
         Xmax=400
         if self.t0==0:
             Xmin=Xmax
@@ -123,6 +124,9 @@ class Input(Node):
         Xcar=150
         Ymiddle=self.treadmill[1]
         deltaYmax=50
+        self.distanceMin=100
+        Ymin=50
+        Ymax=350
 
 
         if len(self.Lobstacle)==0:
@@ -131,7 +135,7 @@ class Input(Node):
             # If one car: center in Y position
             if len(self.Lkeys)==1:
                 self.Linput=[self.Lkeys[0],Xmin,Ymiddle]
-                return 
+                return  
             
             # If several car: we create two columns. We separate these columns if we not have obstacles
             self.Linput=[]
@@ -151,64 +155,113 @@ class Input(Node):
         # self.get_logger().info(str(self.Lobstacle))
 
         # we have obstacles
-        # We use the position of the car with smallest id to define where to go
-        car=self.DictCar[self.Lkeys[0]]
-        first_car_input=[car.Xinput,car.Yinput]
-        self.tobstacle=time.time()
+        
+        
         # self.get_logger().info(str(first_car_input)) 
 
-        i=5
-        distance_min=150
-        # We use the space invader method. We mesure the distance between the first car and the obstacles and we maximize the minimal distance
-        current_distance = self.distance_car_obstacle(first_car_input)
-        right_distance = self.distance_car_obstacle([first_car_input[0],first_car_input[1]-i])
-        left_distance = self.distance_car_obstacle([first_car_input[0],first_car_input[1]+i])
+        # i=10
+        # distance_min=150
+        # # We use the space invader method. We mesure the distance between the first car and the obstacles and we maximize the minimal distance
+        # current_distance = self.distance_car_obstacle(first_car_input)
+        # right_distance = self.distance_car_obstacle([first_car_input[0],first_car_input[1]-i])
+        # left_distance = self.distance_car_obstacle([first_car_input[0],first_car_input[1]+i])
         
-        if current_distance>=left_distance and current_distance>=right_distance or current_distance>distance_min:
-            # Keep position
-            self.get_logger().info('Current {:.2f}'.format(current_distance)) 
-            Yinput=first_car_input[1]
+        # if current_distance>=left_distance and current_distance>=right_distance or current_distance>distance_min:
+        #     # Keep position
+        #     self.get_logger().info('Current {:.2f}'.format(current_distance)) 
+        #     Yinput=first_car_input[1]
             
-        elif right_distance>current_distance and right_distance>left_distance:
-            # Go to the right
-            i+=5
-            distance=self.distance_car_obstacle([first_car_input[0],first_car_input[1]-i])
-            while right_distance<distance and right_distance<distance_min and i<=100:
-                right_distance=distance
-                i+=5
-                distance=self.distance_car_obstacle([first_car_input[0],first_car_input[1]-i])
-            self.get_logger().info('Right {:.2f} '.format(distance))   
-            Yinput=first_car_input[1]-i
+        # elif right_distance>current_distance and right_distance>left_distance:
+        #     # Go to the right
+        #     i+=5
+        #     distance=self.distance_car_obstacle([first_car_input[0],first_car_input[1]-i])
+        #     while right_distance<distance and right_distance<distance_min and i<=100:
+        #         right_distance=distance
+        #         i+=5
+        #         distance=self.distance_car_obstacle([first_car_input[0],first_car_input[1]-i])
+        #     self.get_logger().info('Right {:.2f} '.format(distance))   
+        #     Yinput=first_car_input[1]-i
         
-        elif left_distance>current_distance and left_distance>right_distance:
-            # Go to the left
-            i+=5
-            distance=self.distance_car_obstacle([first_car_input[0],first_car_input[1]+i])
-            while left_distance<distance and left_distance<distance_min and i<=100:
-                left_distance=distance
-                i+=5
-                distance=self.distance_car_obstacle([first_car_input[0],first_car_input[1]+i])
-            self.get_logger().info('left {:.2f} '.format(distance))    
-            Yinput=first_car_input[1]+i
+        # elif left_distance>current_distance and left_distance>right_distance:
+        #     # Go to the left
+        #     i+=5
+        #     distance=self.distance_car_obstacle([first_car_input[0],first_car_input[1]+i])
+        #     while left_distance<distance and left_distance<distance_min and i<=100:
+        #         left_distance=distance
+        #         i+=5
+        #         distance=self.distance_car_obstacle([first_car_input[0],first_car_input[1]+i])
+        #     self.get_logger().info('left {:.2f} '.format(distance))    
+        #     Yinput=first_car_input[1]+i
 
-        else:
-            self.get_logger().info('error') 
-            Yinput=first_car_input[1]
+        # else:
+        #     self.get_logger().info('error') 
+        #     Yinput=first_car_input[1]
 
-        
-        if Yinput>350:
-            Yinput=350
-        elif Yinput<50:
-            Yinput=50
-        
 
-        # we put the other cars behind the first 
+        self.tobstacle=time.time()
         self.Linput=[]
-        self.Lkeys.reverse()
-        i=0
-        for id in self.Lkeys:
-            self.Linput+=[id,Xmin+i*Xcar,Yinput]
-            i+=1 
+
+        if self.car_independant:
+            # each cars choose these position 
+            for id in self.Lkeys:
+                car=self.DictCar[id]
+                first_car_input=[car.Xinput,car.Yinput]
+                Ly=[y for y in range(Ymin,Ymax+1,10)]
+                Ldistance=[]
+                for y in Ly:
+                    Ldistance.append(self.distance_car_obstacle([car.Xinput,y]))
+                if max(Ldistance)==1000:
+                    Yinput=0.1*Ymiddle+0.9*car.Yinput
+                elif max(Ldistance)==self.distanceMin:
+                    L=[]
+                    for i in range(len(Ly)):
+                        if Ldistance[i]==self.distanceMin:
+                            L.append(Ly[i])
+                    Yinput=L[min(range(len(L)),key=lambda i: abs(L[i]-car.Yinput))]
+                    # self.get_logger().info('{} {} {} {}'.format(id,Yinput,L,Ldistance)) 
+                else:
+                    Yinput=Ly[np.argmax(Ldistance)]
+                
+                if Yinput>Ymax:
+                    Yinput=Ymax
+                elif Yinput<Ymin:
+                    Yinput=Ymin
+                
+                self.Linput+=[id,car.Xinput,Yinput]
+            
+        else:
+            # We use the position of the car with smallest id to define where to go
+            car=self.DictCar[self.Lkeys[0]]
+            first_car_input=[car.Xinput,car.Yinput]
+            
+
+            Ly=[y for y in range(50,351,10)]
+            Ldistance=[]
+            for y in Ly:
+                Ldistance.append(self.distance_car_obstacle([first_car_input[0],y]))
+            if max(Ldistance)==1000:
+                Yinput=Ymiddle
+            elif max(Ldistance)==self.distanceMin:
+                L=[]
+                for i in range(len(Ly)):
+                    if Ldistance[i]==self.distanceMin:
+                        L.append(Ly[i])
+                Yinput=L[min(range(len(L)),key=lambda i: abs(L[i]-first_car_input[1]))]
+                # self.get_logger().info('{} {} {}'.format(Yinput,L,Ldistance)) 
+            else:
+                Yinput=Ly[np.argmax(Ldistance)]
+            
+            if Yinput>350:
+                Yinput=350
+            elif Yinput<50:
+                Yinput=50
+            
+            # we put the other cars behind the first 
+            self.Lkeys.reverse()
+            i=0
+            for id in self.Lkeys:
+                self.Linput+=[id,Xmin+i*Xcar,Yinput]
+                i+=1 
         return
 
     def distance_car_obstacle(self,car):
@@ -221,6 +274,8 @@ class Input(Node):
                 distance.append(abs(car[1]-obstacle[1]))
         distance.sort()
         if len(distance)>=1:
+            if distance[0]>self.distanceMin:
+                return(self.distanceMin)
             return distance[0]
         return 1000
 
