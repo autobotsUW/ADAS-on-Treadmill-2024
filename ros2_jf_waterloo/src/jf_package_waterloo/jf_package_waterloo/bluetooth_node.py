@@ -19,7 +19,7 @@ class SerialCommunication(Node):
         # Define all bluetooth address with is id car
         self.DictAddr={}
         self.DictAddr[0]='98:D3:71:FE:AB:41'
-        self.DictAddr[1]='98:D3:51:FE:EC:72'
+        # self.DictAddr[1]='98:D3:51:FE:EC:72'
 
         # Open all bluetooth connection
         self.DictSock={}
@@ -43,7 +43,7 @@ class SerialCommunication(Node):
                     msg.data='{:.2f} bluetooth connection'.format(time.time()-self.t0)
                     self.error_pub.publish(msg)
                 i+=1
-                self.get_logger().info('Bluetooth connection NO established. {}'.format(key))    
+                self.get_logger().info('Bluetooth connection NO established. {} {}/10'.format(key,i))    
             self.get_logger().info("Bluetooth connection established. {} {}".format(key,bd_addr))
 
     def Send_message(self):

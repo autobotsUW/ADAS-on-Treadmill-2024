@@ -22,7 +22,7 @@ class car_Class():
         self.last_error_angle=0
         self.center_servo=100
         if id==0:
-            self.center_servo=97
+            self.center_servo=85
         if id==1:
             self.center_servo=103
 
@@ -37,10 +37,10 @@ class car_Class():
         Kp_speed = 0.48
         Ki_speed = 0.24
         Kd_speed = 0.24
-        Kp_angle = 3
-        Ki_angle = 0.2
-        Kd_angle = 0.2
-        k_stanley = 5e-2
+        Kp_angle = 1
+        Ki_angle = 0
+        Kd_angle = 0
+        k_stanley = 1e-1
 
         error_speed = self.Xinput - self.Xcar
         error_angle = self.Yinput - self.Ycar
