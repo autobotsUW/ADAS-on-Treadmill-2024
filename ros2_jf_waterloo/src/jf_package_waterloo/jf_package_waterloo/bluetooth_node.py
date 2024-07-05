@@ -19,7 +19,7 @@ class SerialCommunication(Node):
         # Define all bluetooth address with is id car
         self.DictAddr={}
         self.DictAddr[0]='98:D3:71:FE:AB:41'
-        # self.DictAddr[1]='98:D3:51:FE:EC:72'
+        self.DictAddr[1]='98:D3:51:FE:EC:72'
 
         # Open all bluetooth connection
         self.DictSock={}

@@ -24,7 +24,7 @@ class car_Class():
         if id==0:
             self.center_servo=85
         if id==1:
-            self.center_servo=103
+            self.center_servo=105
 
     def calculate_command(self):
         """
@@ -37,10 +37,21 @@ class car_Class():
         Kp_speed = 0.48
         Ki_speed = 0.24
         Kd_speed = 0.24
-        Kp_angle = 1
-        Ki_angle = 0
-        Kd_angle = 0
+        # Kp_angle = 1
+        # Ki_angle = 0
+        # Kd_angle = 0
+        Kp_angle = 0.9
+        Ki_angle = 0.1
+        Kd_angle = 0.1
         k_stanley = 1e-1
+
+        # Kp_speed = 0.48
+        # Ki_speed = 0.24
+        # Kd_speed = 0.24
+        # Kp_angle = 1
+        # Ki_angle = 0
+        # Kd_angle = 0
+        # k_stanley = 1e-1
 
         error_speed = self.Xinput - self.Xcar
         error_angle = self.Yinput - self.Ycar
@@ -59,10 +70,10 @@ class car_Class():
 
         # Stanley controller
         heading_error = self.car_angle
-        self.angle=int(heading_error + m.atan2(k_stanley * cross_track_error, self.speed)* 180 / m.pi)
+        self.angle=int((heading_error + m.atan2(k_stanley * cross_track_error, self.speed)* 180 / m.pi))
         
         # angle saturation: the car cannot be at too great an angle to the axis of the treadmill
-        max_angle=15
+        max_angle=20
         if (self.car_angle>max_angle and self.angle<0) or (self.car_angle<-max_angle and self.angle>0):
             minimal_publisher.get_logger().info("Saturation angle car {} {}".format(self.id,self.car_angle))
             self.angle=0     
@@ -88,7 +99,7 @@ class car_Class():
             self.speed=0
         
         # angle saturation and adaptation at the servomotor
-        delta_servo=40
+        delta_servo=30
         self.angle+=self.center_servo
         if self.angle>self.center_servo+delta_servo:
             self.angle=self.center_servo+delta_servo
