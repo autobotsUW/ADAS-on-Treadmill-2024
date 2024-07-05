@@ -174,7 +174,7 @@ dossier_courant = os.getcwd()
 fichiers_dans_dossier = os.listdir(dossier_courant)
 
 # Affiche la liste des fichiers
-print("Mesures tracee:")
+print("Mesures tracees:")
 for fichier in fichiers_dans_dossier:
     if fichier[-4:]=='.csv' and ("{}.png".format(fichier[:-4]) not in fichiers_dans_dossier):
         print(fichier)
