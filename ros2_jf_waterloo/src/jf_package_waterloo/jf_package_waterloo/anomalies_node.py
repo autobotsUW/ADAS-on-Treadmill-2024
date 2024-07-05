@@ -54,7 +54,7 @@ class MinimalSubscriber(Node):
                     data.append(rd.randint(0,50))  # radius
 
             elif self.type=="fixed" or self.type=="add":
-                input=self.anomalies.split(';')
+                input=self.anomalies.split(',')
                 while len(input)%3:
                     input.pop()
                 data=[int(i) for i in input]
@@ -71,15 +71,15 @@ class MinimalSubscriber(Node):
                     data.append(rd.randint(10,100))  # heigth
 
             elif self.type=="add":
-                for i in range(0,len(self.car),6):
-                    car=self.anomalies.split(';')
+                for i in range(0,len(self.car)):
+                    car=self.anomalies.split(',')
                     if i<len(car):
-                        data.append(self.car[i]+car[i])
+                        data.append(self.car[i]+int(car[i]))
                     else:
                         data.append(self.car[i])
                         
             elif self.type=="fixed":
-                car=self.anomalies.split(';')
+                car=self.anomalies.split(',')
                 while len(car)%6:
                     car.pop()
                 data=[int(i) for i in car]
@@ -93,15 +93,15 @@ class MinimalSubscriber(Node):
                     data.append(rd.randint(0,400))  # y
 
             elif self.type=="add":
-                for i in range(0,len(self.input),6):
-                    input=self.anomalies.split(';')
+                for i in range(0,len(self.input)):
+                    input=self.anomalies.split(',')
                     if i<len(input):
-                        data.append(self.input[i]+input[i])
+                        data.append(self.input[i]+int(input[i]))
                     else:
                         data.append(self.input[i])
                         
             elif self.type=="fixed":
-                input=self.anomalies.split(';')
+                input=self.anomalies.split(',')
                 while len(input)%6:
                     input.pop()
                 data=[int(i) for i in input]
@@ -116,15 +116,15 @@ class MinimalSubscriber(Node):
                     data.append(rd.randint(80,120))  # direction
 
             elif self.type=="add":
-                for i in range(0,len(self.command),6):
-                    command=self.anomalies.split(';')
+                for i in range(0,len(self.command)):
+                    command=self.anomalies.split(',')
                     if i<len(command):
-                        data.append(self.command[i]+command[i])
+                        data.append(self.command[i]+int(command[i]))
                     else:
                         data.append(self.command[i])
                         
             elif self.type=="fixed":
-                command=self.anomalies.split(';')
+                command=self.anomalies.split(',')
                 while len(command)%6:
                     command.pop()
                 data=[int(i) for i in command]

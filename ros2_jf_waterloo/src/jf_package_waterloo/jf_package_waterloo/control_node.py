@@ -24,7 +24,7 @@ class car_Class():
         if id==0:
             self.center_servo=85
         if id==1:
-            self.center_servo=103
+            self.center_servo=105
 
     def calculate_command(self):
         """
@@ -40,7 +40,7 @@ class car_Class():
         # Kp_angle = 1
         # Ki_angle = 0
         # Kd_angle = 0
-        Kp_angle = 1
+        Kp_angle = 0.9
         Ki_angle = 0
         Kd_angle = 0
         k_stanley = 1e-1
@@ -73,17 +73,17 @@ class car_Class():
         self.angle=int((heading_error + m.atan2(k_stanley * cross_track_error, self.speed)* 180 / m.pi))
         
         # angle saturation: the car cannot be at too great an angle to the axis of the treadmill
-        max_angle=20
-        if (self.car_angle>max_angle and self.angle<0) or (self.car_angle<-max_angle and self.angle>0):
-            minimal_publisher.get_logger().info("Saturation angle car {} {}".format(self.id,self.car_angle))
-            self.angle=0     
+        # max_angle=20
+        # if (self.car_angle>max_angle and self.angle<0) or (self.car_angle<-max_angle and self.angle>0):
+        #     minimal_publisher.get_logger().info("Saturation angle car {} {}".format(self.id,self.car_angle))
+        #     self.angle=0     
             
             
         # managing the car that goes to the edge of the treadmill
-        if self.Ycar>360:
-            self.angle=-30
-        elif self.Ycar<40:
-            self.angle=30
+        # if self.Ycar>360:
+        #     self.angle=-20
+        # elif self.Ycar<40:
+        #     self.angle=20
         
         # managing the car that goes to the edge of the treadmill
         if self.Xcar>600:
