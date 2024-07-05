@@ -24,7 +24,7 @@ class car_Class():
         if id==0:
             self.center_servo=85
         if id==1:
-            self.center_servo=105
+            self.center_servo=103
 
     def calculate_command(self):
         """
@@ -40,9 +40,9 @@ class car_Class():
         # Kp_angle = 1
         # Ki_angle = 0
         # Kd_angle = 0
-        Kp_angle = 0.9
-        Ki_angle = 0.1
-        Kd_angle = 0.1
+        Kp_angle = 1
+        Ki_angle = 0
+        Kd_angle = 0
         k_stanley = 1e-1
 
         # Kp_speed = 0.48

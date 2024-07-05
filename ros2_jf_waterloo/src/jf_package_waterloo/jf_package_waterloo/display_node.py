@@ -16,7 +16,7 @@ class Display(Node):
     def __init__(self):
         super().__init__('minimal_subscriber')
         self.get_logger().info("Display Node started.\n")
-        # self.serial_sub = self.create_subscription(Int32MultiArray, 'command',self.command_sub_function, 10)
+        self.serial_sub = self.create_subscription(Int32MultiArray, 'command',self.command_sub_function, 10)
         self.car_sub = self.create_subscription(Int32MultiArray, 'car_position', self.car_sub_function, 10)
         self.obstacles_sub = self.create_subscription(Int32MultiArray, 'obstacles_position', self.obstacles_sub_function, 10)
         self.input_sub = self.create_subscription(Int32MultiArray, 'input_position', self.input_sub_function, 10)

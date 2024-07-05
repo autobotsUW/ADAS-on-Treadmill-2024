@@ -115,7 +115,7 @@ class Input(Node):
         Calculate new input for the car with space invaders methods
         """
         # Begin at the middle of the treadmill and move back.
-        Xmin=150
+        Xmin=300
         Xmax=400
         # To begin we define an input at the middle of the treadmill
         if self.t0==0:
@@ -125,7 +125,7 @@ class Input(Node):
         Xcar=140
         Ymiddle=self.treadmill[1]
         deltaYmax=50
-        self.distanceMin=120
+        self.distanceMin=150
         Ymin=50
         Ymax=350
 
