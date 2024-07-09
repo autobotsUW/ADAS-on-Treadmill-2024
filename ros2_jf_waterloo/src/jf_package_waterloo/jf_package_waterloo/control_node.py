@@ -13,7 +13,7 @@ class car_Class():
     """
     def __init__(self,id):
         self.id=id
-        self.speed,self.angle,self.Xcar,self.Ycar,self.Xinput,self.Yinput,self.car_angle=0,0,0,0,400,200,0
+        self.speed,self.direction,self.Xcar,self.Ycar,self.Xinput,self.Yinput,self.car_angle=0,0,0,0,400,200,0
         self.begin=False
         self.error_sum_speed = 0
         self.error_sum_angle = 0
@@ -22,7 +22,7 @@ class car_Class():
         self.last_error_angle=0
         self.center_servo=100
         if id==0:
-            self.center_servo=85
+            self.center_servo=86
         if id==1:
             self.center_servo=105
 
@@ -40,7 +40,7 @@ class car_Class():
         # Kp_angle = 1
         # Ki_angle = 0
         # Kd_angle = 0
-        Kp_angle = 0.9
+        Kp_angle = 0.8
         Ki_angle = 0
         Kd_angle = 0
         k_stanley = 1e-1
@@ -70,27 +70,27 @@ class car_Class():
 
         # Stanley controller
         heading_error = self.car_angle
-        self.angle=int((heading_error + m.atan2(k_stanley * cross_track_error, self.speed)* 180 / m.pi))
+        self.direction=int((heading_error + m.atan2(k_stanley * cross_track_error, self.speed)* 180 / m.pi))
         
         # angle saturation: the car cannot be at too great an angle to the axis of the treadmill
         # max_angle=20
-        # if (self.car_angle>max_angle and self.angle<0) or (self.car_angle<-max_angle and self.angle>0):
+        # if (self.car_angle>max_angle and self.direction<0) or (self.car_angle<-max_angle and self.direction>0):
         #     minimal_publisher.get_logger().info("Saturation angle car {} {}".format(self.id,self.car_angle))
-        #     self.angle=0     
+        #     self.direction=0     
             
             
         # managing the car that goes to the edge of the treadmill
         # if self.Ycar>360:
-        #     self.angle=-20
+        #     self.direction=-20
         # elif self.Ycar<40:
-        #     self.angle=20
+        #     self.direction=20
         
         # managing the car that goes to the edge of the treadmill
         if self.Xcar>600:
             self.speed=0
-        elif self.Xcar<=50 and self.speed<Kp_speed * error_speed:
-            self.speed= Kp_speed * error_speed
-            self.error_sum_angle = 0
+        # elif self.Xcar<=50 and self.speed<Kp_speed * error_speed:
+        #     self.speed= Kp_speed * error_speed
+        #     self.error_sum_angle = 0
 
         # speed saturation
         if self.speed>150:
@@ -99,12 +99,12 @@ class car_Class():
             self.speed=0
         
         # angle saturation and adaptation at the servomotor
-        delta_servo=30
-        self.angle+=self.center_servo
-        if self.angle>self.center_servo+delta_servo:
-            self.angle=self.center_servo+delta_servo
-        elif self.angle<self.center_servo-delta_servo:
-            self.angle=self.center_servo-delta_servo
+        delta_servo=20
+        self.direction+=self.center_servo
+        if self.direction>self.center_servo+delta_servo:
+            self.direction=self.center_servo+delta_servo
+        elif self.direction<self.center_servo-delta_servo:
+            self.direction=self.center_servo-delta_servo
 
         if self.speed>20:
             self.begin=True
@@ -137,21 +137,25 @@ class Control(Node):
         self.command=[]
         for i in range(0,len(msg.data),6):
             id,x,y,angle=msg.data[i:i+4]
-            if id in self.DictCar.keys():
+            if angle<-80 or angle>80:
+                self.get_logger().info("Error angle car {} {}".format(id,angle))
+                pass
+            elif id in self.DictCar.keys():
                 car=self.DictCar[id]
                 car.Xcar=x
                 car.Ycar=y
                 car.car_angle=angle
-            
+                car.calculate_command()
+                self.command+=[id,car.speed,car.direction]
             else:
                 car=car_Class(id)
                 car.Xcar=x
                 car.Ycar=y
                 car.car_angle=angle
                 self.DictCar[id]=car
-
-            car.calculate_command()
-            self.command+=[id,car.speed,car.angle]
+                car.calculate_command()
+                self.command+=[id,car.speed,car.direction]
+                
         self.send_command()
     
     def input_sub_function(self, msg):

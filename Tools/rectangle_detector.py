@@ -66,7 +66,7 @@ def find_the_car(img):
     Lobstacle=[]
     for cnt in contours:
         area = cv2.contourArea(cnt)
-        if area > 800:  # Filter small contours
+        if area > 0:  # Filter small contours
             # Fit a rotated rectangle to the contour
             rect = cv2.minAreaRect(cnt)
             box = cv2.boxPoints(rect)
@@ -153,8 +153,6 @@ def find_the_car(img):
     processing_time = end_time - start_time
    #  print("Processing time: {:.6f} seconds".format(processing_time))
     return treadmill, car,Lobstacle
-fichier=open('violet.txt','w')
-fichier.close()
 cap = cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH,640)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT,480)
@@ -163,7 +161,6 @@ i=0
 while True:
    start_time=time.time()
    ret, frame = cap.read()
-   cv2.imwrite("output.png", frame)
    
    if not ret:
       break

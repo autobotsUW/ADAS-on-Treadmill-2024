@@ -33,6 +33,7 @@ class Display(Node):
         self.CarObject = []
         self.ObstaclesObject = []
         self.InputObject = []
+        self.LinesObject=[]
         self.treadmill=[640,480]
         timer_period = 0.01  # seconds
         self.init_display()
@@ -48,10 +49,19 @@ class Display(Node):
         """
         Read treadmill position
         """
-        if self.treadmill!=msg.data:
-            self.treadmill=msg.data
+        if self.treadmill!=msg.data[:3]:
+            self.treadmill=msg.data[:3]
             self.ax.set_xlim(0, 2*int(msg.data[0]))
             self.ax.set_ylim(0, 2*int(msg.data[1]))
+        if len(msg.data)>3:
+            for object in self.LinesObject:
+                object.remove()
+            self.LinesObject = []
+            for y in msg.data[3:]:
+                line_patch = patches.Polygon(xy=list(zip([0, 2 * int(msg.data[0])], [y, y])), closed=None, fill=None, edgecolor='black', linestyle='--')
+                self.ax.add_patch(line_patch)
+                self.LinesObject.append(line_patch)
+            
     
     def command_sub_function(self, msg):
         """

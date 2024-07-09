@@ -65,7 +65,7 @@ class Camera(Node):
                 self.error_pub.publish(msg)
             else:
                 # Search cars and obstacles
-                treadmill,car,obstacles=self.find_the_car(frame[20:420,65:783])
+                treadmill,car,obstacles=self.find_the_car(frame[48:425,54:769])
                 if len(treadmill)>1:
                     msg=Int32MultiArray()
                     msg.data = [int(i) for i in treadmill]
@@ -75,6 +75,8 @@ class Camera(Node):
                 if len(car)>1:
                     for i in range(0,len(car),6):
                             car[i+3]=car[i+3]-treadmill[2]
+                            if car[i+3]<-80 or car[i+3]>80:
+                                self.get_logger().info("Error angle car {} {}".format(car[i+3],treadmill[2]))
                     msg=Int32MultiArray()
                     msg.data = [int(i) for i in car]
                     self.publisher_car.publish(msg)
@@ -129,7 +131,7 @@ class Camera(Node):
         """
         if not self.window:
             self.initialize_window(title)
-        cv2.circle(img, (self.Xinput,self.Yinput), 5, (0, 0, 255), -1)
+        # cv2.circle(img, (self.Xinput,self.Yinput), 5, (0, 0, 255), -1)
         cv2.imshow(title, img)
         cv2.waitKey(1)
 
@@ -150,7 +152,15 @@ class Camera(Node):
         tags = self.detector.detect(gray_img)
         car=[]
         for tag in tags:
-            angle_degrees=0 #We can detect the angle with the april tags but this is not precise so we don't use it (we use the angle of the rectangle)
+            H = tag.homography
+            # Normaliser la matrice d'homographie
+            H = H / H[2, 2]
+            # Extraire les vecteurs de rotation
+            r1 = H[:, 0]
+            r2 = H[:, 1]
+            # Calculer l'angle de rotation
+            angle_radians = np.arctan2(r2[1], r2[0])
+            angle_degrees = np.degrees(angle_radians)+180
             car+=[tag.tag_id]+[int(L-tag.center[0])]+[int(tag.center[1])]+[int(angle_degrees)]+[0,0]
             if self.display:
                 cv2.circle(color_img, [int(tag.center[0]),int(tag.center[1])], 5, (0, 0, 255), -1)  
@@ -158,25 +168,53 @@ class Camera(Node):
 
         # Apply a threshold to get a binary image
         ret, binary_img = cv2.threshold(gray_img, 50, 255, cv2.THRESH_BINARY)
-        # cv2.imwrite("binaire.jpg", binary_img)
+        # cv2.imwrite("2-binaire_line.jpg", binary_img)
+
+        edges_img = cv2.Canny(binary_img, 50, 150)
+
+        # Détecter les lignes avec la transformée de Hough
+        lines = cv2.HoughLinesP(edges_img, 1, np.pi/180, 100, minLineLength=400, maxLineGap=400)
+        Llines=[]
+        # self.get_logger().info("{}".format(lines))
+        # Dessiner les lignes détectées sur l'image d'origine
+        if lines is not None:
+            for line in lines:
+                x1, y1, x2, y2 = line[0]
+                y=int((y1+y2)/2)
+                Ld=[abs(y-yi) for yi in Llines]
+                Ld.sort()
+                if len(Llines)==0 or Ld[0]>40:
+                    Llines.append(y)
+                    cv2.line(binary_img, (0, y), (L, y), (255, 255, 255), 18)
+                    if self.display:
+                        cv2.line(color_img, (0, y), (L, y), (255, 0, 0), 2)
+                
+        # print(len(Llines))
+        Llines.sort()
+        #    cv2.imwrite("3-binaire_line2.jpg", binary_img)
+        kernel = np.ones((5,5), np.uint8) 
+        binary_img = cv2.erode(binary_img, kernel, iterations=6)
+        #    cv2.imwrite("4-erode.jpg", binary_img)
+        binary_img = cv2.dilate(binary_img, kernel, iterations=6)
+        #    cv2.imwrite("5-dilate.jpg", binary_img)
 
         # Find contours in the binary image
         contours, hierarchy = cv2.findContours(binary_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
-        treadmill=[]
+        treadmill=[np.shape(color_img)[1]//2,np.shape(color_img)[0]//2,90]
         Lobstacle=[]
         for cnt in contours:
             area = cv2.contourArea(cnt)
-            if area > 800:  # Filter small contours
+            if area>800:
                 # Fit a rotated rectangle to the contour
                 rect = cv2.minAreaRect(cnt)
                 box = cv2.boxPoints(rect)
                 box = np.int0(box)
-                
                 width,height=rect[1]
-                if width>200 and height>200:
+
+                if width>200 and height>200 and area>5e5:
                     if self.display:
-                        cv2.drawContours(color_img, [box], 0, (255, 0, 0), 3)
+                        cv2.drawContours(color_img, [box], 0, (0, 0, 255), 3)
                     # Calculate the center of the rectangle
                     center = (int(rect[0][0]), int(rect[0][1]))
                     angle = rect[2]
@@ -184,15 +222,16 @@ class Camera(Node):
                         angle+=90
                     treadmill=list(center)+[abs(angle)]
                 
-                elif 0.7<width/height<1.3 and 1000<area<2800:
+                elif area<2000:
                     # Calculate the center of the rectangle
                     center = (int(L-rect[0][0]), int(rect[0][1]))
                     radius=int(max(width,height)/2)+1
                     if self.display:
-                        cv2.circle(color_img, center, radius, (0, 0, 255), 3)
+                        center2 = (int(rect[0][0]), int(rect[0][1]))
+                        cv2.circle(color_img, center2, radius, (0, 0, 255), 3)
                     Lobstacle.append(list(center)+[radius])
-                
-                elif 5000>area>3000:
+                    
+                elif 8000>area>2000:
                     # This is a car
                     # Calculate the center of the rectangle
                     center = (int(rect[0][0]), int(rect[0][1]))
@@ -234,6 +273,7 @@ class Camera(Node):
         if self.display:
             self.show_image(color_img, "Rotated Rectangles, Center Points, and Orthogonal Lines")
         #  cv2.imwrite("output.jpg", color_img)
+        treadmill+=Llines
         end_time = time.time()
         processing_time = end_time - start_time
         # self.get_logger().info("Processing time: {:.3f} seconds".format(processing_time))

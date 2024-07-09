@@ -28,16 +28,26 @@ class Input(Node):
         self.Lkeys=[]
         self.tobstacle=0
         self.treadmill=[320,240]
+        self.lines=[]
         self.t0=0
         self.numberOfCar=1
+        self.numberOfLines=1
         self.car_independant=True
+        self.tLines=0
+        self.line=1
+        self.addlines=1
 
     def treadmill_sub_function(self,msg):
         """
         Read treadmill position
         """
-        if self.treadmill!=msg.data:
-            self.treadmill=msg.data
+        # self.get_logger().info('{}'.format(msg.data))
+        if len(msg.data)>=3:
+            self.treadmill==msg.data[:3]
+        if len(msg.data)>=3+self.numberOfLines:
+            self.numberOfLines=len(msg.data[3:])
+            self.lines=msg.data[3:]
+            
 
 
     def send_input(self):
@@ -68,6 +78,7 @@ class Input(Node):
         # No movement of the treadmill
         if self.t0==0 and msg.data[1]<550:
             self.t0=time.time()
+            self.tLines=self.t0
 
         # Mannaging detection of several cars
         numberOfCar=len(msg.data)//6
@@ -115,15 +126,26 @@ class Input(Node):
         Calculate new input for the car with space invaders methods
         """
         # Begin at the middle of the treadmill and move back.
-        Xmin=150
+        Xmin=300
         Xmax=400
         # To begin we define an input at the middle of the treadmill
         if self.t0==0:
             Xmin=Xmax
-        elif Xmax-15*(time.time()-self.t0)>Xmin:
-            Xmin=Xmax-15*(time.time()-self.t0)
+        elif Xmax-10*(time.time()-self.t0)>Xmin:
+            Xmin=Xmax-10*(time.time()-self.t0)
         Xcar=150
         Ymiddle=self.treadmill[1]
+        if self.numberOfLines!=0:
+            if(time.time()-self.tLines)>=10:
+                self.tLines=time.time()
+                self.line+=self.addlines
+                if self.line==self.numberOfLines-1:
+                    self.addlines=-1
+                elif self.line==1:
+                    self.addlines=1
+            self.get_logger().info('Line {} Ymiddle {}'.format(self.line,self.numberOfLines))
+            Ymiddle=(self.lines[self.line-1]+self.lines[self.line])/2
+            
         deltaYmax=50
         self.distanceMin=100
         Ymin=50
