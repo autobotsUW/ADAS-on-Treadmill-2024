@@ -12,6 +12,7 @@ class car_Class():
     def __init__(self,id):
         self.id=id
         self.Xcar,self.Ycar,self.Xinput,self.Yinput=0,0,500,200
+        self.lane=2
 
 class Input(Node):
 
@@ -31,7 +32,11 @@ class Input(Node):
         self.lines=[]
         self.t0=0
         self.numberOfCar=1
+        self.numberOfLines=1
         self.car_independant=True
+        self.tLines=0
+        self.line=1
+        self.addlines=1
 
     def treadmill_sub_function(self,msg):
         """
@@ -39,13 +44,24 @@ class Input(Node):
         """
         # self.get_logger().info('{}'.format(msg.data))
         if len(msg.data)>=3:
-            self.treadmill==msg.data[:3]           
+            self.treadmill==msg.data[:3]
+        if len(msg.data)>=3+self.numberOfLines:
+            self.numberOfLines=len(msg.data[3:])
+            self.lines=msg.data[3:]
+            
 
 
     def send_input(self):
         """
         Send input position to input_position topic
         """
+        for id in self.Lkeys:
+            car=self.DictCar[id]
+            id=car.id
+            X=car.Xinput
+            Y=(self.lines[car.lane-1]+self.lines[car.lane])/2
+            self.Linput=[id,X,Y]
+                
         msg = Int32MultiArray()
         msg.data = [int(i) for i in self.Linput]
         self.publisher_.publish(msg)
@@ -127,98 +143,46 @@ class Input(Node):
             Xmin=Xmax-10*(time.time()-self.t0)
         Xcar=150
         Ymiddle=self.treadmill[1]
+        if self.numberOfLines!=0:
+            if(time.time()-self.tLines)>=10:
+                self.tLines=time.time()
+                self.line+=self.addlines
+                if self.line==self.numberOfLines-1:
+                    self.addlines=-1
+                elif self.line==1:
+                    self.addlines=1
+            Ymiddle=(self.lines[self.line-1]+self.lines[self.line])/2
             
-        deltaYmax=50
-        self.distanceMin=100
-        Ymin=50
-        Ymax=350
 
-
+        if len(self.Lkeys)==1 and len(self.Lobstacle)==0:
+            self.Linput=[self.Lkeys[0],Xmin,Ymiddle]
+            return  
+        
         if len(self.Lobstacle)==0:
-            # self.get_logger().info("No obstacles detected") 
-
-            # If one car: center in Y position
-            if len(self.Lkeys)==1:
-                self.Linput=[self.Lkeys[0],Xmin,Ymiddle]
-                return  
-            
-            # If several car: we create two columns. We separate these columns if we not have obstacles
-            self.Linput=[]
-            self.Lkeys.sort()
-            # 1/3 of the treadmill
-            deltaY=min(int(time.time()-self.tobstacle)-5,deltaYmax)
-            if deltaY<0:
-                deltaY=0
-            i=len(self.Lkeys)-1
-            plus=True
-            for id in self.Lkeys:
-                self.Linput+=[id,Xmin+i*Xcar,Ymiddle+deltaY]
-                deltaY*=-1
-                i-=1
-            return
-        # self.get_logger().info(str(self.Lobstacle))
-        # we have obstacles
-        self.tobstacle=time.time()
-        self.Linput=[]
-
-        if self.car_independant:
-            # each cars choose these position 
             for id in self.Lkeys:
                 car=self.DictCar[id]
-                first_car_input=[car.Xinput,car.Yinput]
-                Ly=[y for y in range(Ymin,Ymax+1,10)]
-                Ldistance=[]
-                for y in Ly:
-                    Ldistance.append(self.distance_car_obstacle([car.Xinput,y]))
-                if max(Ldistance)==1000:
-                    Yinput=0.05*Ymiddle+0.95*car.Yinput
-                elif max(Ldistance)==self.distanceMin:
-                    L=[]
-                    for i in range(len(Ly)):
-                        if Ldistance[i]==self.distanceMin:
-                            L.append(Ly[i])
-                    Yinput=L[min(range(len(L)),key=lambda i: abs(L[i]-car.Yinput))]
-                    # self.get_logger().info('{} {} {} {}'.format(id,Yinput,L,Ldistance)) 
-                else:
-                    Yinput=Ly[np.argmax(Ldistance)]
-                
-                if Yinput>Ymax:
-                    Yinput=Ymax
-                elif Yinput<Ymin:
-                    Yinput=Ymin
-                
-                self.Linput+=[id,car.Xinput,Yinput]
-            
-        else:
-            # We use the position of the car with smallest id to define where to go
-            car=self.DictCar[self.Lkeys[0]]
-            first_car_input=[car.Xinput,car.Yinput]
-            
 
-            Ly=[y for y in range(50,351,10)]
-            Ldistance=[]
-            for y in Ly:
-                Ldistance.append(self.distance_car_obstacle([first_car_input[0],y]))
-            if max(Ldistance)==1000:
-                Yinput=Ymiddle
-            elif max(Ldistance)==self.distanceMin:
-                L=[]
-                for i in range(len(Ly)):
-                    if Ldistance[i]==self.distanceMin:
-                        L.append(Ly[i])
-                Yinput=L[min(range(len(L)),key=lambda i: abs(L[i]-first_car_input[1]))]
-                # self.get_logger().info('{} {} {}'.format(Yinput,L,Ldistance)) 
-            else:
-                Yinput=Ly[np.argmax(Ldistance)]
+                for otherid in self.Lkeys:
+                    if id!=otherid:
+                        othercar=self.DictCar[otherid]
+                        if abs(car.Xcar-othercar.Xcar)<Xcar and car.lane==othercar.lane:
+                            car.lane+=1
+
+                if car.lane==2:
+                    car.Xinput-=2
+                elif car.lane==3:
+                    car.Xinput+=2
+
+                if car.Xinput<Xmin:
+                    car.lane+=1
+                elif car.Xinput>Xmax:
+                    car.lane-=1
+
+
+
+                
             
-        
-            # we put the other cars behind the first 
-            self.Lkeys.reverse()
-            i=0
-            for id in self.Lkeys:
-                self.Linput+=[id,Xmin+i*Xcar,Yinput]
-                i+=1 
-        return
+       
 
     def distance_car_obstacle(self,car):
         """

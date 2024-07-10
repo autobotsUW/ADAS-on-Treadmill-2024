@@ -33,6 +33,7 @@ setup(
             'save_topic=jf_package_waterloo.save_topic:main',
             'anomalies_input_node=jf_package_waterloo.anomalies_input_node:main',
             'anomalies_node=jf_package_waterloo.anomalies_node:main',
+            'car_on_road_input_node=jf_package_waterloo.car_on_road_input_node:main',
         ],
     },
 )
