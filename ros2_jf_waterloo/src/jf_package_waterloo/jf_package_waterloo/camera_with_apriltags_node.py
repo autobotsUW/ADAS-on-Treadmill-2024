@@ -18,6 +18,8 @@ import cv2
 import numpy as np
 import time
 import apriltag
+from datetime import datetime
+import os
 
 from std_msgs.msg import String,Float32MultiArray,Int32MultiArray
 
@@ -74,9 +76,12 @@ class Camera(Node):
                 # Send the informations of cars [number,x,y,angle,width,height]
                 if len(car)>1:
                     for i in range(0,len(car),6):
-                            car[i+3]=car[i+3]-treadmill[2]
-                            if car[i+3]<-80 or car[i+3]>80:
-                                self.get_logger().info("Error angle car {} {}".format(car[i+3],treadmill[2]))
+                        car[i+3]=car[i+3]-treadmill[2]
+                        if car[i+3]>80:
+                            car[i+3]-=90
+                            self.get_logger().info("Error angle car {}".format(car))
+                            file_name=os.path.expanduser('~/ADAS-on-Treadmill-2024/Error {}.jpg'.format(datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+                            cv2.imwrite(file_name, frame)
                     msg=Int32MultiArray()
                     msg.data = [int(i) for i in car]
                     self.publisher_car.publish(msg)
@@ -163,7 +168,16 @@ class Camera(Node):
             angle_degrees = np.degrees(angle_radians)+180
             car+=[tag.tag_id]+[int(L-tag.center[0])]+[int(tag.center[1])]+[int(angle_degrees)]+[0,0]
             if self.display:
-                cv2.circle(color_img, [int(tag.center[0]),int(tag.center[1])], 5, (0, 0, 255), -1)  
+                cv2.circle(color_img, [int(tag.center[0]),int(tag.center[1])], 5, (0, 0, 255), -1) 
+                line_length = 100  # You can adjust this value
+                # Calculate the end points of the orthogonal line
+                orthogonal_angle_rad = np.deg2rad(angle_degrees)  # Adjust by 90 degrees
+                x_end = int(tag.center[0] + line_length * np.cos(orthogonal_angle_rad))
+                y_end = int(tag.center[1] + line_length * np.sin(orthogonal_angle_rad))
+                x_start = int(tag.center[0])
+                y_start = int(tag.center[1])
+                # Draw the orthogonal line through the center with the calculated angle
+                cv2.line(color_img, (x_start, y_start), (x_end, y_end), (0, 0, 255), 3)    
             
 
         # Apply a threshold to get a binary image
@@ -173,7 +187,7 @@ class Camera(Node):
         edges_img = cv2.Canny(binary_img, 50, 150)
 
         # Détecter les lignes avec la transformée de Hough
-        lines = cv2.HoughLinesP(edges_img, 1, np.pi/180, 100, minLineLength=400, maxLineGap=400)
+        lines = cv2.HoughLinesP(edges_img, 1, np.pi/180, 100, minLineLength=300, maxLineGap=700)
         Llines=[]
         # self.get_logger().info("{}".format(lines))
         # Dessiner les lignes détectées sur l'image d'origine

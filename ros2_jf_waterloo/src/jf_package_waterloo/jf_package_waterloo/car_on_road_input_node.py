@@ -12,7 +12,7 @@ class car_Class():
     def __init__(self,id):
         self.id=id
         self.Xcar,self.Ycar,self.Xinput,self.Yinput=0,0,500,200
-        self.lane=2
+        self.lane=1
 
 class Input(Node):
 
@@ -59,19 +59,25 @@ class Input(Node):
             car=self.DictCar[id]
             id=car.id
             X=car.Xinput
-            Y=(self.lines[car.lane-1]+self.lines[car.lane])/2
+            if car.lane<len(self.lines):
+                Y=(self.lines[car.lane-1]+self.lines[car.lane])/2
+            else:
+                Y=self.treadmill[1]
             self.Linput=[id,X,Y]
-                
-        msg = Int32MultiArray()
-        msg.data = [int(i) for i in self.Linput]
-        self.publisher_.publish(msg)
+        if len(self.Linput)/3==self.numberOfCar:
+            msg = Int32MultiArray()
+            msg.data = [int(i) for i in self.Linput]
+            self.publisher_.publish(msg)
+        else:
+            self.get_logger().info("Error number of cars {} {}".format(self.numberOfCar,self.Linput)) 
+        
 
         # Add the new input in the car information
         for i in range(0,len(msg.data),3):
             id,x,y=msg.data[i:i+3]
             if id in self.DictCar.keys():
                 car=self.DictCar[id]
-                car.Xinput=x
+                # car.Xinput=x
                 car.Yinput=y
         
     def car_sub_function(self, msg):
@@ -87,6 +93,7 @@ class Input(Node):
         if self.t0==0 and msg.data[1]<550:
             self.t0=time.time()
             self.tLines=self.t0
+            self.get_logger().info('Go')
 
         # Mannaging detection of several cars
         numberOfCar=len(msg.data)//6
@@ -115,11 +122,7 @@ class Input(Node):
         if len(self.Lkeys)>=1:
             # self.get_logger().info("Car obstacles detected") 
             self.define_input()
-            # if we have not the good number of input we not change the input (ex: detection of 1 car in a 2 cars situation)
-            if len(self.Linput)/3==self.numberOfCar:
-                self.send_input()
-            else:
-                self.get_logger().info("Error number of cars") 
+            self.send_input()
 
     def obstacles_sub_function(self, msg):
         """
@@ -134,31 +137,33 @@ class Input(Node):
         Calculate new input for the car with space invaders methods
         """
         # Begin at the middle of the treadmill and move back.
-        Xmin=300
-        Xmax=400
+        Xmin=150
+        Xmax=500
+        Xcar=150
+        dx=0.5
         # To begin we define an input at the middle of the treadmill
         if self.t0==0:
             Xmin=Xmax
-        elif Xmax-10*(time.time()-self.t0)>Xmin:
-            Xmin=Xmax-10*(time.time()-self.t0)
-        Xcar=150
-        Ymiddle=self.treadmill[1]
-        if self.numberOfLines!=0:
-            if(time.time()-self.tLines)>=10:
-                self.tLines=time.time()
-                self.line+=self.addlines
-                if self.line==self.numberOfLines-1:
-                    self.addlines=-1
-                elif self.line==1:
-                    self.addlines=1
-            Ymiddle=(self.lines[self.line-1]+self.lines[self.line])/2
+            return()
+
+        
+        # Ymiddle=self.treadmill[1]
+        # if self.numberOfLines!=0:
+        #     if(time.time()-self.tLines)>=10:
+        #         self.tLines=time.time()
+        #         self.line+=self.addlines
+        #         if self.line==self.numberOfLines-1:
+        #             self.addlines=-1
+        #         elif self.line==1:
+        #             self.addlines=1
+        #     Ymiddle=(self.lines[self.line-1]+self.lines[self.line])/2
             
 
-        if len(self.Lkeys)==1 and len(self.Lobstacle)==0:
-            self.Linput=[self.Lkeys[0],Xmin,Ymiddle]
-            return  
+        # if len(self.Lkeys)==1 and len(self.Lobstacle)==0:
+        #     self.Linput=[self.Lkeys[0],Xmin,Ymiddle]
+        #     return  
         
-        if len(self.Lobstacle)==0:
+        elif len(self.Lobstacle)==0:
             for id in self.Lkeys:
                 car=self.DictCar[id]
 
@@ -166,17 +171,26 @@ class Input(Node):
                     if id!=otherid:
                         othercar=self.DictCar[otherid]
                         if abs(car.Xcar-othercar.Xcar)<Xcar and car.lane==othercar.lane:
-                            car.lane+=1
+                            if car.Ycar>othercar.Ycar:
+                                car.lane+=1
+                            else:
+                                othercar.lane+=1
 
-                if car.lane==2:
-                    car.Xinput-=2
+                if car.lane==1:
+                    car.Xinput-=dx
+                elif car.lane==2:
+                    car.Xinput+=dx
                 elif car.lane==3:
-                    car.Xinput+=2
-
-                if car.Xinput<Xmin:
+                    car.Xinput+=2*dx
+                elif car.lane==3:
+                    car.Xinput+=3*dx
+                # self.get_logger().info("Car {} lane {} Xinput {}".format(car.id,car.lane,car.Xinput)) 
+                if car.Xinput<Xmin and car.lane<2:
                     car.lane+=1
-                elif car.Xinput>Xmax:
+                    self.get_logger().info("Car {} lane {}".format(car.id,car.lane)) 
+                elif car.Xinput>Xmax and car.lane>1:
                     car.lane-=1
+                    self.get_logger().info("Car {} lane {}".format(car.id,car.lane)) 
 
 
 
@@ -209,7 +223,7 @@ class Input(Node):
     #             distance+=(car[0]-obstacle[0])**2+(car[1]-obstacle[1])**2
     #     return distance**0.5
 
-def main(args=None):
+def main(args=None): 
     rclpy.init(args=args)
 
     minimal_publisher = Input()

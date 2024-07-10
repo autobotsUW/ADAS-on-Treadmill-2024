@@ -30,33 +30,33 @@ def find_the_car(color_img):
    car=[]
    print("Nombre de tag: {}".format(len(tags)))
    for tag in tags:
-      # H = tag.homography
-      #       # Normaliser la matrice d'homographie
-      # H = H / H[2, 2]
-      # # Extraire les vecteurs de rotation
-      # r1 = H[:, 0]
-      # r2 = H[:, 1]
-      # # Calculer l'angle de rotation
-      # angle_radians = np.arctan2(r2[1], r2[0])
-      # angle_degrees = np.degrees(angle_radians)+180
+      H = tag.homography
+            # Normaliser la matrice d'homographie
+      H = H / H[2, 2]
+      # Extraire les vecteurs de rotation
+      r1 = H[:, 0]
+      r2 = H[:, 1]
+      # Calculer l'angle de rotation
+      angle_radians = np.arctan2(r2[1], r2[0])
+      angle_degrees = np.degrees(angle_radians)+180
 
-      angle_degrees=0
+      # angle_degrees=0
       car+=[tag.tag_id]+[int(L-tag.center[0])]+[int(tag.center[1])]+[int(angle_degrees)]
       cv2.circle(color_img, [int(tag.center[0]),int(tag.center[1])], 5, (0, 0, 255), -1)
       
       # for corner in tag.corners:
       #    cv2.circle(color_img, [int(corner[0]),int(corner[1])], 5, (0, 0, 255), -1)
-      # line_length = 100  # You can adjust this value
+      line_length = 100  # You can adjust this value
 
-      # # Calculate the end points of the orthogonal line
-      # orthogonal_angle_rad = np.deg2rad(angle_degrees)  # Adjust by 90 degrees
-      # x_end = int(tag.center[0] + line_length * np.cos(orthogonal_angle_rad))
-      # y_end = int(tag.center[1] + line_length * np.sin(orthogonal_angle_rad))
-      # x_start = int(tag.center[0])
-      # y_start = int(tag.center[1])
+      # Calculate the end points of the orthogonal line
+      orthogonal_angle_rad = np.deg2rad(angle_degrees)  # Adjust by 90 degrees
+      x_end = int(tag.center[0] + line_length * np.cos(orthogonal_angle_rad))
+      y_end = int(tag.center[1] + line_length * np.sin(orthogonal_angle_rad))
+      x_start = int(tag.center[0])
+      y_start = int(tag.center[1])
 
-      # # Draw the orthogonal line through the center with the calculated angle
-      # cv2.line(color_img, (x_start, y_start), (x_end, y_end), (0, 0, 255), 3)    
+      # Draw the orthogonal line through the center with the calculated angle
+      cv2.line(color_img, (x_start, y_start), (x_end, y_end), (0, 0, 255), 3)    
 
 
    # Apply a threshold to get a binary image
@@ -66,7 +66,7 @@ def find_the_car(color_img):
    edges_img = cv2.Canny(binary_img, 50, 150)
    
    # Détecter les lignes avec la transformée de Hough
-   lines = cv2.HoughLinesP(edges_img, 1, np.pi/180, 100, minLineLength=400, maxLineGap=400)
+   lines = cv2.HoughLinesP(edges_img, 1, np.pi/180, 100, minLineLength=300, maxLineGap=700)
    Llines=[]
    # Dessiner les lignes détectées sur l'image d'origine
    for line in lines:

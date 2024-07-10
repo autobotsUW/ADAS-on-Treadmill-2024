@@ -34,24 +34,23 @@ class car_Class():
         delta_time = (current_time - self.previous_time)
         self.previous_time = current_time
 
-        Kp_speed = 0.48
+        Kp_speed = 0.3
         Ki_speed = 0.24
         Kd_speed = 0.24
-        # Kp_angle = 1
-        # Ki_angle = 0
-        # Kd_angle = 0
-        Kp_angle = 0.8
-        Ki_angle = 0
+        Kp_angle = 1
+        Ki_angle = 1e-2
         Kd_angle = 0
-        k_stanley = 1e-1
+        k_stanley = 2e-3
+        k_angle_direction=1
 
         # Kp_speed = 0.48
         # Ki_speed = 0.24
         # Kd_speed = 0.24
-        # Kp_angle = 1
+        # Kp_angle = 0.8
         # Ki_angle = 0
         # Kd_angle = 0
         # k_stanley = 1e-1
+        # k_angle_direction=1
 
         error_speed = self.Xinput - self.Xcar
         error_angle = self.Yinput - self.Ycar
@@ -70,7 +69,8 @@ class car_Class():
 
         # Stanley controller
         heading_error = self.car_angle
-        self.direction=int((heading_error + m.atan2(k_stanley * cross_track_error, self.speed)* 180 / m.pi))
+        self.direction=int((heading_error + m.atan(k_stanley * cross_track_error)* 180 / m.pi)*k_angle_direction)
+        # self.direction=int((heading_error + m.atan2(k_stanley * cross_track_error, self.speed)* 180 / m.pi)*k_angle_direction)
         
         # angle saturation: the car cannot be at too great an angle to the axis of the treadmill
         # max_angle=20
@@ -88,9 +88,8 @@ class car_Class():
         # managing the car that goes to the edge of the treadmill
         if self.Xcar>600:
             self.speed=0
-        # elif self.Xcar<=50 and self.speed<Kp_speed * error_speed:
-        #     self.speed= Kp_speed * error_speed
-        #     self.error_sum_angle = 0
+        # if abs(self.direction)<3:
+        #     self.direction=0
 
         # speed saturation
         if self.speed>150:
