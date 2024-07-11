@@ -79,9 +79,9 @@ class Camera(Node):
                         car[i+3]=car[i+3]-treadmill[2]
                         if car[i+3]>80:
                             car[i+3]-=90
-                            self.get_logger().info("Error angle car {}".format(car))
-                            file_name=os.path.expanduser('~/ADAS-on-Treadmill-2024/Error {}.jpg'.format(datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
-                            cv2.imwrite(file_name, frame)
+                            # self.get_logger().info("Error angle car {}".format(car))
+                            # file_name=os.path.expanduser('~/ADAS-on-Treadmill-2024/Error {}.jpg'.format(datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+                            # cv2.imwrite(file_name, frame)
                     msg=Int32MultiArray()
                     msg.data = [int(i) for i in car]
                     self.publisher_car.publish(msg)

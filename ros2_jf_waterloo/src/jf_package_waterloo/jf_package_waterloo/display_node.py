@@ -128,6 +128,8 @@ class Display(Node):
         self.InputObject = []
         # Plot input
         for i in range(0,len(self.input),3):
+            text=self.ax.text(self.input[i+1], self.input[i+2]+10, str(int(self.input[i])), horizontalalignment='center', verticalalignment='center', fontsize=16, color='black')
+            self.InputObject.append(text)
             input= patches.Circle((self.input[i+1], self.input[i+2]), 2, edgecolor='black', facecolor='black',linewidth=2)
             self.ax.add_patch(input)
             self.InputObject.append(input)

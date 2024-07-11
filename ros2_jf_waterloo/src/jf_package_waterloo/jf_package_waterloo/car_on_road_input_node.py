@@ -12,7 +12,7 @@ class car_Class():
     def __init__(self,id):
         self.id=id
         self.Xcar,self.Ycar,self.Xinput,self.Yinput=0,0,500,200
-        self.lane=1
+        self.lane=id+1
 
 class Input(Node):
 
@@ -55,6 +55,7 @@ class Input(Node):
         """
         Send input position to input_position topic
         """
+        self.Linput=[]
         for id in self.Lkeys:
             car=self.DictCar[id]
             id=car.id
@@ -63,22 +64,25 @@ class Input(Node):
                 Y=(self.lines[car.lane-1]+self.lines[car.lane])/2
             else:
                 Y=self.treadmill[1]
-            self.Linput=[id,X,Y]
+            self.Linput+=[id,X,Y]
+
         if len(self.Linput)/3==self.numberOfCar:
             msg = Int32MultiArray()
             msg.data = [int(i) for i in self.Linput]
             self.publisher_.publish(msg)
+
+            # Add the new input in the car information
+            for i in range(0,len(msg.data),3):
+                id,x,y=msg.data[i:i+3]
+                if id in self.DictCar.keys():
+                    car=self.DictCar[id]
+                    # car.Xinput=x
+                    car.Yinput=y
         else:
             self.get_logger().info("Error number of cars {} {}".format(self.numberOfCar,self.Linput)) 
         
 
-        # Add the new input in the car information
-        for i in range(0,len(msg.data),3):
-            id,x,y=msg.data[i:i+3]
-            if id in self.DictCar.keys():
-                car=self.DictCar[id]
-                # car.Xinput=x
-                car.Yinput=y
+        
         
     def car_sub_function(self, msg):
         """
@@ -139,7 +143,7 @@ class Input(Node):
         # Begin at the middle of the treadmill and move back.
         Xmin=150
         Xmax=500
-        Xcar=150
+        Xcar=200
         dx=0.5
         # To begin we define an input at the middle of the treadmill
         if self.t0==0:
@@ -163,35 +167,48 @@ class Input(Node):
         #     self.Linput=[self.Lkeys[0],Xmin,Ymiddle]
         #     return  
         
+        
         elif len(self.Lobstacle)==0:
             for id in self.Lkeys:
+                carAtRight=False
+                carAtLeft=False
+                overtake=False
                 car=self.DictCar[id]
 
-                for otherid in self.Lkeys:
+                for otherid in self.DictCar.keys():
                     if id!=otherid:
                         othercar=self.DictCar[otherid]
-                        if abs(car.Xcar-othercar.Xcar)<Xcar and car.lane==othercar.lane:
-                            if car.Ycar>othercar.Ycar:
-                                car.lane+=1
-                            else:
-                                othercar.lane+=1
-
+                        if abs(car.Xcar-othercar.Xcar)<Xcar and car.lane==othercar.lane and car.Xcar<othercar.Xcar:
+                                overtake=True
+                                self.get_logger().info("Car {} and {} lane {} Position x: {} {}".format(car.id,othercar.id,car.lane,car.Xcar,othercar.Xcar)) 
+                        
+                        if abs(car.Xcar-othercar.Xcar)<Xcar and car.lane+1==othercar.lane and car.lane+1<self.numberOfLines-1:
+                            carAtLeft=True
+                        if abs(car.Xcar-othercar.Xcar)<1.5*Xcar and car.lane-1==othercar.lane and car.lane-1>=0:
+                            carAtRight=True
+                        self.get_logger().info("Car {} lane {} overtake {} left {} right {}".format(car.id,car.lane,overtake,carAtLeft,carAtRight)) 
+                        
                 if car.lane==1:
                     car.Xinput-=dx
                 elif car.lane==2:
                     car.Xinput+=dx
                 elif car.lane==3:
-                    car.Xinput+=2*dx
+                    car.Xinput+=dx
                 elif car.lane==3:
                     car.Xinput+=3*dx
-                # self.get_logger().info("Car {} lane {} Xinput {}".format(car.id,car.lane,car.Xinput)) 
-                if car.Xinput<Xmin and car.lane<2:
+                if car.Xinput<Xmin:
+                    car.Xinput=Xmin
+                elif car.Xinput>Xmax:
+                    car.Xinput=Xmax
+
+
+                # self.get_logger().info("Car {} lane {} Overtake {}".format(car.id,car.lane,overtake)) 
+                if (car.Xinput<Xmin and car.lane<2 and carAtLeft==False) or (overtake==True and carAtLeft==False):
                     car.lane+=1
                     self.get_logger().info("Car {} lane {}".format(car.id,car.lane)) 
-                elif car.Xinput>Xmax and car.lane>1:
+                elif carAtRight==False and car.lane>1:
                     car.lane-=1
                     self.get_logger().info("Car {} lane {}".format(car.id,car.lane)) 
-
 
 
                 

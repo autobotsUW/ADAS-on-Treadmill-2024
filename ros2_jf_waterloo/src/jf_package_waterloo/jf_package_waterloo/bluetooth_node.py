@@ -18,7 +18,7 @@ class SerialCommunication(Node):
         
         # Define all bluetooth address with is id car
         self.DictAddr={}
-        # self.DictAddr[0]='98:D3:71:FE:AB:41'
+        self.DictAddr[0]='98:D3:71:FE:AB:41'
         self.DictAddr[1]='98:D3:51:FE:EC:72'
 
         # Open all bluetooth connection
@@ -53,6 +53,7 @@ class SerialCommunication(Node):
         for i in range(0,len(self.command),3):
             id,speed,angle=self.command[i:i+3]
             if id in self.DictSock.keys():
+                # speed=0
                 msg = "[{},{}]".format(int(speed), int(angle))
                 msb_bytes = msg.encode('UTF-8')
                 sock=self.DictSock[id]
