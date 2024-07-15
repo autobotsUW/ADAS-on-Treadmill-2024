@@ -84,18 +84,20 @@ def find_the_car(color_img):
          j+=1
       y_mid=sum(Ly[i:i+j+1])//len(Ly[i:i+j+1])
       Llines.append(y_mid)
-      cv2.line(binary_img, (0, y_mid), (L, y_mid), (255, 255, 255), 15)
+      cv2.line(binary_img, (0, y_mid), (L, y_mid), (255, 255, 255), 10)
       cv2.line(color_img, (0, y_mid), (L, y_mid), (255, 0, 0), 2)
       i+=j+1
       j=0
-   show_image(binary_img, "Rotated Rectangles, Center Points, and Orthogonal Lines")
+  
        
 
    print(len(Llines))
    Llines.sort()
    cv2.imwrite("3-binaire_line2.jpg", binary_img)
    kernel = np.ones((5,5), np.uint8) 
-   binary_img = cv2.erode(binary_img, kernel, iterations=6)
+   binary_img = cv2.dilate(binary_img, kernel, iterations=1)
+   show_image(binary_img, "Rotated Rectangles, Center Points, and Orthogonal Lines")
+   binary_img = cv2.erode(binary_img, kernel, iterations=7)
    cv2.imwrite("4-erode.jpg", binary_img)
    binary_img = cv2.dilate(binary_img, kernel, iterations=6)
    cv2.imwrite("5-dilate.jpg", binary_img)
@@ -190,6 +192,8 @@ def find_the_car(color_img):
 cap = cv2.VideoCapture(0,cv2.CAP_GSTREAMER)
 # cap.set(cv2.CAP_PROP_FRAME_WIDTH,640)
 # cap.set(cv2.CAP_PROP_FRAME_HEIGHT,480)
+
+cap.set(cv2.CAP_PROP_SETTINGS, 1)
 cap.set(cv2.CAP_PROP_FPS,30)
 options = apriltag.DetectorOptions(families="tag36h11")
 detector = apriltag.Detector(options)

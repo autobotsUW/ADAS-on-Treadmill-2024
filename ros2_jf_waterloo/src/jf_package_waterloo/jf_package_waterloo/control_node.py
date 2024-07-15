@@ -34,13 +34,13 @@ class car_Class():
         delta_time = (current_time - self.previous_time)
         self.previous_time = current_time
 
-        Kp_speed = 0.3
+        Kp_speed = 0.48
         Ki_speed = 0.24
-        Kd_speed = 0.24
-        Kp_angle = 1.15
-        Ki_angle = 8e-3
-        Kd_angle = 0
-        k_stanley = 2e-3
+        Kd_speed = 0.12
+        Kp_angle = 3.6
+        Ki_angle = 6e-3
+        Kd_angle = 1e-3
+        k_stanley = 1e-3
         k_angle_direction=1
 
         # Kp_speed = 0.48

@@ -48,6 +48,9 @@ def update_speed(val):
     if int(val)==0:
         send_to_treadmill(65,0)
 
+def start():
+    send_to_treadmill(65, 97)
+    send_to_treadmill(61, int(scale.get()))
 
 def create_window():
     """
@@ -62,7 +65,7 @@ def create_window():
     frame_buttons = Frame(root, padx=20, pady=20)
     frame_buttons.pack()
 
-    start_button = Button(frame_buttons, text="Start", command=lambda: send_to_treadmill(65, 97))
+    start_button = Button(frame_buttons, text="Start", command=start)
     start_button.grid(column=0, row=0, padx=10)
 
     stop_button = Button(frame_buttons, text="Stop", command=lambda: send_to_treadmill(65, 0))

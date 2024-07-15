@@ -21,6 +21,15 @@ class car_Class():
         self.ObstacleInTheLaneLeft=False
         self.dx=0.5
 
+    def find_lane(self,y,lines):
+        for i in range(1,len(lines)):
+            if lines[i-1]<y<lines[i]:
+                self.lane=i
+                self.Ycar=y
+                return
+
+
+
     def test_other_car(self,DictCar,numberOfLines):
         self.carAtRight=[]
         self.carAtLeft=[]
@@ -28,7 +37,7 @@ class car_Class():
         self.ObstacleInTheLane=False
         self.ObstacleInTheLaneRight=False
         self.ObstacleInTheLaneLeft=False
-        Xcar=150
+        Xcar=180
         for otherid in DictCar.keys():
             if id!=otherid:
                 othercar=DictCar[otherid]
@@ -55,7 +64,20 @@ class car_Class():
     def move(self,numberOfLines):
         Xmin=150
         Xmax=500
-        minimal_publisher.get_logger().info("Car {} lane {} overtake {} left {} right {} obstacles {} {} {}".format(self.id,self.lane,self.overtake,len(self.carAtLeft),len(self.carAtRight),self.ObstacleInTheLaneLeft,self.ObstacleInTheLane,self.ObstacleInTheLaneRight)) 
+        
+        if self.lane==1:
+            self.Xinput-=self.dx
+        elif self.lane==2:
+            self.Xinput+=self.dx
+        elif self.lane==3:
+            self.Xinput+=self.dx
+        elif self.lane==3:
+            self.Xinput+=3*self.dx
+        if self.Xinput<Xmin:
+            self.Xinput=Xmin
+        elif self.Xinput>Xmax:
+            self.Xinput=Xmax
+        # minimal_publisher.get_logger().info("Car {} lane {} overtake {} left {} right {} obstacles {} {} {}".format(self.id,self.lane,self.overtake,len(self.carAtLeft),len(self.carAtRight),self.ObstacleInTheLaneLeft,self.ObstacleInTheLane,self.ObstacleInTheLaneRight)) 
 
         if ((self.ObstacleInTheLaneLeft==False and self.ObstacleInTheLane==True and len(self.carAtLeft)==0) or (self.overtake==True and len(self.carAtLeft)==0)) and self.lane<numberOfLines:
             self.lane+=1
@@ -71,18 +93,7 @@ class car_Class():
                     if self.Xinput<Xmin:
                         self.Xinput=Xmin
 
-        if self.lane==1:
-            self.Xinput-=self.dx
-        elif self.lane==2:
-            self.Xinput+=self.dx
-        elif self.lane==3:
-            self.Xinput+=self.dx
-        elif self.lane==3:
-            self.Xinput+=3*self.dx
-        if self.Xinput<Xmin:
-            self.Xinput=Xmin
-        elif self.Xinput>Xmax:
-            self.Xinput=Xmax
+        
         # minimal_publisher.get_logger().info("Car {} Xinput {}".format(self.id,self.Xinput)) 
     
     def go_to_the_left(self,numberOfLines):
@@ -211,7 +222,7 @@ class Input(Node):
             if id in self.DictCar.keys():
                 car=self.DictCar[id]
                 car.Xcar=x
-                car.Ycar=y
+                car.find_lane(y,self.lines)
                 car.car_angle=angle
             else:
                 car=car_Class(id)
@@ -268,8 +279,9 @@ class Input(Node):
                 car.test_obstacles(Lobstacles)
             
         for id in self.Lkeys:
-            car=self.DictCar[id]
-            car.move(self.numberOfLines)
+            if id!=2:
+                car=self.DictCar[id]
+                car.move(self.numberOfLines)
 
 def main(args=None): 
     rclpy.init(args=args)

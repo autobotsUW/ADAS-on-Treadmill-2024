@@ -18,7 +18,7 @@ class Input(Node):
         Send the input to input_position topic
         """
         msg = Int32MultiArray()
-        msg.data = [int(x),int(y)]
+        msg.data = [0][int(x),int(y)]
         self.publisher_.publish(msg)
         self.get_logger().info('Publishing: "%s"' % msg.data)
 
