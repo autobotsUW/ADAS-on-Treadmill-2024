@@ -37,8 +37,8 @@ class car_Class():
         Kp_speed = 0.3
         Ki_speed = 0.24
         Kd_speed = 0.24
-        Kp_angle = 1
-        Ki_angle = 1e-2
+        Kp_angle = 1.15
+        Ki_angle = 8e-3
         Kd_angle = 0
         k_stanley = 2e-3
         k_angle_direction=1

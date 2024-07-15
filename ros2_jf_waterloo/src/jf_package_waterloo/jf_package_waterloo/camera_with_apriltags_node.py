@@ -38,7 +38,7 @@ class Camera(Node):
         self.Xinput=320
         self.Yinput=240
         self.window=False
-        self.display=False  #True to display the image from the camera
+        self.display=True  #True to display the image from the camera
         options = apriltag.DetectorOptions(families="tag36h11")
         self.detector = apriltag.Detector(options)
         self.launch_camera()
@@ -66,8 +66,10 @@ class Camera(Node):
                 msg.data='camera connection'
                 self.error_pub.publish(msg)
             else:
+                # file_name = os.path.expanduser('~/ADAS-on-Treadmill-2024/data/{}.png'.format(datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]))
+                # cv2.imwrite(file_name, frame)
                 # Search cars and obstacles
-                treadmill,car,obstacles=self.find_the_car(frame[48:425,54:769])
+                treadmill,car,obstacles=self.find_the_car(frame[20:430,10:792])
                 if len(treadmill)>1:
                     msg=Int32MultiArray()
                     msg.data = [int(i) for i in treadmill]
@@ -191,17 +193,26 @@ class Camera(Node):
         Llines=[]
         # self.get_logger().info("{}".format(lines))
         # Dessiner les lignes détectées sur l'image d'origine
+        Ly=[]
         if lines is not None:
             for line in lines:
-                x1, y1, x2, y2 = line[0]
-                y=int((y1+y2)/2)
-                Ld=[abs(y-yi) for yi in Llines]
-                Ld.sort()
-                if len(Llines)==0 or Ld[0]>40:
-                    Llines.append(y)
-                    cv2.line(binary_img, (0, y), (L, y), (255, 255, 255), 18)
-                    if self.display:
-                        cv2.line(color_img, (0, y), (L, y), (255, 0, 0), 2)
+                    x1, y1, x2, y2 = line[0]
+                    y=int((y1+y2)/2)
+                    Ly.append(y)
+        i=0
+        j=0
+        Ly.sort()
+        print(len(Ly))
+        while i+j+1<len(Ly):
+            while i+j+1<len(Ly) and abs(Ly[i+j]-Ly[i+j+1])<20:
+                j+=1
+            y_mid=sum(Ly[i:i+j+1])//len(Ly[i:i+j+1])
+            Llines.append(y_mid)
+            cv2.line(binary_img, (0, y_mid), (L, y_mid), (255, 255, 255), 15)
+            if self.display:
+                cv2.line(color_img, (0, y_mid), (L, y_mid), (255, 0, 0), 2)
+            i+=j+1
+            j=0
                 
         # print(len(Llines))
         Llines.sort()
@@ -225,6 +236,7 @@ class Camera(Node):
                 box = cv2.boxPoints(rect)
                 box = np.int0(box)
                 width,height=rect[1]
+                isAnObstacle=True
 
                 if width>200 and height>200 and area>5e5:
                     if self.display:
@@ -235,40 +247,34 @@ class Camera(Node):
                     if height<width:
                         angle+=90
                     treadmill=list(center)+[abs(angle)]
-                
-                elif area<2000:
-                    # Calculate the center of the rectangle
-                    center = (int(L-rect[0][0]), int(rect[0][1]))
-                    radius=int(max(width,height)/2)+1
-                    if self.display:
-                        center2 = (int(rect[0][0]), int(rect[0][1]))
-                        cv2.circle(color_img, center2, radius, (0, 0, 255), 3)
-                    Lobstacle.append(list(center)+[radius])
+                    isAnObstacle=False
                     
                 elif 8000>area>2000:
                     # This is a car
                     # Calculate the center of the rectangle
                     center = (int(rect[0][0]), int(rect[0][1]))
-                    if self.display:
-                        cv2.circle(color_img, center, 5, (0, 255, 0), -1)
-                        # Draw the rotated rectangle on the color image
-                        cv2.drawContours(color_img, [box], 0, (0, 255, 0), 3)  
                     # Get the angle of the rectangle
                     angle = rect[2]
                     if height<width:
                         angle+=90
                     else:
                         height,width=width,height
-
+                    
                     # Add the angle, the width, and the height to the list
                     for i in range(0,len(car),6):
-                        if (((L-car[i+1])-center[0])**2+(car[i+2]-center[1])**2)**0.5<25:
+                        # self.get_logger().info("Distance: {} ".format((((L-car[i+1])-center[0])**2+(car[i+2]-center[1])**2)**0.5))
+                        if (((L-car[i+1])-center[0])**2+(car[i+2]-center[1])**2)**0.5<40:
+                            isAnObstacle=False
                             # if not(70<angle<110):
-                            #     self.get_logger().info("Error angle: {} ".format(angle))
+                            #     self.get_logger().info("Error angle: {} ".format((((L-car[i+1])-center[0])**2+(car[i+2]-center[1])**2)**0.5))
                             car[i+3]=angle
                             car[i+4]=width
                             car[i+5]=height
+                        
                             if self.display:
+                                cv2.circle(color_img, center, 5, (0, 255, 0), -1)
+                                # Draw the rotated rectangle on the color image
+                                cv2.drawContours(color_img, [box], 0, (0, 255, 0), 3)  
                                 # Calculate the length of the line to draw
                                 line_length = 100  # You can adjust this value
 
@@ -282,10 +288,30 @@ class Camera(Node):
                                 # Draw the orthogonal line through the center with the calculated angle
                                 cv2.line(color_img, (x_start, y_start), (x_end, y_end), (0, 255, 0), 2)    
 
+                if area<1e4 and isAnObstacle==True:
+                    # Calculate the center of the rectangle
+                    center = (int(L-rect[0][0]), int(rect[0][1]))
+                    radius=int(max(width,height)/2)+1
+                    for i in range(0,len(car),6):
+                        self.get_logger().info("Distance: {} {}".format((((car[i+1])-center[0])**2+(car[i+2]-center[1])**2)**0.5,radius))
+                        if (((car[i+1])-center[0])**2+(car[i+2]-center[1])**2)**0.5>radius:
+                    
+                            if self.display:
+                                center2 = (int(rect[0][0]), int(rect[0][1]))
+                                cv2.circle(color_img, center2, radius, (0, 0, 255), 3)
+                            Lobstacle.append(list(center)+[radius])
+            else:
+                rect = cv2.minAreaRect(cnt)
+                box = cv2.boxPoints(rect)
+                box = np.int0(box)
+                width,height=rect[1]
+                cv2.drawContours(binary_img, [box], 0, (0, 255, 255), 3)
+
                     
         # Display the image with rectangles, center points, and orthogonal lines
         if self.display:
             self.show_image(color_img, "Rotated Rectangles, Center Points, and Orthogonal Lines")
+            # self.show_image(binary_img, "Rotated Rectangles, Center Points, and Orthogonal Lines")
         #  cv2.imwrite("output.jpg", color_img)
         treadmill+=Llines
         end_time = time.time()
