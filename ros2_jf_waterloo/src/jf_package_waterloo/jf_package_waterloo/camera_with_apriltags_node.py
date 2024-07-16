@@ -39,7 +39,7 @@ class Camera(Node):
         self.Yinput=240
         self.window=False
         self.display=True  #True to display the image from the camera
-        options = apriltag.DetectorOptions(families="tag36h11",quad_decimate=0.5,quad_blur = 0.5,refine_edges=True,refine_decode=True,refine_pose=True,quad_contours=True)
+        options = apriltag.DetectorOptions(families="tag36h11",refine_edges=True,refine_decode=True,refine_pose=True,quad_contours=True)
         self.detector = apriltag.Detector(options)
         self.launch_camera()
     
@@ -49,12 +49,18 @@ class Camera(Node):
         """
         # Parameter of camera 
         cap = cv2.VideoCapture(0)
-        # cap.set(cv2.CAP_PROP_FRAME_WIDTH,640)
-        # cap.set(cv2.CAP_PROP_FRAME_HEIGHT,480)
+        # cap.set(cv2.CAP_PROP_FRAME_WIDTH,1080)
+        # cap.set(cv2.CAP_PROP_FRAME_HEIGHT,720)
         cap.set(cv2.CAP_PROP_FPS,30)
+        cap.set(cv2.CAP_PROP_AUTOFOCUS,0)
+        cap.set(cv2.CAP_PROP_FOCUS, 0)
+        
 
         while True:
             start_time = time.time()
+            # if cap.get(cv2.CAP_PROP_FOCUS)!=0.0:
+            #     cap.set(cv2.CAP_PROP_FOCUS,0)
+            #     self.get_logger().info("Pb focus")
             # read a picture from the camera
             ret,frame=cap.read()
         
@@ -148,18 +154,28 @@ class Camera(Node):
         Input: image with a good size
         Output: information of tradmill, cars and obstacles 
         """
-        L=np.shape(color_img)[1]
+        # Start measuring time
+        start_time = time.time()
+
+        # color_img = cv2.resize(image, (700,400))
+        l,L=np.shape(color_img)[0],np.shape(color_img)[1]
+        # dH,dV=400/l,700/L
+        
         # Convert to grayscale
         gray_img = cv2.cvtColor(color_img, cv2.COLOR_BGR2GRAY)
 
-        # Start measuring time
-        start_time = time.time()
-        
         # Search april tags
+        
         tags = self.detector.detect(gray_img)
         car=[]
-        if len(tags)<2:
+        if len(tags)<1:
             self.get_logger().info("Error tag: {} tags".format(len(tags)))
+            sharpen_kernel = np.array([[-1, -1, -1],
+                           [-1,  9, -1],
+                           [-1, -1, -1]])
+            sharpened_frame = cv2.filter2D(gray_img, -1, sharpen_kernel)
+            tags = self.detector.detect(gray_img)
+            self.get_logger().info("Test 2 Error tag: {} tags".format(len(tags)))
         for tag in tags:
             H = tag.homography
             # Normaliser la matrice d'homographie
@@ -203,13 +219,13 @@ class Camera(Node):
         i=0
         j=0
         Ly.sort()
-        print(len(Ly))
+        # print(len(Ly))
         while i+j+1<len(Ly):
             while i+j+1<len(Ly) and abs(Ly[i+j]-Ly[i+j+1])<20:
                 j+=1
             y_mid=sum(Ly[i:i+j+1])//len(Ly[i:i+j+1])
             Llines.append(y_mid)
-            cv2.line(binary_img, (0, y_mid), (L, y_mid), (255, 255, 255), 15)
+            cv2.line(binary_img, (0, y_mid), (L, y_mid), (255, 255, 255), 14)
             if self.display:
                 cv2.line(color_img, (0, y_mid), (L, y_mid), (255, 0, 0), 2)
             i+=j+1
@@ -217,13 +233,13 @@ class Camera(Node):
                 
         # print(len(Llines))
         Llines.sort()
-        #    cv2.imwrite("3-binaire_line2.jpg", binary_img)
+        # cv2.imwrite("3-binaire_line2.jpg", binary_img)
         kernel = np.ones((5,5), np.uint8) 
         # binary_img = cv2.dilate(binary_img, kernel, iterations=1)
-        binary_img = cv2.erode(binary_img, kernel, iterations=6)
-        #    cv2.imwrite("4-erode.jpg", binary_img)
-        binary_img = cv2.dilate(binary_img, kernel, iterations=6)
-        #    cv2.imwrite("5-dilate.jpg", binary_img)
+        binary_img = cv2.erode(binary_img, kernel, iterations=5)
+        # cv2.imwrite("4-erode.jpg", binary_img)
+        binary_img = cv2.dilate(binary_img, kernel, iterations=4)
+        # cv2.imwrite("5-dilate.jpg", binary_img)
 
         # Find contours in the binary image
         contours, hierarchy = cv2.findContours(binary_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -251,7 +267,8 @@ class Camera(Node):
                     treadmill=list(center)+[abs(angle)]
                     isAnObstacle=False
                     
-                elif 8000>area>1500:
+                elif 4500>area>1500:
+                    # self.get_logger().info(str(area))
                     # This is a car
                     # Calculate the center of the rectangle
                     center = (int(rect[0][0]), int(rect[0][1]))

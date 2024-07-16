@@ -18,7 +18,7 @@ class SerialCommunication(Node):
         
         # Define all bluetooth address with is id car
         self.DictAddr={}
-        # self.DictAddr[0]='98:D3:71:FE:AB:41'
+        self.DictAddr[0]='98:D3:71:FE:AB:41'
         self.DictAddr[1]='98:D3:51:FE:EC:72'
 
         # Open all bluetooth connection
@@ -29,7 +29,7 @@ class SerialCommunication(Node):
             state=False
             i=0
             # we try 10 connection attemps for each cars
-            while state==False and i<=10:
+            while state==False and i<=5:
                 try:
                     sock = bluetooth.BluetoothSocket(Protocols.RFCOMM)
                     sock.connect((bd_addr, port))

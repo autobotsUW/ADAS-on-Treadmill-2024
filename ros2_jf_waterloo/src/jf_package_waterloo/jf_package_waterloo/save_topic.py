@@ -24,7 +24,7 @@ class MinimalSubscriber(Node):
         self.treadmill=[]
         self.t0=t.time()
         fichier=open(self.file_name,'w')
-        fichier.write("Time (s);    ;car_position;   ;input;    ;command;   ;obstacles;\n")
+        fichier.write("Time (s);    ;car_position;   ;input;    ;command;   ;treadmill;     ;obstacles;\n")
         fichier.close()
         self.input 
         self.subscription  # prevent unused variable warning
@@ -71,11 +71,12 @@ class MinimalSubscriber(Node):
             for command in self.command:
                 data+=";"+str(command)
             data+=';    '
-            for obstacle in self.obstacles:
-                data+=";"+str(obstacle)
-            data+=';    '
             for treadmill in self.treadmill:
                 data+=";"+str(treadmill)
+            data+=';    '
+            for obstacle in self.obstacles:
+                data+=";"+str(obstacle)
+            
 
             file=open(self.file_name,'a')
             file.write(data+';\n')

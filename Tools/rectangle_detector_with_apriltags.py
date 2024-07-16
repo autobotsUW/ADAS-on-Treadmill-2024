@@ -193,8 +193,8 @@ cap = cv2.VideoCapture(0,cv2.CAP_GSTREAMER)
 # cap.set(cv2.CAP_PROP_FRAME_WIDTH,640)
 # cap.set(cv2.CAP_PROP_FRAME_HEIGHT,480)
 
-cap.set(cv2.CAP_PROP_SETTINGS, 1)
-cap.set(cv2.CAP_PROP_FPS,30)
+# cap.set(cv2.CAP_PROP_SETTINGS, 1)
+# cap.set(cv2.CAP_PROP_FPS,30)
 options = apriltag.DetectorOptions(families="tag36h11")
 detector = apriltag.Detector(options)
 i=0
@@ -210,7 +210,7 @@ while True:
    # cv2.imwrite("1-img_camera_resize.png", frame[50:430,50:757])
    # assert False
    # print(find_the_car(frame[50:430,50:757]))
-   # assert False
+   assert False
       
    if (cv2.waitKey(1) & 0xFF == ord('q')) and i>10 :
       break

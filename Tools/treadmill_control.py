@@ -116,7 +116,7 @@ def create_window():
     button_set_input = Button(frame_parameters, text="Set input", command=lambda: send_to_treadmill(Xinput.get(), Yinput.get()))
     button_set_input.grid(column=0, row=3, columnspan=2, pady=10)
 
-    set_speed(1)
+    set_speed(0.8)
 
     root.mainloop()
 
