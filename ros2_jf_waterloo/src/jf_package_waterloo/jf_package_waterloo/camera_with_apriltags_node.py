@@ -39,7 +39,7 @@ class Camera(Node):
         self.Yinput=240
         self.window=False
         self.display=True  #True to display the image from the camera
-        options = apriltag.DetectorOptions(families="tag36h11", refine_edges=True,refine_decode=True,refine_pose=True,quad_contours=True)
+        options = apriltag.DetectorOptions(families="tag36h11",quad_decimate=0.5,quad_blur = 0.5,refine_edges=True,refine_decode=True,refine_pose=True,quad_contours=True)
         self.detector = apriltag.Detector(options)
         self.launch_camera()
     
@@ -52,7 +52,6 @@ class Camera(Node):
         # cap.set(cv2.CAP_PROP_FRAME_WIDTH,640)
         # cap.set(cv2.CAP_PROP_FRAME_HEIGHT,480)
         cap.set(cv2.CAP_PROP_FPS,30)
-        nberror=0
 
         while True:
             start_time = time.time()
@@ -69,58 +68,52 @@ class Camera(Node):
                 # file_name = os.path.expanduser('~/ADAS-on-Treadmill-2024/data/{}.png'.format(datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]))
                 # cv2.imwrite(file_name, frame)
                 # Search cars and obstacles
-                treadmill,car,obstacles=self.find_the_car(frame[20:430,10:792])
+                treadmill,car,obstacles=self.find_the_car(frame[50:430,50:757])
+
+                if len(treadmill)>1:
+                    msg=Int32MultiArray()
+                    msg.data = [int(i) for i in treadmill]
+                    self.publisher_treadmill.publish(msg)
+
+                # Send the informations of cars [number,x,y,angle,width,height]
                 if len(car)>1:
-
-                    if len(treadmill)>1:
-                        msg=Int32MultiArray()
-                        msg.data = [int(i) for i in treadmill]
-                        self.publisher_treadmill.publish(msg)
-
-                    # Send the informations of cars [number,x,y,angle,width,height]
-                    if len(car)>1:
-                        for i in range(0,len(car),6):
-                            car[i+3]=car[i+3]-treadmill[2]
-                            if car[i+3]>80:
-                                car[i+3]-=90
-                                # self.get_logger().info("Error angle car {}".format(car))
-                                # file_name=os.path.expanduser('~/ADAS-on-Treadmill-2024/Error {}.jpg'.format(datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
-                                # cv2.imwrite(file_name, frame)
-                        msg=Int32MultiArray()
-                        msg.data = [int(i) for i in car]
-                        self.publisher_car.publish(msg)
-                    else:
-                        # If no car
-                        msg=Int32MultiArray()
-                        msg.data = []
-                        self.publisher_car.publish(msg)
-                        # self.get_logger().info("Car not detected")
-                    
-                    # Send the informations of obstacles [x,y,radius]
-                    if len(obstacles)>0:
-                        msg=Int32MultiArray()
-                        L=[]
-                        for obstacle in obstacles:
-                            # self.get_logger().info(str(obstacle))
-                            if len(car)>1:
-                                if (car[0]-obstacle[0])**2+(car[1]-obstacle[1])**2>obstacle[2]**2:
-                                    L+=[int(i) for i in obstacle]
-                            else:
-                                L+=[int(i) for i in obstacle]
-                        msg.data=L
-                        self.publisher_obstacles.publish(msg)
-                        # self.get_logger().info("Obstacles detected in {}".format(L))
-                    else:
-                        # If no obtsacle
-                        msg=Int32MultiArray()
-                        msg.data = []
-                        self.publisher_obstacles.publish(msg)
-                        # self.get_logger().info("No obstacles detected") 
+                    for i in range(0,len(car),6):
+                        car[i+3]=car[i+3]-treadmill[2]
+                        if car[i+3]>80:
+                            car[i+3]-=90
+                            # self.get_logger().info("Error angle car {}".format(car))
+                            # file_name=os.path.expanduser('~/ADAS-on-Treadmill-2024/Error {}.jpg'.format(datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+                            # cv2.imwrite(file_name, frame)
+                    msg=Int32MultiArray()
+                    msg.data = [int(i) for i in car]
+                    self.publisher_car.publish(msg)
                 else:
-                    nberror+=1
-                    self.get_logger().info("No Tag: {}".format(nberror)) 
-                    file_name=os.path.expanduser('~/ADAS-on-Treadmill-2024/Error {}.jpg'.format(datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
-                    cv2.imwrite(file_name, frame)
+                    # If no car
+                    msg=Int32MultiArray()
+                    msg.data = []
+                    self.publisher_car.publish(msg)
+                    # self.get_logger().info("Car not detected")
+                
+                # Send the informations of obstacles [x,y,radius]
+                if len(obstacles)>0:
+                    msg=Int32MultiArray()
+                    L=[]
+                    for obstacle in obstacles:
+                        # self.get_logger().info(str(obstacle))
+                        if len(car)>1:
+                            if (car[0]-obstacle[0])**2+(car[1]-obstacle[1])**2>obstacle[2]**2:
+                                L+=[int(i) for i in obstacle]
+                        else:
+                            L+=[int(i) for i in obstacle]
+                    msg.data=L
+                    self.publisher_obstacles.publish(msg)
+                    # self.get_logger().info("Obstacles detected in {}".format(L))
+                else:
+                    # If no obtsacle
+                    msg=Int32MultiArray()
+                    msg.data = []
+                    self.publisher_obstacles.publish(msg)
+                    # self.get_logger().info("No obstacles detected") 
                         
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
@@ -198,7 +191,7 @@ class Camera(Node):
         edges_img = cv2.Canny(binary_img, 50, 150)
 
         # Détecter les lignes avec la transformée de Hough
-        lines = cv2.HoughLinesP(edges_img, 1, np.pi/180, 100, minLineLength=300, maxLineGap=700)
+        lines = cv2.HoughLinesP(edges_img, 1, np.pi/180, 150, minLineLength=300, maxLineGap=700)
         Llines=[]
         # Dessiner les lignes détectées sur l'image d'origine
         Ly=[]
@@ -239,7 +232,7 @@ class Camera(Node):
         Lobstacle=[]
         for cnt in contours:
             area = cv2.contourArea(cnt)
-            if area>1000:
+            if area>800:
                 # Fit a rotated rectangle to the contour
                 rect = cv2.minAreaRect(cnt)
                 box = cv2.boxPoints(rect)

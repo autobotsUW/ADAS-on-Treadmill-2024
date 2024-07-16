@@ -14,15 +14,17 @@ class MinimalSubscriber(Node):
         self.subscription = self.create_subscription(Int32MultiArray,'input_position',self.input_listener_callback,10)
         self.subscription = self.create_subscription(Int32MultiArray,'command',self.command_callback,10)
         self.subscription = self.create_subscription(Int32MultiArray,'obstacles_position',self.obstacles_callback,10)
+        self.subscription = self.create_subscription(Int32MultiArray,'treadmill_position',self.treadmill_callback,10)
 
 
         self.file_name=os.path.expanduser('~/ADAS-on-Treadmill-2024/Mesure/Mesure {}.csv'.format(datetime.now().strftime("%Y-%m-%d %H:%M")))
         self.input=[300,200]
         self.command=[0,0]
         self.obstacles=[]
+        self.treadmill=[]
         self.t0=t.time()
         fichier=open(self.file_name,'w')
-        fichier.write("Time (s);    ;car_position;   ;input;    ;command;   ;obstacles\n")
+        fichier.write("Time (s);    ;car_position;   ;input;    ;command;   ;obstacles;\n")
         fichier.close()
         self.input 
         self.subscription  # prevent unused variable warning
@@ -32,6 +34,12 @@ class MinimalSubscriber(Node):
         Save obstacles data received
         """
         self.obstacles=msg.data
+
+    def treadmill_callback(self,msg):
+        """
+        Save obstacles data received
+        """
+        self.treadmill=msg.data
 
     def command_callback(self,msg):
         """
@@ -65,9 +73,12 @@ class MinimalSubscriber(Node):
             data+=';    '
             for obstacle in self.obstacles:
                 data+=";"+str(obstacle)
+            data+=';    '
+            for treadmill in self.treadmill:
+                data+=";"+str(treadmill)
 
             file=open(self.file_name,'a')
-            file.write(data+'\n')
+            file.write(data+';\n')
             file.close()
             # self.get_logger().info('I heard: "%s"' % msg.data)
 

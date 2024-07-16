@@ -84,7 +84,7 @@ def find_the_car(color_img):
          j+=1
       y_mid=sum(Ly[i:i+j+1])//len(Ly[i:i+j+1])
       Llines.append(y_mid)
-      cv2.line(binary_img, (0, y_mid), (L, y_mid), (255, 255, 255), 10)
+      cv2.line(binary_img, (0, y_mid), (L, y_mid), (255, 255, 255), 15)
       cv2.line(color_img, (0, y_mid), (L, y_mid), (255, 0, 0), 2)
       i+=j+1
       j=0
@@ -95,9 +95,9 @@ def find_the_car(color_img):
    Llines.sort()
    cv2.imwrite("3-binaire_line2.jpg", binary_img)
    kernel = np.ones((5,5), np.uint8) 
-   binary_img = cv2.dilate(binary_img, kernel, iterations=1)
-   show_image(binary_img, "Rotated Rectangles, Center Points, and Orthogonal Lines")
-   binary_img = cv2.erode(binary_img, kernel, iterations=7)
+   # binary_img = cv2.dilate(binary_img, kernel, iterations=1)
+   # show_image(binary_img, "Rotated Rectangles, Center Points, and Orthogonal Lines")
+   binary_img = cv2.erode(binary_img, kernel, iterations=6)
    cv2.imwrite("4-erode.jpg", binary_img)
    binary_img = cv2.dilate(binary_img, kernel, iterations=6)
    cv2.imwrite("5-dilate.jpg", binary_img)
@@ -181,7 +181,7 @@ def find_the_car(color_img):
 
             
    # Display the image with rectangles, center points, and orthogonal lines
-   # show_image(color_img, "Rotated Rectangles, Center Points, and Orthogonal Lines")
+   show_image(color_img, "Rotated Rectangles, Center Points, and Orthogonal Lines")
    # show_image(binary_img, "Rotated Rectangles, Center Points, and Orthogonal Lines")
    cv2.imwrite("6-line_detection.png", color_img)
    end_time = time.time()
@@ -205,11 +205,11 @@ while True:
    
    if not ret:
       break
-   # show_image(frame[20:430,10:792], "Rotated Rectangles, Center Points, and Orthogonal Lines")
-   # cv2.imwrite("0-img_camera.png", frame[20:430,10:792])
-   # cv2.imwrite("1-img_camera_resize.png", frame)
+   show_image(frame[50:430,50:757], "Rotated Rectangles, Center Points, and Orthogonal Lines")
+   cv2.imwrite("0-img_camera.png", frame)
+   # cv2.imwrite("1-img_camera_resize.png", frame[50:430,50:757])
    # assert False
-   print(find_the_car(frame[20:430,10:792]))
+   # print(find_the_car(frame[50:430,50:757]))
    # assert False
       
    if (cv2.waitKey(1) & 0xFF == ord('q')) and i>10 :
