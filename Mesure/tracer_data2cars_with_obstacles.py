@@ -41,12 +41,11 @@ def tracer(path,aff=True):
     LdimyObstacles=[]
 
     for ligne in lignes[2:]:
-        data=ligne.split("  ")
-        t=float(data[0].replace(";",""))
+        data=ligne.removesuffix('\n').split(";    ;")
+        # print(data)
+        t=float(data[0])
 
-        cars=data[2].split(";")
-        cars.pop()
-        cars.pop(0)
+        cars=data[1].split(";")
         Lxcars=[]
         for i in range(0,len(cars),6):
             if cars[i]=="0":
@@ -68,9 +67,7 @@ def tracer(path,aff=True):
                 
                 Lxcars.append(float(cars[i+1]))
 
-        input=data[4].split(";")
-        input.pop()
-        input.pop(0)
+        input=data[2].split(";")
         for i in range(0,len(input),3):
             if input[i]=="0":
                 Lt0input.append(t)
@@ -81,12 +78,9 @@ def tracer(path,aff=True):
                 Lx1input.append(float(input[i+1]))
                 Ly1input.append(float(input[i+2]))
 
-        command=data[6].split(";")
-        # print(command)
-        command.pop()
-        command.pop(0)
+        command=data[3].split(";")
         for i in range(0,len(command),3):
-            if command[i]=="0":
+            if command[i]=="0": 
                 Lt0command.append(t)
                 Lspeed0.append(float(command[i+1]))
                 Ldirection0.append(float(command[i+2]))
@@ -94,20 +88,19 @@ def tracer(path,aff=True):
                 Lt1command.append(t)
                 Lspeed1.append(float(command[i+1]))
                 Ldirection1.append(float(command[i+2]))
-        
-        obstacles=data[8].split(";")
-        # print(command)
-        obstacles.pop(0)
-        for i in range(0,len(obstacles),3):
-            LtxObstacles.append(t)
-            LObstaclesx.append(float(obstacles[i]))
-            LdimxObstacles.append(float(obstacles[i+2])/2)
-            Ld=[float(obstacles[i])-xcar for xcar in Lxcars] 
-            Ld.sort()
-            if len(Ld)>0 and Ld[0]<float(obstacles[i+2]):
-                LtyObstacles.append(t)
-                LObstaclesy.append(float(obstacles[i+1]))
-                LdimyObstacles.append(float(obstacles[i+2])/2)
+        if len(data)>5:
+            obstacles=data[5].split(";")
+            obstacles.pop()
+            for i in range(0,len(obstacles),3):
+                LtxObstacles.append(t)
+                LObstaclesx.append(float(obstacles[i]))
+                LdimxObstacles.append(float(obstacles[i+2])/2)
+                Ld=[float(obstacles[i])-xcar for xcar in Lxcars] 
+                Ld.sort()
+                if len(Ld)>0 and Ld[0]<float(obstacles[i+2]):
+                    LtyObstacles.append(t)
+                    LObstaclesy.append(float(obstacles[i+1]))
+                    LdimyObstacles.append(float(obstacles[i+2])/2)
 
     # fig, (ax1, ax2,ax3) = plt.subplots(3, 1, figsize=(10, 15))
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 15))

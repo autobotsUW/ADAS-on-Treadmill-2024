@@ -52,7 +52,7 @@ class SerialCommunication(Node):
         """
         for i in range(0,len(self.command),3):
             id,speed,angle=self.command[i:i+3]
-            if id in self.DictSock.keys():
+            if id in self.DictSock.keys() and id!=2:
                 # speed=0
                 msg = "[{},{}]".format(int(speed), int(angle))
                 msb_bytes = msg.encode('UTF-8')

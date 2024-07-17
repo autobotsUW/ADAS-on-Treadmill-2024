@@ -22,9 +22,9 @@ class car_Class():
         self.last_error_angle=0
         self.center_servo=100
         if id==0:
-            self.center_servo=86
+            self.center_servo=83
         if id==1:
-            self.center_servo=105
+            self.center_servo=104
 
     def calculate_command(self):
         """
@@ -34,14 +34,31 @@ class car_Class():
         delta_time = (current_time - self.previous_time)
         self.previous_time = current_time
 
+        error_speed = self.Xinput - self.Xcar
+        error_angle = self.Yinput - self.Ycar
+
         Kp_speed = 0.48
         Ki_speed = 0.24
         Kd_speed = 0.12
         Kp_angle = 3
-        Ki_angle = 2e-3
-        Kd_angle = 1e-3
+        Ki_angle = 5e-4
+        Kd_angle = 1e-4
         k_stanley = 1e-3
         k_angle_direction=1
+
+        # if abs(error_angle)>80:
+        #     Kp_angle = 1
+        #     Ki_angle = 0
+        #     Kd_angle = 0
+        #     k_stanley = 3e-3
+        #     k_angle_direction=1
+        #     self.error_sum_angle=0
+        # else:
+        #     Kp_angle = 4
+        #     Ki_angle = 5e-4
+        #     Kd_angle = 0
+        #     k_stanley = 1e-3
+        #     k_angle_direction=1
 
         # Kp_speed = 0.48
         # Ki_speed = 0.24
@@ -51,11 +68,8 @@ class car_Class():
         # Kd_angle = 0
         # k_stanley = 1e-1
         # k_angle_direction=1
+        # minimal_publisher.get_logger().info("Car{} {}".format(self.id,(error_angle-self.last_error_angle)/delta_time))
 
-        error_speed = self.Xinput - self.Xcar
-        error_angle = self.Yinput - self.Ycar
-
-        
         # PID controller
         if self.begin==True:
             self.error_sum_speed += error_speed * delta_time
@@ -98,7 +112,7 @@ class car_Class():
             self.speed=0
         
         # angle saturation and adaptation at the servomotor
-        delta_servo=20
+        delta_servo=30
         self.direction+=self.center_servo
         if self.direction>self.center_servo+delta_servo:
             self.direction=self.center_servo+delta_servo

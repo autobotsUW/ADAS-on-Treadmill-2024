@@ -44,8 +44,8 @@ class car_Class():
                 if abs(self.Xcar-othercar.Xcar)<Xcar and self.lane==othercar.lane and self.Xcar<othercar.Xcar:
                         self.overtake=True
                         # minimal_publisher.get_logger().info("Car {} and {} lane {} Position x: {} {}".format(car.id,othercar.id,car.lane,car.Xcar,othercar.Xcar)) 
-                
-                if abs(self.Xcar-othercar.Xcar)<Xcar and self.lane+1==othercar.lane and self.lane+1<numberOfLines-1:
+                # minimal_publisher.get_logger().info("Car {} lane {} overtake {} left {} right {}".format(self.id,othercar.id,abs(self.Xcar-othercar.Xcar)<Xcar,self.lane+1==othercar.lane,self.lane+1<numberOfLines)) 
+                if abs(self.Xcar-othercar.Xcar)<Xcar and self.lane+1==othercar.lane and self.lane+1<numberOfLines:
                     self.carAtLeft.append(othercar)
                 if abs(self.Xcar-othercar.Xcar)<1.5*Xcar and self.lane-1==othercar.lane and self.lane-1>=0:
                     self.carAtRight.append(othercar)
@@ -89,7 +89,7 @@ class car_Class():
         elif self.ObstacleInTheLane==True:   
             if self.go_to_the_left(numberOfLines)==False:
                 if self.go_to_the_right()==False:
-                    self.Xinput-=2*self.dx
+                    self.Xinput-=self.dx
                     if self.Xinput<Xmin:
                         self.Xinput=Xmin
 
@@ -97,6 +97,9 @@ class car_Class():
         # minimal_publisher.get_logger().info("Car {} Xinput {}".format(self.id,self.Xinput)) 
     
     def go_to_the_left(self,numberOfLines):
+        if self.id==2:
+            return False
+        # minimal_publisher.get_logger().info("Car {} Left {}".format(self.id,self.carAtLeft)) 
         if len(self.carAtLeft)==0 and self.lane<numberOfLines:
             self.lane+=1
             return True
@@ -112,6 +115,8 @@ class car_Class():
         return False
     
     def go_to_the_right(self):
+        if self.id==2:
+            return False
         if len(self.carAtRight)==0 and self.lane>1:
             self.lane-=1
             return True
@@ -230,6 +235,7 @@ class Input(Node):
                 car.Ycar=y
                 car.car_angle=angle
                 self.DictCar[id]=car
+                # self.get_logger().info('{} cars'.format(self.DictCar.keys()))
             self.Lkeys.append(id)
         self.Lkeys.sort()
 
