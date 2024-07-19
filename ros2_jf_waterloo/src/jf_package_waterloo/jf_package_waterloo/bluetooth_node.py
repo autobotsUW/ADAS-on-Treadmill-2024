@@ -65,7 +65,7 @@ class SerialCommunication(Node):
                     msg=String()
                     msg.data='{:.2f} bluetooth connection'.format(time.time()-self.t0)
                     self.error_pub.publish(msg)
-            else:
+            elif id!=2:
                 self.get_logger().error("Error sending message: car no exist")
                 msg=String()
                 msg.data='{:.2f} Error sending message: car no exist'.format(time.time()-self.t0)
