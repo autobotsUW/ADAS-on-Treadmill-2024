@@ -5,7 +5,7 @@ Bluetooth connection with the computer is via the HC05 module.
 To protect the Arduino, we'll use a pull-up resistor and a flyback diode.
 
 ## Electrical Circuit:
-![alt text](https://github.com/autobotsUW/ADAS-on-Treadmill-2024/blob/main/Car/SchemaPNG.png)  
+![alt text](https://github.com/autobotsUW/ADAS-on-Treadmill-2024/blob/main/Picture/SchemaPNG.png)  
 
 
 ## Problems encountered:
