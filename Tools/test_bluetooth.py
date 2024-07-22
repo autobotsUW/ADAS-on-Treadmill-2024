@@ -3,13 +3,13 @@ from bluetooth import Protocols
 import time
 
 # bd_addr = '58:56:00:01:06:67'  
-# bd_addr = '98:D3:71:FE:AB:41'     #Purple
-bd_addr = '98:D3:51:FE:EC:72'     #Red
+bd_addr = '98:D3:71:FE:AB:41'     #Purple
+# bd_addr = '98:D3:51:FE:EC:72'     #Red
 port = 1
 sock = bluetooth.BluetoothSocket(Protocols.RFCOMM)
 sock.connect((bd_addr, port))
 bluetooth_status = True
-speed=0
+speed=50
 angle=103
 while True:
     # for angle in range(70,111,10):           

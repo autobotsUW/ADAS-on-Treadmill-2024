@@ -151,7 +151,7 @@ def tracer(path,aff=True):
 
     # Afficher les sous-graphiques
     plt.tight_layout()
-    plt.savefig("{}.png".format(path[:-4]))
+    plt.savefig("{}.svg".format(path[:-4]),format='svg')
     plt.show(block=aff)
     plt.pause(1e-3)
     plt.close()
