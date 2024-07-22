@@ -107,7 +107,7 @@ class MinimalSubscriber(Node):
         self.i+=1
         # self.get_logger().info(str(self.i))
         if (self.i%30)==0:
-            self.get_logger().info("Save Trust score figure")
+            # self.get_logger().info("Save Trust score figure")
             fig.savefig(self.file_name, format='svg')
 
     def plot_trust_score(self):
