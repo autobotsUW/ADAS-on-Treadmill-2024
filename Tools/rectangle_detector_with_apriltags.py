@@ -189,12 +189,13 @@ def find_the_car(color_img):
    print("Processing time: {:.6f} seconds".format(processing_time))
    return Llines, car,Lobstacle
 
-cap = cv2.VideoCapture(0,cv2.CAP_GSTREAMER)
-# cap.set(cv2.CAP_PROP_FRAME_WIDTH,640)
-# cap.set(cv2.CAP_PROP_FRAME_HEIGHT,480)
-
-# cap.set(cv2.CAP_PROP_SETTINGS, 1)
-# cap.set(cv2.CAP_PROP_FPS,30)
+cap = cv2.VideoCapture(0)
+# cap.set(cv2.CAP_PROP_FRAME_WIDTH,1080)
+# cap.set(cv2.CAP_PROP_FRAME_HEIGHT,720)
+cap.set(cv2.CAP_PROP_FPS,30)
+cap.set(cv2.CAP_PROP_AUTOFOCUS,0)
+cap.set(cv2.CAP_PROP_FOCUS, 0)
+        
 options = apriltag.DetectorOptions(families="tag36h11")
 detector = apriltag.Detector(options)
 i=0
@@ -205,11 +206,11 @@ while True:
    
    if not ret:
       break
-   show_image(frame[50:430,50:757], "Rotated Rectangles, Center Points, and Orthogonal Lines")
+   # show_image(frame[50:430,50:757], "Rotated Rectangles, Center Points, and Orthogonal Lines")
    cv2.imwrite("0-img_camera.png", frame)
-   # cv2.imwrite("1-img_camera_resize.png", frame[50:430,50:757])
+   cv2.imwrite("1-img_camera_resize.png", frame[50:430,50:757])
    # assert False
-   # print(find_the_car(frame[50:430,50:757]))
+   print(find_the_car(frame[50:430,50:757]))
    assert False
       
    if (cv2.waitKey(1) & 0xFF == ord('q')) and i>10 :
@@ -219,7 +220,7 @@ while True:
    processing_time = end_time - start_time
    # print("End time: {:.6f} seconds".format(processing_time))
    time.sleep(0.1)
-   # i+=1
+   i+=1
 cap.release()
 cv2.waitKey(0)
 cv2.destroyAllWindows()

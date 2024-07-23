@@ -34,7 +34,7 @@ class car_Class():
         self.time=[t]
         self.trust_score=[0]
         DictColor={0:'purple',1:'red',2:'blue'}
-        self.plot,=ax.plot([], [], lw=2, color=DictColor[id],label='Car {}'.format(id))
+        self.plot,=ax.plot([], [], lw=5, color=DictColor[id],label='Car {}'.format(id))
         
 
     def calculate_trust_score(self,t,x,y):
