@@ -14,7 +14,7 @@ We use ROS2 Humble with ubuntu 22.04
 Place the cars at the front of the conveyor belt, at the edge of the empty space, with the batteries connected.  
 Check that the camera is connected.
 
-![image](Picture/ADAS3.png)
+![image](Picture/LaunchConfig.jpg)
 
 ### Software
 
