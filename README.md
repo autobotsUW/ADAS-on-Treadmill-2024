@@ -5,14 +5,15 @@ The University of Waterloo’s Real-time Embedded Systems Lab hosts an autonomou
 
 ![alt text](https://github.com/autobotsUW/ADAS-on-Treadmill-2024/blob/main/Picture/ADAS3.png)
 
-Information from the camera is received on a PC and processed by ROS 2, before being transmitted to the cars via Bluetooth.
+Information from the camera is received on a PC and processed by ROS 2, before being transmitted to the cars via Bluetooth.  
 We use ROS2 Humble with ubuntu 22.04
 
 ## How to launch
 ### Hardware
 
-Place the cars at the front of the treadmill, on the edge of the empty space.
+Place the cars at the front of the conveyor belt, at the edge of the empty space, with the batteries connected.  
 Check that the camera is connected.
+
 
 ### Software
 
@@ -25,10 +26,10 @@ colcon build
 cd launch
 ros2 launch <launch_file>
 ```
-Remember to check that each car is connected. (This is noted in the terminal and the Bluetooth modules flash intermittently). 
+Remember to check that each car is connected. (This is noted in the terminal and the Bluetooth modules flash intermittently).  
 
-To launch the treadmill: use treadmill_control.py.
-Run the program, a window opens, you choose the speed and click on start.
+To launch the treadmill: use treadmill_control.py.  
+Run the program, a window opens, you choose the speed and click on start.  
 If nothing happens, set the enp9s0 Ethernet link to profile 2 with IP 192.168.124.1. 
 
 # Package
