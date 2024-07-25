@@ -74,7 +74,7 @@ To allow communication between these nodes, several topics are used:
 ### /car_position
 - **Type**: Int32 list
 - **Description**: List of car positions and their dimensions.
-- **Format**: `[id_1, x_1, y_1, θ_1, height_1, width_1, id_2, x_2, y_2, θ_2, height_2, width_2, ...]`
+- **Format**: `[id_1, x_1, y_1, \theta_1, height_1, width_1, id_2, x_2, y_2, \theta_2, height_2, width_2, ...]`
 
 ### /input_position
 - **Type**: Int32 list

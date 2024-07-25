@@ -24,7 +24,7 @@ class car_Class():
         if id==0:
             self.center_servo=85
         if id==1:
-            self.center_servo=110
+            self.center_servo=106
 
     def calculate_command(self):
         """
