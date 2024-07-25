@@ -4,6 +4,9 @@ To control the car, we'll use an arduino Uno. To control the motor, we'll use a 
 Bluetooth connection with the computer is via the HC05 module.  
 To protect the Arduino, we'll use a pull-up resistor and a flyback diode.
 
+## Possible operating problems :
+If the static error is too high for one of the cars, it's best to redefine the servo center. To do this, run the program with only the problem car on the treadmill and modify the “center_servo” variable associated with the car id in the “control-node” node. 
+
 ## Electrical Circuit:
 ![alt text](https://github.com/autobotsUW/ADAS-on-Treadmill-2024/blob/main/Picture/SchemaPNG.png)  
 
