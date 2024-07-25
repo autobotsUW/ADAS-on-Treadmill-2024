@@ -34,7 +34,8 @@ setup(
             'anomalies_input_node=jf_package_waterloo.anomalies_input_node:main',
             'anomalies_node=jf_package_waterloo.anomalies_node:main',
             'car_on_road_input_node=jf_package_waterloo.car_on_road_input_node:main',
-            'trust_score_node=jf_package_waterloo.trust_score_node:main'
+            'trust_score_node=jf_package_waterloo.trust_score_node:main',
+            'STL_trust_score_node=jf_package_waterloo.STL_trust_score_node:main'
         ],
     },
 )
