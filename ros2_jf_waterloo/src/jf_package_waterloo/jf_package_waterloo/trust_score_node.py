@@ -71,7 +71,7 @@ class MinimalSubscriber(Node):
         self.car_sub = self.create_subscription(Int32MultiArray, 'car_position', self.car_sub_function, 10)
         self.car_sub  # prevent unused variable warning
         self.DictCar={}
-        self.file_name=os.path.expanduser('~/ADAS-on-Treadmill-2024/Mesure/Trust_score_{}.svg'.format(datetime.now().strftime("%Y-%m-%d %H:%M")))
+        self.file_name=os.path.expanduser('~/ADAS-on-Treadmill-2024/Mesure/Trust_score_{}.png'.format(datetime.now().strftime("%Y-%m-%d %H:%M")))
         plt.ion()  # Mode interactif
         global fig,ax
         fig, ax = plt.subplots()
@@ -108,7 +108,7 @@ class MinimalSubscriber(Node):
         # self.get_logger().info(str(self.i))
         if (self.i%30)==0:
             # self.get_logger().info("Save Trust score figure")
-            fig.savefig(self.file_name, format='svg')
+            fig.savefig(self.file_name)
 
     def plot_trust_score(self):
         ax.relim()
