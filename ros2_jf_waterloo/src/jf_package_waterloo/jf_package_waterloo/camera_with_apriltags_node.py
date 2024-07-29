@@ -74,7 +74,7 @@ class Camera(Node):
                 # file_name = os.path.expanduser('~/ADAS-on-Treadmill-2024/data/{}.png'.format(datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]))
                 # cv2.imwrite(file_name, frame)
                 # Search cars and obstacles
-                treadmill,car,obstacles=self.find_the_car(frame[50:430,50:757])
+                treadmill,car,obstacles=self.find_the_car(frame[30:404,41:745])
 
                 if len(treadmill)>1:
                     msg=Int32MultiArray()

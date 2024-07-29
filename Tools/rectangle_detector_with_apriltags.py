@@ -210,7 +210,7 @@ while True:
    cv2.imwrite("0-img_camera.png", frame)
    cv2.imwrite("1-img_camera_resize.png", frame[50:430,50:757])
    # assert False
-   print(find_the_car(frame[50:430,50:757]))
+   print(find_the_car(frame[30:404,41:745]))
    assert False
       
    if (cv2.waitKey(1) & 0xFF == ord('q')) and i>10 :
