@@ -19,6 +19,14 @@ def tracer(path,aff=True):
     Ly1dim=[]
     Langle1=[]
 
+    Lt2=[]
+    Lx2=[]
+    Lx2dim=[]
+    Ly2=[]
+    Ly2dim=[]
+    Langle2=[]
+
+
     Lt0input=[]
     Lt1input=[]
     Lx0input=[]
@@ -66,6 +74,15 @@ def tracer(path,aff=True):
                 Ly1dim.append(float(cars[i+5]))
                 
                 Lxcars.append(float(cars[i+1]))
+            elif cars[i]=="2":
+                Lt2.append(t)
+                Lx2.append(float(cars[i+1]))
+                Ly2.append(float(cars[i+2]))
+                Langle2.append(float(cars[i+3]))
+                Lx2dim.append(float(cars[i+4]))
+                Ly2dim.append(float(cars[i+5]))
+                
+                Lxcars.append(float(cars[i+1]))
 
         input=data[2].split(";")
         for i in range(0,len(input),3):
@@ -106,8 +123,9 @@ def tracer(path,aff=True):
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 15))
 
     # Premier sous-graphe
-    ax1.plot(Lt0, Lx0, '+r', label='car 0')
-    ax1.plot(Lt1, Lx1, '+b', label='car 1')
+    ax1.plot(Lt0, Lx0, '+',color='purple', label='car 0')
+    ax1.plot(Lt1, Lx1, '+',color='red',label='car 1')
+    ax1.plot(Lt2, Lx2, '+',color='blue', label='car 2')
     # ax1.errorbar(Lt0, Lx0, yerr=Lx0dim, color='r', fmt='o', capsize=0, label='car 0')
     # ax1.errorbar(Lt1, Lx1, yerr=Lx1dim, color='b', fmt='o', capsize=0, label='car 1')
     ax1.plot(Lt0input, Lx0input, 'k', label='car 0 input')
@@ -119,8 +137,9 @@ def tracer(path,aff=True):
     ax1.set_title('Position X')
 
     # Deuxième sous-graphe
-    ax2.plot(Lt0, Ly0, '+r', label='car 0')
-    ax2.plot(Lt1, Ly1, '+b', label='car 1')
+    ax2.plot(Lt0, Ly0, '+',color='purple', label='car 0')
+    ax2.plot(Lt1, Ly1, '+',color='red', label='car 1')
+    ax2.plot(Lt2, Ly2, '+',color='blue', label='car 2')
     # ax2.errorbar(Lt0, Ly0, yerr=Ly0dim, color='r', fmt='o', capsize=0, label='car 0')
     # ax2.errorbar(Lt1, Ly1, yerr=Ly1dim, color='b', fmt='o', capsize=0, label='car 1')
     ax2.plot(Lt0input, Ly0input, 'k', label='car 0 input')
