@@ -188,6 +188,7 @@ fichiers_dans_dossier = os.listdir(dossier_courant)
 # Affiche la liste des fichiers
 print("Mesures tracees:")
 for fichier in fichiers_dans_dossier:
+    print(fichier)
     if fichier[-4:]=='.csv' and ("{}.png".format(fichier[:-4]) not in fichiers_dans_dossier):
         print(fichier)
         tracer(fichier,False)
