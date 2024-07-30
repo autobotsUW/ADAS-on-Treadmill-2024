@@ -1,67 +1,75 @@
-import rtamt
-import matplotlib.pyplot as plt
-import numpy as np
+# import rtamt
+# import matplotlib.pyplot as plt
+# import numpy as np
 
-# Création d'un moniteur STL
-spec = rtamt.StlDiscreteTimeSpecification()
+# # Création d'un moniteur STL
+# spec = rtamt.StlDiscreteTimeSpecification()
 
-# Ajout de variables
-spec.declare_var('x', 'float')
+# # Ajout de variables
+# spec.declare_var('x', 'float')
 
-# Définition de la formule STL
-spec.spec = 'G[0,50] (x >= -1 and x <= 1)'
+# # Définition de la formule STL
+# spec.spec = 'G[0,50] (x >= -1 and x <= 1)'
 
-# Compilation de la spécification
-spec.parse()
+# # Compilation de la spécification
+# spec.parse()
 
-# Génération de la trace de signal
-n=1000
-mu=0
-sigma=0.1
-# Création de la trace de signal avec vecteur de temps
-Lt=[t for t in range(1000)]
-# Lx=np.random.normal(mu, sigma, n)
-Lx=[1.5*np.sin(2*np.pi*t/400) for t in Lt]
-trace = {
-    'time': Lt,
-    'x': Lx
-}
+# # Génération de la trace de signal
+# n=1000
+# mu=0
+# sigma=0.1
+# # Création de la trace de signal avec vecteur de temps
+# Lt=[t for t in range(1000)]
+# # Lx=np.random.normal(mu, sigma, n)
+# Lx=[1.5*np.sin(2*np.pi*t/400) for t in Lt]
+# trace = {
+#     'time': Lt,
+#     'x': Lx
+# }
 
-# Évaluation de la formule STL sur la trace de signal
-robustness = spec.evaluate(trace)
-# print(robustness)
-# assert False
+# # Évaluation de la formule STL sur la trace de signal
+# robustness = spec.evaluate(trace)
+# # print(robustness)
+# # assert False
 
-# Extraction des données de robustesse
-times = [t for t, r in robustness]
-robustness_values = [r for t, r in robustness]
+# # Extraction des données de robustesse
+# times = [t for t, r in robustness]
+# robustness_values = [r for t, r in robustness]
 
-# Tracé des signaux et de la robustesse
-fig, ax1 = plt.subplots()
+# # Tracé des signaux et de la robustesse
+# fig, ax1 = plt.subplots()
 
-# Tracé de la valeur du signal x(t)
-ax1.set_xlabel('Time')
-ax1.set_ylabel('Signal x(t)', color='tab:blue')
-ax1.plot(trace['time'], trace['x'], label='x(t)', color='tab:blue')
-ax1.tick_params(axis='y', labelcolor='tab:blue')
-ax1.set_ylim(-2, 2)
-ax1.axhline(y=-1, color='gray', linestyle='--')
-ax1.axhline(y=1, color='gray', linestyle='--')
+# # Tracé de la valeur du signal x(t)
+# ax1.set_xlabel('Time')
+# ax1.set_ylabel('Signal x(t)', color='tab:blue')
+# ax1.plot(trace['time'], trace['x'], label='x(t)', color='tab:blue')
+# ax1.tick_params(axis='y', labelcolor='tab:blue')
+# ax1.set_ylim(-2, 2)
+# ax1.axhline(y=-1, color='gray', linestyle='--')
+# ax1.axhline(y=1, color='gray', linestyle='--')
 
-# Tracé de la robustesse
-ax2 = ax1.twinx()
-ax2.set_ylabel('Robustness', color='tab:red')
-ax2.plot(times, robustness_values, label='Robustness', color='tab:red')
-ax2.tick_params(axis='y', labelcolor='tab:red')
-ax2.set_ylim(-2, 2)
+# # Tracé de la robustesse
+# ax2 = ax1.twinx()
+# ax2.set_ylabel('Robustness', color='tab:red')
+# ax2.plot(times, robustness_values, label='Robustness', color='tab:red')
+# ax2.tick_params(axis='y', labelcolor='tab:red')
+# ax2.set_ylim(-2, 2)
 
-# Ajout d'une ligne horizontale à y=0 pour montrer la frontière de la satisfaction
-ax2.axhline(y=0, color='gray', linestyle='--')
+# # Ajout d'une ligne horizontale à y=0 pour montrer la frontière de la satisfaction
+# ax2.axhline(y=0, color='gray', linestyle='--')
 
 
-fig.tight_layout()
-plt.title('Signal x(t) and STL Robustness')
-plt.show()
+# fig.tight_layout()
+# plt.title('Signal x(t) and STL Robustness')
+# plt.show()
+
+
+
+
+
+
+
+
 
 # import matplotlib.pyplot as plt
 # import numpy as np
@@ -123,3 +131,47 @@ plt.show()
 # plt.ioff()
 # plt.show()
 
+
+
+
+
+
+
+
+
+
+import sys
+import rtamt
+
+def monitor():
+    a1 = [(0, 3), (3, 2)]
+    b1 = [(0, 2), (2, 5), (4, 1), (7, -7)]
+
+    a2 = [(5, 6), (6, -2), (8, 7), (11, -1)]
+    b2 = [(10, 4)]
+
+    a3 = [(13, -6), (15, 0)]
+    b3 = [(15, 0)]
+
+    # # stl
+    spec = rtamt.StlDenseTimeSpecification()
+    spec.name = 'STL dense-time specification'
+    spec.declare_var('a', 'float')
+    spec.spec = 'a>=2'
+    try:
+        spec.parse()
+    except rtamt.RTAMTException as err:
+        print('RTAMT Exception: {}'.format(err))
+        sys.exit()
+
+    rob = spec.update(['a', a1], ['b', b1])
+    print('rob: ' + str(rob))
+
+    rob = spec.update(['a', a2], ['b', b2])
+    print('rob: ' + str(rob))
+
+    rob = spec.update(['a', a3], ['b', b3])
+    print('rob: ' + str(rob))
+
+if __name__ == '__main__':
+    monitor()
