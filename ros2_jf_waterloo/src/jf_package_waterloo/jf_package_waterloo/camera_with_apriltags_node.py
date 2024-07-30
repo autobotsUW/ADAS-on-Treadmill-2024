@@ -175,7 +175,7 @@ class Camera(Node):
                            [-1, -1, -1]])
             sharpened_frame = cv2.filter2D(gray_img, -1, sharpen_kernel)
             tags = self.detector.detect(gray_img)
-            self.get_logger().info("Test 2 Error tag: {} tags".format(len(tags)))
+            # self.get_logger().info("Test 2 Error tag: {} tags".format(len(tags)))
         for tag in tags:
             H = tag.homography
             # Normaliser la matrice d'homographie
