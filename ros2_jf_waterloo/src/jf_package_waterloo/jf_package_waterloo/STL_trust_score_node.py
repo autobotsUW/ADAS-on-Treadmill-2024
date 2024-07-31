@@ -27,20 +27,23 @@ class STL:
         self.Lsignal = [0]
         self.Lrobustness = [0]
         self.spec.parse()
-        self.fig, self.ax1 = plt.subplots()
-        self.ax1.set_xlabel('Time')
-        self.ax1.set_ylabel('Signal', color='tab:blue')
-        self.line_signal, = self.ax1.plot([], [], label='signal', color='tab:blue')
-        self.ax1.tick_params(axis='y', labelcolor='tab:blue')
-        # self.ax1.set_ylim(-20, 20)
-        # self.ax1.axhline(y=-5, color='gray', linestyle='--')
-        # self.ax1.axhline(y=5, color='gray', linestyle='--')
-        self.ax2 = self.ax1.twinx()
-        self.ax2.set_ylabel('Robustness', color='tab:red')
-        self.line_robustness, = self.ax2.plot([], [], label='Robustness', color='tab:red')
-        self.ax2.tick_params(axis='y', labelcolor='tab:red')
-        # self.ax2.set_ylim(-20, 20)
-        self.ax2.axhline(y=0, color='black', linestyle='--')
+        # self.fig, self.ax1 = plt.subplots()
+        # self.ax1.set_xlabel('Time')
+        # self.ax1.set_ylabel('Signal', color='tab:blue')
+        # self.line_signal, = self.ax1.plot([], [], label='signal', color='tab:blue')
+        # self.ax1.tick_params(axis='y', labelcolor='tab:blue')
+        # # self.ax1.set_ylim(-20, 20)
+        # # self.ax1.axhline(y=-5, color='gray', linestyle='--')
+        # # self.ax1.axhline(y=5, color='gray', linestyle='--')
+        # self.ax2 = self.ax1.twinx()
+        # self.ax2.set_ylabel('Robustness', color='tab:red')
+        # self.line_robustness, = self.ax2.plot([], [], label='Robustness', color='tab:red')
+        # self.ax2.tick_params(axis='y', labelcolor='tab:red')
+        # # self.ax2.set_ylim(-20, 20)
+        # self.ax2.axhline(y=0, color='black', linestyle='--')
+
+    def __str__(self):
+        return 'STL'
 
 
     def parse(self):
@@ -53,7 +56,7 @@ class STL:
     def evaluate(self,):
         if len(self.Lt) <= self.n_value:
             n=0
-            print('n_value is too high')
+            # print('n_value is too high')
         else:
             n = self.n_value
         trace = {'time': self.Lt[-n:], self.var: self.Lsignal[-n:]}
@@ -64,8 +67,8 @@ class STL:
         self.Lt.append(t)
         self.Lsignal.append(x)
         self.evaluate()
-        if len(self.Lt)%10==0:
-            self.update_plot()
+        # if len(self.Lt)%10==0:
+        #     self.update_plot()
     
     def update_plot(self):
         self.line_signal.set_data(self.Lt, self.Lsignal)
@@ -88,19 +91,53 @@ class car_Class():
         self.xdata=[x]
         self.ydata=[y]
         self.time=[t]
-        self.trust_score=[0]
         DictColor={0:'purple',1:'red',2:'blue'}
+
+        self.fig, self.ax1 = plt.subplots()
+        self.ax1.set_xlabel('Time')
+        self.ax1.set_ylabel('Signal', color='black')
+        self.yline_signal, = self.ax1.plot([], [], label='signal', color='black')
+
+        self.ax2 = self.ax1.twinx()
+        self.ax2.set_ylabel('Robustness')
+        self.ax2.axhline(y=0, color='black', linestyle='--')
 
         self.Lstl=[]
         for i in range(len(lines)-1):
-            self.Lstl.append(['y',STL('G[0,30] (y >= {} and y <= {})'.format(lines[i],lines[i+1]),30)])
+            line_robustness, = self.ax2.plot([], [], label='Robustness lane {}'.format(i+1))
+            self.Lstl.append(['y',STL('G[0,30] (y >= {} and y <= {})'.format(lines[i],lines[i+1]),30),line_robustness])
+
+        self.ax1.set_title('Car {}'.format(id))
+        plt.legend()
+
 
     def calculate_trust_score(self,t,x,y):
+        self.xdata.append(x)
+        self.ydata.append(y)
+        self.time.append(t)
         for stl in self.Lstl:
             if stl[0]=='y':
                 stl[1].add_value(t,y)
             else:
                 stl[1].add_value(t,x)
+        self.update_plot()
+
+    def update_plot(self):
+        self.yline_signal.set_data(self.time,self.ydata)
+        
+        for stl in self.Lstl:
+            # minimal_subscriber.get_logger().info("{} ".format(stl[1]))
+            # minimal_subscriber.get_logger().info("{} {}".format(stl[1].Lt,stl[1].Lrobustness))
+            stl[2].set_data(stl[1].Lt,stl[1].Lrobustness)
+        self.ax1.set_xlim(0, max(self.time))
+        self.ax2.set_xlim(0, max(self.time))
+        self.ax1.relim()
+        self.ax1.autoscale_view()
+        self.ax2.relim()
+        self.ax2.autoscale_view()
+        plt.draw()
+        minimal_subscriber.get_logger().info("Plot {:.2f}".format(self.time[-1]))
+        plt.pause(0.001)
 
 
 class MinimalSubscriber(Node):
@@ -109,6 +146,7 @@ class MinimalSubscriber(Node):
         super().__init__('minimal_subscriber')
         self.car_sub = self.create_subscription(Int32MultiArray, 'car_position', self.car_sub_function, 10)
         self.treadmill_sub = self.create_subscription(Int32MultiArray, 'treadmill_position', self.treadmill_sub_function, 1)
+        self.t0=0
         
         self.car_sub  # prevent unused variable warning
         self.DictCar={}
@@ -121,14 +159,13 @@ class MinimalSubscriber(Node):
         """
         # self.get_logger().info('{}'.format(msg.data))
         if len(msg.data)>=3:
-            self.treadmill==msg.data[:3]
-        if len(msg.data)>=3+self.numberOfLines:
-            if self.numberOfLines<len(msg.data[3:])-1:
-                self.numberOfLines=len(msg.data[3:])-1
-                self.get_logger().info('{} Lane'.format(self.numberOfLines))
+            self.treadmill=msg.data[:3]
+        if len(msg.data)>=3 and self.lines==False:
             self.lines=msg.data[3:]
 
     def car_sub_function(self, msg):
+        if self.t0==0 and self.lines==False:
+            return
         if self.t0==0:
             self.t0=time.time()
             t=0
@@ -141,16 +178,13 @@ class MinimalSubscriber(Node):
                 car=self.DictCar[id]
                 car.calculate_trust_score(t,x,y)
             else:
-                car=car_Class(id,t,x,y)
+                car=car_Class(id,t,x,y,self.lines)
                 self.DictCar[id]=car
                 # car.calculate_trust_score(t,x,y)
 
-        
-
-
 def main(args=None):
     rclpy.init(args=args)
-
+    global minimal_subscriber
     minimal_subscriber = MinimalSubscriber()
 
     rclpy.spin(minimal_subscriber)
