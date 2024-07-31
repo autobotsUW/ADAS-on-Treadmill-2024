@@ -184,7 +184,7 @@ class Input(Node):
                 Y=self.treadmill[1]
             self.Linput+=[id,X,Y]
 
-        if len(self.Linput)/3==self.numberOfCar:
+        if len(self.Linput)/3==self.numberOfCar or (self.numberOfCar==3 and len(self.Linput)/3==2):
             msg = Int32MultiArray()
             msg.data = [int(i) for i in self.Linput]
             self.publisher_.publish(msg)
