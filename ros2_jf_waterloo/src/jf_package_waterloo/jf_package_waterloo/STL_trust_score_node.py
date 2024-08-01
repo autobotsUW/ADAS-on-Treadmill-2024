@@ -94,7 +94,7 @@ class car_Class():
         DictColor={0:'purple',1:'red',2:'blue'}
 
         self.fig, self.ax1 = plt.subplots()
-        self.ax1.set_xlabel('Time')
+        self.ax1.set_xlabel('Time (s)')
         self.ax1.set_ylabel('Signal', color='black')
         self.yline_signal, = self.ax1.plot([], [], label='signal', color='black')
 
@@ -109,8 +109,8 @@ class car_Class():
 
         self.ax1.set_title('Car {}'.format(id))
         plt.legend()
-
-
+        self.file_name=os.path.expanduser('~/ADAS-on-Treadmill-2024/Mesure/Trust_score_car{}_{}.png'.format(id,datetime.now().strftime("%Y-%m-%d %H:%M")))
+        
     def calculate_trust_score(self,t,x,y):
         self.xdata.append(x)
         self.ydata.append(y)
@@ -120,7 +120,11 @@ class car_Class():
                 stl[1].add_value(t,y)
             else:
                 stl[1].add_value(t,x)
-        self.update_plot()
+        if len(self.time)%50==0: 
+            self.update_plot()
+        if len(self.time)%120==0: 
+            self.fig.savefig(self.file_name)
+            
 
     def update_plot(self):
         self.yline_signal.set_data(self.time,self.ydata)
@@ -128,9 +132,9 @@ class car_Class():
         for stl in self.Lstl:
             # minimal_subscriber.get_logger().info("{} ".format(stl[1]))
             # minimal_subscriber.get_logger().info("{} {}".format(stl[1].Lt,stl[1].Lrobustness))
-            stl[2].set_data(stl[1].Lt,stl[1].Lrobustness)
-        self.ax1.set_xlim(0, max(self.time))
-        self.ax2.set_xlim(0, max(self.time))
+            stl[2].set_data(stl[1].Lt[1:],stl[1].Lrobustness[1:])
+        # self.ax1.set_xlim(0, max(self.time))
+        # self.ax2.set_xlim(0, max(self.time))
         self.ax1.relim()
         self.ax1.autoscale_view()
         self.ax2.relim()
@@ -143,8 +147,8 @@ class car_Class():
 class MinimalSubscriber(Node):
 
     def __init__(self):
-        super().__init__('minimal_subscriber')
-        self.car_sub = self.create_subscription(Int32MultiArray, 'car_position', self.car_sub_function, 10)
+        super().__init__('STL_trust_score')
+        self.car_sub = self.create_subscription(Int32MultiArray, 'car_position', self.car_sub_function, 25)
         self.treadmill_sub = self.create_subscription(Int32MultiArray, 'treadmill_position', self.treadmill_sub_function, 1)
         self.t0=0
         
