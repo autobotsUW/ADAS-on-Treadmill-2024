@@ -74,7 +74,7 @@ class Camera(Node):
                 # file_name = os.path.expanduser('~/ADAS-on-Treadmill-2024/data/{}.png'.format(datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]))
                 # cv2.imwrite(file_name, frame)
                 # Search cars and obstacles
-                treadmill,car,obstacles=self.find_the_car(frame[30:404,41:745])
+                treadmill,car,obstacles=self.find_the_car(frame[45:425,45:750])
 
                 if len(treadmill)>1:
                     msg=Int32MultiArray()
@@ -101,7 +101,7 @@ class Camera(Node):
                     # self.get_logger().info("Car not detected")
                 
                 # Send the informations of obstacles [x,y,radius]
-                if len(obstacles)>0:
+                if len(obstacles)>0 and len(car)>1:
                     msg=Int32MultiArray()
                     L=[]
                     for obstacle in obstacles:

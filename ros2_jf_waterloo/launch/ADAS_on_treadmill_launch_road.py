@@ -38,4 +38,9 @@ def generate_launch_description():
             executable='trust_score_node',
             name='trust_score_node',
         ),
+        Node(
+            package='jf_package_waterloo',
+            executable='STL_trust_score_node',
+            name='STL_trust_score_node',
+        ),
     ])
