@@ -106,3 +106,9 @@ To allow communication between these nodes, several topics are used:
 - **ADAS_on_treadmill_launch_several_cars**: the car avoid obstacles for several cars. Works for one car
 - **ADAS_on_treadmill_launch_road**: highway simulation with lane change
 
+
+## Contact:
+For any information, you can contact us at:
+jules.farnault@ens-paris-saclay.fr  
+zambelli.lucas2@gmail.com
+
