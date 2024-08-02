@@ -108,7 +108,7 @@ To allow communication between these nodes, several topics are used:
 
 
 ## Contact:
-For any information, you can contact us at:
+For any information, you can contact us at:  
 jules.farnault@ens-paris-saclay.fr  
 zambelli.lucas2@gmail.com
 
