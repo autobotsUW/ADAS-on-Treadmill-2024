@@ -9,9 +9,9 @@ class car_Class():
     Class to have all information for one car
     """
 
-    def __init__(self,id,):
+    def __init__(self,id):
         self.id=id
-        self.Xcar,self.Ycar,self.Xinput,self.Yinput=0,0,id*150+300,id*150+100
+        self.Xcar,self.Ycar,self.Xinput,self.Yinput=0,0,id*100+250,id*150+100
         # data blue car
         self.xdata=[]
         self.ydata=[]
@@ -24,13 +24,15 @@ class car_Class():
         """
         Calculate the input for the car
         """
-        if other_car.trust<0.7:
+        if self.trust<0.7:
             # it's time to move away
             vector=[self.Xcar-other_car.Xcar,self.Ycar-other_car.Ycar]
             norme=np.linalg.norm(vector)
             vector=vector/norme
-            self.Xinput=self.Xcar+vector[0]*10
-            self.Yinput=self.Ycar+vector[1]*10
+            self.Xinput=self.Xinput+vector[0]
+            self.Yinput=self.Yinput+vector[1]
+            minimal_publisher.get_logger().info("Move")
+            
 
 
     def calculate_trust_score(self,t,x,y):
@@ -46,16 +48,19 @@ class car_Class():
             var_x = self.variance(self.xdata)
             var_y = self.variance(self.ydata)
             self.trust_score.append(var_x + var_y)
-
-        if self.trust_score[-1]>=10000:
-            self.STL_dangerous.append(1)
-        elif self.trust_score[-1]<=5000:
+        
+        if self.trust_score[-1]>=6000 or dangerous_param!=1:
+            minimal_publisher.get_logger().info("Danger")
             self.STL_dangerous.append(0)
+        elif self.trust_score[-1]<=3000:
+            self.STL_dangerous.append(1)
         else:
             self.STL_dangerous.append(self.STL_dangerous[-1])
 
-        if len(self.STL_dangerous)>10:
-            self.trust=sum(self.STL_dangerous[-10:])/10
+        if len(self.STL_dangerous)>100:
+            self.trust=sum(self.STL_dangerous[-100:])/10
+        else:
+            self.trust=sum(self.STL_dangerous)/len(self.STL_dangerous)
     
     def variance(self,data):
         n = len(data)
@@ -86,6 +91,13 @@ class Input(Node):
         self.t0=0
         self.numberOfCar=1
 
+        self.declare_parameter('dangerous', 0)
+        
+        global dangerous_param
+        # Récupération du paramètre
+        dangerous_param = self.get_parameter('dangerous').get_parameter_value()
+        
+
 
     def treadmill_sub_function(self,msg):
         """
@@ -101,7 +113,7 @@ class Input(Node):
         """
         Xmax=500
         Xmin=100
-        Ymax=350
+        Ymax=320
         Ymin=50
         self.Linput=[]
         for id in self.Lkeys:
@@ -117,12 +129,12 @@ class Input(Node):
                     car.Yinput=Ymin
                 self.Linput+=[car.id,car.Xinput,car.Yinput]
 
-        if len(self.Linput)/3==self.numberOfCar or (self.numberOfCar==3 and len(self.Linput)/3==2):
-            msg = Int32MultiArray()
-            msg.data = [int(i) for i in self.Linput]
-            self.publisher_.publish(msg)
-        else:
-            self.get_logger().info("Error number of cars {} {}".format(self.numberOfCar,self.Linput)) 
+        # if len(self.Linput)/3==self.numberOfCar or (self.numberOfCar==3 and len(self.Linput)/3==2):
+        msg = Int32MultiArray()
+        msg.data = [int(i) for i in self.Linput]
+        self.publisher_.publish(msg)
+        # else:
+            # self.get_logger().info("Error number of cars {} {}".format(self.numberOfCar,self.Linput)) 
               
     def car_sub_function(self, msg):
         """
@@ -156,7 +168,7 @@ class Input(Node):
                 car.Ycar=y
                 car.car_angle=angle
             else:
-                car=car_Class(id,t,x,y)
+                car=car_Class(id)
                 car.Xcar=x
                 car.Ycar=y
                 car.car_angle=angle
@@ -165,35 +177,43 @@ class Input(Node):
             self.Lkeys.append(id)
         self.Lkeys.sort()
         
-        blue_car=self.DictCar[2]
-        distance_min=1000000
-        id_distance_min=None
-        # Find the closest car
-        for id in self.Lkeys:
-            if id!=2:
-                car=self.DictCar[id]
-                distance=(car.Xcar-blue_car.Xcar)**2+(car.Ycar-blue_car.Ycar)**2
-                if distance<distance_min:
-                    distance_min=distance
-                    id_distance_min=id
-        
-        # Calculate the trust score of the closest car
-        if id_distance_min!=None:
-            car=self.DictCar[id_distance_min]
-            car.calculate_trust_score(t,blue_car.Xcar,blue_car.Ycar)
-            car.calculate_input(blue_car)
-        
-        # vérifier la distance entre la voiture 0 et 1
-        car0=self.DictCar[0]
-        car1=self.DictCar[1]
-        if (car0.Xcar-car1.Xcar)**2+(car0.Ycar-car1.Ycar)**2<10000:
-            vector=[car0.Xcar-car1.Xcar,car0.Ycar-car1.Ycar]
-            norme=np.linalg.norm(vector)
-            vector=vector/norme
-            car0.Xinput=car0.Xcar+vector[0]*5
-            car0.Yinput=car0.Ycar+vector[1]*5
-            car1.Xinput=car1.Xcar-vector[0]*5
-            car1.Yinput=car1.Ycar-vector[1]*5
+        if 2 in self.Lkeys:
+            blue_car=self.DictCar[2]
+            distance_min=150
+            id_distance_min=None
+            # Find the closest car
+            for id in self.Lkeys:
+                if id!=2:
+                    car=self.DictCar[id]
+                    distance=((car.Xcar-blue_car.Xcar)**2+(car.Ycar-blue_car.Ycar)**2)**0.5
+                    if distance<distance_min:
+                        distance_min=distance
+                        id_distance_min=id
+            
+            # Calculate the trust score of the closest car
+            if id_distance_min!=None:
+                car=self.DictCar[id_distance_min]
+                global dangerous_param
+                # Récupération du paramètre
+                dangerous_param = self.get_parameter('dangerous').get_parameter_value()
+                car.calculate_trust_score(t,blue_car.Xcar,blue_car.Ycar)
+                self.get_logger().info('Blue car closest with car {}, trust score: {}'.format(id_distance_min,car.trust))
+                car.calculate_input(blue_car)
+            
+            # vérifier la distance entre la voiture 0 et 1
+            if 0 in self.Lkeys and 1 in self.Lkeys:
+                car0=self.DictCar[0]
+                car1=self.DictCar[1]
+                if ((car0.Xcar-car1.Xcar)**2+(car0.Ycar-car1.Ycar)**2)**0.5<100:
+                    vector=[car0.Xcar-car1.Xcar,car0.Ycar-car1.Ycar]
+                    norme=np.linalg.norm(vector)
+                    vector=vector/norme
+                    car0.Xinput=car0.Xcar+vector[0]
+                    car0.Yinput=car0.Ycar+vector[1]
+                    car1.Xinput=car1.Xcar-vector[0]
+                    car1.Yinput=car1.Ycar-vector[1]
+        else:
+            self.get_logger().info('No blue car')
 
         if len(self.Lkeys)>=1:
             self.send_input()

@@ -33,4 +33,9 @@ def generate_launch_description():
             executable='save_topic',
             name='save_topic',
         ),
+        Node(
+            package='jf_package_waterloo',
+            executable='trust_score_node',
+            name='trust_score_node',
+        ),
     ])

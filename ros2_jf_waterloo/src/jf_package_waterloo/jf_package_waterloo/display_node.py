@@ -96,6 +96,11 @@ class Display(Node):
             car.set_angle(-angle)
             self.ax.add_patch(car)
             self.CarObject.append(car)
+            circle = patches.Circle([x_center,y_center], 150, edgecolor='green', facecolor='none', linewidth=2)
+            self.ax.add_patch(circle)
+            self.CarObject.append(circle)
+            
+
 
         self.fig.canvas.draw()
         plt.pause(0.001)
